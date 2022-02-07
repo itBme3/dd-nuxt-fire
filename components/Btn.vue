@@ -1,10 +1,7 @@
 <template>
-  <button
-    class="text-white font-bold py-2 px-4 rounded"
+  <button class="button"
     :class="{
-      'bg-blue-500': !disabled && !loading,
-      'hover:bg-blue-700': !disabled && !loading,
-      'bg-gray-600': disabled || loading,
+      'opacity-50': disabled || loading,
       'cursor-not-allowed': disabled,
       'cursor-wait': loading,
     }"

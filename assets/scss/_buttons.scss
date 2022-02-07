@@ -1,0 +1,11 @@
+.button {
+    @apply bg-blue-500 px-2 py-1 flex items-center justify-center whitespace-nowrap rounded font-bold;
+    &:not(.icon-button){
+        .gicon {
+            @apply mr-2;
+        }
+    }
+    &:not(.uppercase) {
+        padding-bottom: .4em;
+    }
+}

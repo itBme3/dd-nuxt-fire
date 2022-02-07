@@ -1,5 +1,4 @@
 import { NuxtConfig } from '@nuxt/types'
-import colors from './utils/colors';
 
 const isDev = process.env.NODE_ENV === 'development'
 const useEmulators = false // manually change if emulators needed
@@ -14,7 +13,11 @@ const config: NuxtConfig = {
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
       { hid: 'description', name: 'description', content: '' },
     ],
-    link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
+    link: [
+      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+      { rel: 'stylesheet', href: 'https://use.typekit.net/ptm4ahe.css' },
+      { rel: 'stylesheet', href: 'https://d1azc1qln24ryf.cloudfront.net/99224/GiGIcons/style-cf.css?x6haug' }
+    ],
   },
 
   css: ['~/assets/scss/style.scss'],

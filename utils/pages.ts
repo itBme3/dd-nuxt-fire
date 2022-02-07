@@ -1,0 +1,32 @@
+const pages: {
+            label: string
+            path: string
+            icon: string
+            color: string
+      }[] = [
+      {
+            label: 'Products',
+            path: '/products',
+            icon: 'pictures',
+            color: 'purple'
+      },
+      {
+            label: 'Images',
+            path: '/images',
+            icon: 'images',
+            color: 'blue'
+      },
+      {
+            label: 'Uploads',
+            path: '/images/uploads',
+            icon: 'upload',
+            color: 'cyan'
+      },
+      {
+            label: 'Reviews',
+            path: '/reviews',
+            icon: 'star-full',
+            color: 'yellow'
+      }
+]
+export default pages;

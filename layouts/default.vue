@@ -1,5 +1,6 @@
 <template>
   <div class="site-container overflow-x-hidden">
+      <SiteNav />
       <main
         class="w-screen transform sm:translate-x-[45px] sm:w-[calc(100vw-90px)] mx-auto"
         style="display: block;"
@@ -80,4 +81,10 @@ export default {
   }
 }
 </script>
+
+<style lang="scss">
+.site-container {
+  @apply min-h-screen
+}
+</style>
 
