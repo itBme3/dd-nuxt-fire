@@ -25,7 +25,9 @@ const config: NuxtConfig = {
     '@nuxt/typescript-build',
     '@nuxtjs/tailwindcss',
     '@nuxtjs/firebase',
+    '@nuxtjs/color-mode',
   ],
+
 
   firebase: {
     lazy: false,
@@ -87,22 +89,21 @@ const config: NuxtConfig = {
       dev: process.env.NODE_ENV === 'development',
     },
   },
+  colorMode: {
+    preference: 'system', // default value of $colorMode.preference
+    fallback: 'dark', // fallback value if not system preference found
+    hid: 'nuxt-color-mode-script',
+    globalName: '__NUXT_COLOR_MODE__',
+    componentName: 'ColorScheme',
+    classPrefix: '',
+    classSuffix: '',
+    storageKey: 'nuxt-color-mode'
+  },
   tailwindcss: {
-    extend: {
-      colors: {
-        transparent: 'transparent',
-        white: colors.white,
-        black: colors.black,
-        blue: colors.blue,
-        cyan: colors.cyan,
-        green: colors.green,
-        yellow: colors.yellow,
-        orange: colors.orange,
-        red: colors.red,
-        purple: colors.purple,
-        gray: colors.coolGray,
-      }
-    }
+    plugins: [
+      require('tailwindcss-dark-mode')()
+    ],
+   
   }
 }
 export default config

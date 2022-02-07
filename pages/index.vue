@@ -1,31 +1,15 @@
 <template>
   <div class="max-w-full">
-    <Logo />
-    <div v-for="component in exampleComponents" :key="component.__file">
-      <hr class="mt-5 mb-5" />
-      <component :is="component"></component>
+    <!-- <Logo /> -->
+    <div>
+      <h1>Index</h1>
     </div>
   </div>
 </template>
 
-<script lang="ts">
-import Vue from 'vue'
-import Logo from '~/components/Logo/index.vue'
-import Auth from '~/components/examples/Auth.vue'
-import Firestore from '~/components/examples/Firestore.vue'
-import Functions from '~/components/examples/Functions.vue'
-import Storage from '~/components/examples/Storage.vue'
-import VuexStore from '~/components/examples/VuexStore.vue'
+<script lang="js">
 
-export default Vue.extend({
-  components: {
-    Logo,
-    Auth,
-    Firestore,
-    Functions,
-    Storage,
-    VuexStore
-  },
+export default {
   async asyncData({ app }) {
     // INFO -> app.$fire.firestore etc. are accessible
     const messageRef = app.$fire.firestore.collection('products_live').doc('tailored-fit-dark-wash')
@@ -42,15 +26,8 @@ export default Vue.extend({
     }
   },
   data: () => ({
-    exampleComponents: [
-      Auth,
-      Firestore,
-      Functions,
-      Storage,
-      VuexStore,
-    ],
-  }),
-})
+  })
+}
 </script>
 
 <style>
