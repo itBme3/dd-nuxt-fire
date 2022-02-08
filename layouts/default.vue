@@ -1,12 +1,10 @@
 <template>
-  <div class="site-container overflow-x-hidden">
+  <div class="site-container overflow-x-hidden inline">
       <SiteNav />
       <main
-        class="w-screen transform sm:translate-x-[45px] sm:w-[calc(100vw-90px)] mx-auto"
+        class="w-screen transform sm:translate-x-[45px] sm:w-[calc(100vw-90px)] mx-auto py-12 px-2"
         style="display: block;"
       >
-      value:{{ $colorMode.value }} <br> preference:{{ $colorMode.preference }}
-      <Btn @click="setColorMode">set color</Btn>
         <Nuxt :key="$route.fullPath" />
       </main>
     </div>

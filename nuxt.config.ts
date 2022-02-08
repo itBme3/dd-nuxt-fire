@@ -7,17 +7,20 @@ console.log({ port: isDev && useEmulators ? 12345 : undefined })
 const config: NuxtConfig = {
   mode: 'spa',
   head: {
-    title: 'nuxt-firebase-demo',
+    title: 'DD Fire',
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
       { hid: 'description', name: 'description', content: '' },
     ],
     link: [
-      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+      { rel: 'icon', type: 'image/x-icon', href: '/media/fire.png' },
       { rel: 'stylesheet', href: 'https://use.typekit.net/ptm4ahe.css' },
       { rel: 'stylesheet', href: 'https://d1azc1qln24ryf.cloudfront.net/99224/GiGIcons/style-cf.css?x6haug' }
     ],
+    script: [
+      { src: 'https://cdnjs.cloudflare.com/ajax/libs/masonry/4.0.0/masonry.pkgd.min.js', async: true, defer: true }
+    ]
   },
 
   css: ['~/assets/scss/style.scss'],
@@ -71,7 +74,11 @@ const config: NuxtConfig = {
   },
 
   modules: ['@nuxtjs/pwa'],
-  // plugins: ['~/plugins/lazyMode'],
+  plugins: [
+    '~/plugins/check-view.js',
+    '~/plugins/scrollbar.js',
+    { src: '~/plugins/vue-masonry', ssr: false }
+  ],
 
   build: {
     transpile: ['vue-instantsearch', 'instantsearch.js/es']
