@@ -3,9 +3,8 @@ import { NuxtConfig } from '@nuxt/types'
 const isDev = process.env.NODE_ENV === 'development'
 const useEmulators = false // manually change if emulators needed
 console.log({ port: isDev && useEmulators ? 12345 : undefined })
-
 const config: NuxtConfig = {
-  mode: 'spa',
+  ssr: false,
   head: {
     title: 'DD Fire',
     meta: [
@@ -16,11 +15,15 @@ const config: NuxtConfig = {
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/media/fire.png' },
       { rel: 'stylesheet', href: 'https://use.typekit.net/ptm4ahe.css' },
-      { rel: 'stylesheet', href: 'https://d1azc1qln24ryf.cloudfront.net/99224/GiGIcons/style-cf.css?x6haug' }
+      { rel: 'stylesheet', href: 'https://d1azc1qln24ryf.cloudfront.net/99224/GiGIcons/style-cf.css?t0daye' }
     ],
     script: [
       { src: 'https://cdnjs.cloudflare.com/ajax/libs/masonry/4.0.0/masonry.pkgd.min.js', async: true, defer: true }
     ]
+  },
+
+  server: {
+    port: '3333'
   },
 
   css: ['~/assets/scss/style.scss'],
@@ -111,9 +114,9 @@ const config: NuxtConfig = {
   },
   tailwindcss: {
     plugins: [
-      require('tailwindcss-dark-mode')()
+      require('tailwindcss-dark-mode')(),
+      require('@tailwindcss/typography')
     ],
-   
   }
 }
 export default config

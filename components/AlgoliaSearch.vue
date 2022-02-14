@@ -1,6 +1,7 @@
 <template>
-  <div :class="{'algolia-search': true, [indexName]: typeof indexName === 'string' }">
-    <div class="search-bar sticky top-12 rounded bg-white focus-within:bg-gray-200 dark:bg-gray-800 dark:shadow-lg dark:focus-within:shadow-none focus-within:shadow-none dark:focus-within:bg-opacity-20 dark:focus-within:bg-black p-2 flex items-center justify-start">
+  <div 
+    :class="{'algolia-search': true, [indexName]: typeof indexName === 'string' }">
+    <div class="search-bar">
       <input
         v-model="search"
         class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline w-full bg-transparent border-none shadow-none"
@@ -8,16 +9,40 @@
         type="search"
         autocomplete="on"
       />
-      <Btn @click="!!search && search.length > 0 ? search = '' : ''"
-          class="center bg-transparent">
+      <span v-if="hitCount > 0" class="hit-count">{{ hitCount }}</span>
+      <Btn class="center bg-transparent icon-button ml-1"
+        @click="!!search && search.length > 0 ? search = '' : ''">
         <Icon :name="!!search && search.length > 0 ? 'close' : 'search'" />
       </Btn>
     </div>
-    <div v-if="!!hits && !!hits.length" class="hits">
-      <div class="hit"
-        v-for="hit in hits"
-        :key="hit.id">
-        {{ hit.downloadUrl }}
+    <div v-if="!!hits && !!hits.length"
+      :id="indexName + 'AlgoliaMason'"
+      class="hits">
+      <div v-for="hit in hits" :key="hit.id"
+        class="hit">
+        <CardProduct v-if="indexName.includes('product')"
+          :class="{
+            [cardClasses]: typeof cardClasses === 'string' && cardClasses.length > 0,
+            ['card-style-' + cardStyle]: true
+          }"
+          :item="hit" />
+        <CardReview v-else-if="indexName.includes('review')"
+          :class="{
+            [cardClasses]: typeof cardClasses === 'string' && cardClasses.length > 0,
+            ['card-style-' + cardStyle]: true
+          }"
+          :item="hit" />
+        <Card v-else
+          :class="{
+            'p-0': true,
+            [cardClasses]: typeof cardClasses === 'string' && cardClasses.length > 0,
+            ['card-style-' + cardStyle]: true
+          }">
+          <template #media
+            v-if="!!hit.downloadUrl || !!hit.image || !!hit.image">
+            <Media :media="!!hit.downloadUrl ? hit : !!hit.image ? hit.image : hit.media" />
+          </template>
+        </Card>
       </div>
     </div>
     <div v-else-if="hits === null">loading...</div>
@@ -25,7 +50,7 @@
 
     <template v-if="nextPage !== false && fetchingHits === false">
       <div v-view="infiniteScrollHandler">
-        <Btn @click="getNextPage">Get Next Page</Btn>
+        <Btn class="text-xs border-1 border-gray-400 border-opacity-20 bg-transparent" @click="getNextPage" >Get Next Page</Btn>
       </div>
     </template>
   </div>
@@ -61,8 +86,16 @@ export default {
       default: true
     },
     constantFilters: {
-      type: Array, // AlgoliaFilterObject[]
+      type: Array, /* AlgoliaFilterObject[] */
       default: () => []
+    }, 
+    cardClasses: {
+      type: String,
+      default: () => ''
+    }, 
+    cardStyle: {
+      type: String, /* 'media-above' | 'media-left' | 'media-left' */
+      default: 'media-above'
     }
   },
   data() {
@@ -71,7 +104,7 @@ export default {
       search: this.$route?.query?.s ? this.$route.query.s : '',
       filters: this.$route?.query?.filters ? qs.parse(this.$route?.query?.filters) : [],
       hits: null,
-      hitCount: null,
+      hitCount: 0,
       nextPage: false,
       fetchingHits: true
     }
@@ -82,6 +115,9 @@ export default {
       if (!this.indexName?.length) return null;
       const index = searchClient.initIndex(this.indexName)
       return index;
+    },
+    masonId() {
+      return this.indexName + 'AlgoliaMason' 
     }
   },
   watch: {
@@ -120,9 +156,10 @@ export default {
           this.nextPage = res?.hits?.length > 0 && res.page < res.nbPages - 1 ? res.page + 1 : false
           this.lastResponse = res;
           this.hits = page = 0 || !Array.isArray(this.hits) ? res.hits : [...this.hits, ...res.hits]
-          this.hitCount = res.ngHits
+          this.hitCount = res.nbHits
           setTimeout(() => {
-            this.fetchingHits = false;
+            this.fetchingHits = false
+            // this.$redrawVueMasonry(this.masonId)
           }, 250);
           return this.hits
         })
@@ -148,5 +185,29 @@ export default {
 </script>
 
 <style lang="scss">
-
+.search-bar {
+  @apply sticky top-[2.98rem] shadow-lg z-999 rounded bg-white focus-within:bg-gray-200 dark:bg-gray-900 shadow-xl focus-within:shadow-sm dark:focus-within:bg-gray-800 p-2 flex items-center justify-start border border-gray-200 dark:border-gray-800;
+}
+.hit-count {
+  padding: .13em .25em .13em .2em;
+  @apply bg-cyan-300 text-black text-opacity-60 text-xs rounded-sm block;
+}
+.hits {
+  @apply grid grid-cols-12;
+}
+.hit {
+  @apply col-span-12 sm:col-span-6 md:col-span-4 p-1;
+}
+.algolia-search.media {
+  .hit {
+    @apply m-auto;
+  }
+}
+/*
+hover:bg-purple-500
+hover:bg-blue-500
+hover:bg-cyan-500
+hover:bg-green-500
+hover:bg-yellow-500
+*/
 </style>

@@ -35,7 +35,7 @@
           :key="page.path"
           :to="page.path">
           <Btn :class="{
-              'text-left justify-start group w-full bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 dark:hover:text-gray-900 hover:text-gray-900 hover:text-opacity-70 dark:hover:text-opacity-70': true,
+              'text-left justify-start group w-full bg-white dark:bg-opacity-5 text-gray-700 dark:text-gray-300 dark:hover:text-gray-900 hover:text-gray-900 hover:text-opacity-70 dark:hover:text-opacity-70': true,
               ['hover:bg-' + page.color + '-500']: true,
               ['dark:hover:bg-' + page.color + '-500']: true,
             }"
