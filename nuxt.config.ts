@@ -33,6 +33,7 @@ const config: NuxtConfig = {
   buildModules: [
     '@nuxt/typescript-build',
     '@nuxtjs/tailwindcss',
+    '@nuxt/postcss8',
     '@nuxtjs/firebase',
     '@nuxtjs/color-mode',
   ],
