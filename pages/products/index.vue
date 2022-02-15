@@ -1,7 +1,10 @@
 <template>
   <div class="page-content products">
     <Title>Products:</Title>
-    <AlgoliaSearch :index-name="'products_live'" />
+    <AlgoliaSearch 
+      :index-name="'products_live'"
+      :filtering="true"
+    />
   </div>
 </template>
 <script>

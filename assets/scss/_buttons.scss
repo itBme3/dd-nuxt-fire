@@ -1,5 +1,5 @@
 .button {
-    @apply bg-blue-500 px-2 py-1 flex items-center justify-center whitespace-nowrap rounded font-bold;
+    @apply bg-white bg-opacity-5 hover:bg-opacity-10 text-gray-700 dark:text-gray-200 transform scale-100 hover:scale-103 hover:shadow-lg px-2 py-1 flex items-center justify-center whitespace-nowrap rounded font-bold;
     &:not(.icon-button){
         .gicon {
             @apply mr-2;

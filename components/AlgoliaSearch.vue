@@ -15,8 +15,17 @@
         <Icon :name="!!search && search.length > 0 ? 'close' : 'search'" />
       </Btn>
     </div>
+    <AlgoliaSearchFilters 
+      v-if="filtering"
+      :constant-filters="constantFilters"
+      :update-url="updateUrl"
+      :search="search"
+      :index-name="indexName"
+      :index="index"
+      :filters="filters"
+      @change="updateFilters"
+    />
     <div v-if="!!hits && !!hits.length"
-      :id="indexName + 'AlgoliaMason'"
       class="hits">
       <div v-for="hit in hits" :key="hit.id"
         class="hit">
@@ -60,7 +69,7 @@
 import algoliasearch from 'algoliasearch/lite';
 import qs from 'qs';
 import _ from 'lodash'
-import { convertToAlgoliaFilterString } from '~/utils/algolia'
+import { parseUrlParamFilters, stringifyAlgoliaFilters, stringifyUrlParamFilters } from '~/utils/algolia'
 
 const searchClient = algoliasearch(
   '010RMUCHO8',
@@ -81,6 +90,10 @@ export default {
       type: Boolean,
       default: true
     },
+    searchQuery: {
+      type: String,
+      default: ''
+    },
     searchBar: {
       type: Boolean,
       default: true
@@ -96,13 +109,26 @@ export default {
     cardStyle: {
       type: String, /* 'media-above' | 'media-left' | 'media-left' */
       default: 'media-above'
+    },
+    filtersValues: {
+      type: Object,
+      default: () => { return {} }
     }
   },
   data() {
+    const queryFilterKeys = Object.keys(this.$route?.query)
+        .filter(k => k.indexOf('filters') === 0)
+    const filters = this.updateUrl && queryFilterKeys?.length
+      ? parseUrlParamFilters(queryFilterKeys.map(k => `${k}=${this.$route.query[k]}`).join('&')
+      ).filters
+        : Array.isArray(this.filtersValues) 
+          ? this.filtersValues
+          : [];
+          console.log({parmFilters: filters})
     return {
       algoliaIndex: null,
       search: this.$route?.query?.s ? this.$route.query.s : '',
-      filters: this.$route?.query?.filters ? qs.parse(this.$route?.query?.filters) : [],
+      filters: Array.isArray(filters) ? filters : [],
       hits: null,
       hitCount: 0,
       nextPage: false,
@@ -115,39 +141,61 @@ export default {
       if (!this.indexName?.length) return null;
       const index = searchClient.initIndex(this.indexName)
       return index;
-    },
-    masonId() {
-      return this.indexName + 'AlgoliaMason' 
     }
   },
   watch: {
     search: _.debounce(function (value) {
         this.updateSearch(value)
-    }, 250)
+    }, 250),
+    filterValues(val) {
+      this.filters = val
+    }
   },
   mounted() {
     this.getHits();
   },
   methods: {
-    updateSearch(val) {
+    updateSearch(val = this.search) {
       if(this.updateUrl && window !== undefined) {
-        if (!val?.length) {
-          delete this.$route.query.s
-        } else {
-          this.$route.query.s = val
+        let query = stringifyUrlParamFilters(this.filters)
+        try {
+          if (val?.length) {
+            query = `s=${val}&${query}`
+          }
+        } catch(err) {
+          alert(err.message)
         }
-        const queryString = qs.stringify(this.$route.query);
-        const path = !queryString?.length ? this.$route.path : `${this.$route.path}?${queryString}`
+        const path = !query?.length ? this.$route.path : `${this.$route.path}?${query}`
         window.history.pushState({path}, '', path)
       }
       this.getHits()
+    },
+    updateFilters(vals) {
+      this.filters = Array.isArray(vals) ? vals : [];
+      if(this.updateUrl && window !== undefined) {
+        const s = this.$route.query.s;
+        let query = this.$route.query;
+        if (!this.filters?.length) {
+          Object.keys(this.$route.query).forEach(k => {
+            if(k.indexOf('filters') === 0) delete this.$route.query[k]
+          })
+        } else {
+          query = stringifyUrlParamFilters(vals)
+        }
+        if(s?.length) query = `s=${s}&${query}`;
+        console.log({query})
+        const path = !query?.length ? this.$route.path : `${this.$route.path}?${query}`
+        window.history.pushState({path}, '', path)
+      }
+      this.getHits();
     },
     getHits(page = 0) {
       this.fetchingHits = true;
       const search = typeof this.search === 'string' ? this.search : ''
       const constantFilters = Array.isArray(this.constantFilters) ? this.constantFilters : []
       const filterArr = Array.isArray(this.filters) ? this.filters : []
-      const filters = convertToAlgoliaFilterString([...constantFilters, ...filterArr])
+      const filters = stringifyAlgoliaFilters([...constantFilters, ...filterArr])
+      console.log({filters, arr: [...constantFilters, ...filterArr]})
       if(page === 0) {
         this.hits = null
       }
@@ -155,17 +203,17 @@ export default {
         .then(res => {
           this.nextPage = res?.hits?.length > 0 && res.page < res.nbPages - 1 ? res.page + 1 : false
           this.lastResponse = res;
+          console.log(res);
           this.hits = page = 0 || !Array.isArray(this.hits) ? res.hits : [...this.hits, ...res.hits]
           this.hitCount = res.nbHits
           setTimeout(() => {
             this.fetchingHits = false
-            // this.$redrawVueMasonry(this.masonId)
           }, 250);
           return this.hits
         })
         .catch(err => {
           this.nextPage = false;
-          alert(err)
+          alert(err.message)
         })
     },
     getNextPage() {
@@ -194,6 +242,9 @@ export default {
 }
 .hits {
   @apply grid grid-cols-12;
+  em {
+    @apply bg-cyan-400 text-black text-opacity-95 rounded-sm px-1
+  }
 }
 .hit {
   @apply col-span-12 sm:col-span-6 md:col-span-4 p-1;

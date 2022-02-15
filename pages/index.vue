@@ -3,6 +3,9 @@
     <!-- <Logo /> -->
     <div>
       <h1>Index</h1>
+      <SelectStarRating
+        :value="rating"
+        @selected="updateRating"/>
     </div>
   </div>
 </template>
@@ -26,7 +29,14 @@ export default {
     }
   },
   data: () => ({
-  })
+    rating: 3
+  }),
+  methods: {
+    updateRating(e) {
+      this.rating = e
+      console.log({ rating: this.rating })
+    }
+  }
 }
 </script>
 

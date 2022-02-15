@@ -29,6 +29,7 @@
     "vue-instantsearch": "^4.1.1",
     "vue-masonry": "0.12.0",
     "vue-prism-component": "^2.0.0",
+    "vue-tailwind": "^2.5.0",
     "vue2-perfect-scrollbar": "^1.5.5"
   },
   "devDependencies": {

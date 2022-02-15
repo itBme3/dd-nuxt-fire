@@ -11,18 +11,38 @@
         }"
       />
     </div>
-    <h3 class="title">{{ item.title }}</h3>
-    <p>{{ item.review }}</p>
+    <h3 class="title" v-html="title" />
+    <p class="content" v-html="content" />
   </Card>
 </template>
 
 <script>
+import { decodeHtml } from '~/utils/funcs'
 export default {
   props: {
     item: {
       type: Object,
       default: () => null
     }
+  },
+  computed: {
+    title() {
+      if(this.item._highlightResult.title.matchedWords.length === 0) return decodeHtml(this.item.title)
+      return decodeHtml(this.item._highlightResult.title.value.split('<em>').join('___HIGHLIGHT___').split('</em>').join('___ENDHIGHLIGHT___')).split('___HIGHLIGHT___').join('<em>').split('___ENDHIGHLIGHT___').join('</em>')
+    },
+    content() {
+      if(this.item._highlightResult.content.matchedWords.length === 0) return decodeHtml(this.item.content)
+      return decodeHtml(this.item._highlightResult.content.value.split('<em>').join('___HIGHLIGHT___').split('</em>').join('___ENDHIGHLIGHT___')).split('___HIGHLIGHT___').join('<em>').split('___ENDHIGHLIGHT___').join('</em>')
+    }
+  },
+  methods: {
+    decodeHtml
   }
 }
 </script>
+
+<style lang="scss">
+.title {
+  @apply mt-2 mb-1;
+}
+</style>

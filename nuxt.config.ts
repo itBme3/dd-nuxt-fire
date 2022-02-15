@@ -80,6 +80,7 @@ const config: NuxtConfig = {
   plugins: [
     '~/plugins/check-view.js',
     '~/plugins/scrollbar.js',
+    '~/plugins/tailwind-components.js',
     { src: '~/plugins/vue-masonry', ssr: false }
   ],
 

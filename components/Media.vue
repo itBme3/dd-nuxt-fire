@@ -18,7 +18,7 @@
 </template>
 
 <script lang="js">
-import { getThumbImageUrl } from '~/static/funcs'
+import { getThumbImageUrl } from '~/utils/funcs'
 
 export default {
   props: {

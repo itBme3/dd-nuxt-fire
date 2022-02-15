@@ -176,4 +176,25 @@ export const isJsonObject = (item: any) => {
 
   return false;
 }
-export const flattenArray = (arr:any) => arr.reduce((acc:any, val:any) => acc.concat(val), []);
+export const flattenArray = (arr: any) => arr.reduce((acc: any, val: any) => acc.concat(val), []);
+
+export const decodeHtml = (function() {
+  // this prevents any overhead from creating the object each time
+  const element = document.createElement('div');
+
+  function decodeHTMLEntities(strng: string) {
+    let str:any = strng
+    if(str && typeof str === 'string') {
+      // strip script/html tags
+      str = str.replace(/<script[^>]*>([\S\s]*?)<\/script>/gmi, '');
+      str = str.replace(/<\/?\w(?:[^"'>]|"[^"]*"|'[^']*')*>/gmi, '');
+      element.innerHTML = str;
+      str = element.textContent;
+      element.textContent = '';
+    }
+
+    return str;
+  }
+
+  return decodeHTMLEntities;
+})();
