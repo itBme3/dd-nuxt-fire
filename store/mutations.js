@@ -7,9 +7,7 @@ export default {
         window.location.pathname = '/login'
     }
   },
-
   SET_AUTH_USER: (state, { authUser, userDoc }) => {
-    console.log({ authUser })
     state.authUser = {
       uid: authUser.uid,
       email: authUser.email

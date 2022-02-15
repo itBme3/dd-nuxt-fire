@@ -1,5 +1,7 @@
-const { safelist } = require('./static/tw')
-const twColors = require('./static/colors')
+
+let twColors = require('./static/tailwind-theme-values');
+twColors = twColors.colors;
+
 const colors = {
   blue: twColors.blue,
   cyan: twColors.cyan,
@@ -10,11 +12,17 @@ const colors = {
   purple: twColors.purple,
   gray: twColors.trueGray,
 }
+
 module.exports = {
   darkMode: 'class',
   important: true,
   purge: {
-    safelist,
+    safelist: [
+    {
+      pattern: /^(bg|text|border)-/,
+      variants: ['hover', 'dark', 'dark:hover'],
+    }
+    ],
     enabled: true
   },
   

@@ -27,8 +27,9 @@
     />
     <div v-if="!!hits && !!hits.length"
       class="hits">
-      <div v-for="hit in hits" :key="hit.id"
-        class="hit">
+      <div v-for="(hit, i) in hits" :key="hit.id"
+        class="hit"
+        @click="hitClicked(i)">
         <CardProduct v-if="indexName.includes('product')"
           :class="{
             [cardClasses]: typeof cardClasses === 'string' && cardClasses.length > 0,
@@ -67,7 +68,6 @@
 
 <script>
 import algoliasearch from 'algoliasearch/lite';
-import qs from 'qs';
 import _ from 'lodash'
 import { parseUrlParamFilters, stringifyAlgoliaFilters, stringifyUrlParamFilters } from '~/utils/algolia'
 
@@ -113,6 +113,22 @@ export default {
     filtersValues: {
       type: Object,
       default: () => { return {} }
+    },
+    selectedValues: {
+      type: Array,
+      default: () => []
+    },
+    selecting: {
+      type: [Object, Boolean],
+      default: () => true
+      /*
+      true defaults to:
+          { 
+            identifier: 'id',
+            hideSelected: false,
+            hideSideNav: false, 
+          } 
+        */
     }
   },
   data() {
@@ -124,7 +140,6 @@ export default {
         : Array.isArray(this.filtersValues) 
           ? this.filtersValues
           : [];
-          console.log({parmFilters: filters})
     return {
       algoliaIndex: null,
       search: this.$route?.query?.s ? this.$route.query.s : '',
@@ -132,7 +147,8 @@ export default {
       hits: null,
       hitCount: 0,
       nextPage: false,
-      fetchingHits: true
+      fetchingHits: true,
+      selected: Array.isArray(this.selectedValues) ? this.selectedValues : []
     }
   },
   computed: {
@@ -141,6 +157,23 @@ export default {
       if (!this.indexName?.length) return null;
       const index = searchClient.initIndex(this.indexName)
       return index;
+    },
+    selectingOptions() {
+      if(this.selecting === false) return false;
+      const defaultOptions = { 
+          selected: [],
+          identifier: 'id',
+          hideSelected: false,
+          hideSideNav: false 
+      }
+      if(this.selecting === null) {
+        return defaultOptions
+      }
+      try {
+        return {...defaultOptions, ...this.selecting}
+      } catch(err) {
+        return defaultOptions
+      }
     }
   },
   watch: {
@@ -149,7 +182,10 @@ export default {
     }, 250),
     filterValues(val) {
       this.filters = val
-    }
+    },
+    selectedValues(val) {
+      this.selected = val
+    },
   },
   mounted() {
     this.getHits();
@@ -183,8 +219,7 @@ export default {
           query = stringifyUrlParamFilters(vals)
         }
         if(s?.length) query = `s=${s}&${query}`;
-        console.log({query})
-        const path = !query?.length ? this.$route.path : `${this.$route.path}?${query}`
+        const path = `${this.$route.path}${query?.length ? `?${query}`: '' }${this.$route?.hash?.length ? this.$route.hash : ''}`
         window.history.pushState({path}, '', path)
       }
       this.getHits();
@@ -195,7 +230,6 @@ export default {
       const constantFilters = Array.isArray(this.constantFilters) ? this.constantFilters : []
       const filterArr = Array.isArray(this.filters) ? this.filters : []
       const filters = stringifyAlgoliaFilters([...constantFilters, ...filterArr])
-      console.log({filters, arr: [...constantFilters, ...filterArr]})
       if(page === 0) {
         this.hits = null
       }
@@ -203,7 +237,6 @@ export default {
         .then(res => {
           this.nextPage = res?.hits?.length > 0 && res.page < res.nbPages - 1 ? res.page + 1 : false
           this.lastResponse = res;
-          console.log(res);
           this.hits = page = 0 || !Array.isArray(this.hits) ? res.hits : [...this.hits, ...res.hits]
           this.hitCount = res.nbHits
           setTimeout(() => {
@@ -226,7 +259,22 @@ export default {
       }
     },
     scrollHandler({ event, eventName }) {
-      console.log({ event, eventName })
+      return { event, eventName }
+    },
+    hitClicked(index) {
+      const item = this.hits[index];
+      const slug = this.indexName.includes('product') ? item.handle : item.id
+      if(!this.selectingOptions) {
+        this.$router.push({ path: `/products/${slug}${this.$route.hash}` })
+      } else {
+        const identifier = Object.keys(item).includes('objectID') ? 'objectID' : Object.keys(item).includes('id') ? 'id' : 'docId';
+        if(this.selected.map(itm => itm[identifier]).includes(item[identifier])) {
+          this.selected.splice(index, 1)
+        } else {
+          this.selected.push(item)
+        }
+        this.$emit('selection', this.selected)
+      }
     }
   }
 }
@@ -241,7 +289,7 @@ export default {
   @apply bg-cyan-300 text-black text-opacity-60 text-xs rounded-sm block;
 }
 .hits {
-  @apply grid grid-cols-12;
+  @apply grid grid-cols-12 pt-6;
   em {
     @apply bg-cyan-400 text-black text-opacity-95 rounded-sm px-1
   }
@@ -249,9 +297,19 @@ export default {
 .hit {
   @apply col-span-12 sm:col-span-6 md:col-span-4 p-1;
 }
-.algolia-search.media {
-  .hit {
-    @apply m-auto;
+.algolia-search {
+  &.media {
+    .hit {
+      @apply m-auto;
+    }
+  }
+  &.reviews {
+    .hits {
+      @apply space-y-6
+    }
+    .hit {
+      @apply shadow-xl col-span-12 p-4 rounded-lg bg-white dark:bg-gray-800 dark:bg-opacity-50 mx-auto max-w-prose w-full;
+    }
   }
 }
 /*

@@ -1,4 +1,12 @@
 
-.card {
-    @apply rounded p-2 transform scale-100 hover:scale-103 hover:shadow-lg transition overflow-hidden;
+:not(.hit) {
+    .card {
+        @apply transform scale-100 hover:scale-103 hover:shadow-lg rounded p-2 transition ease-quick-in overflow-hidden;
+    }
+}
+.hit {
+    @apply transition ease-quick-in transform scale-100 hover:scale-103 hover:shadow-lg ;
+    .card {
+        @apply hover:scale-100 hover:shadow-none;
+    }
 }
