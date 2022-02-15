@@ -1,6 +1,5 @@
 <template>
   <div class="max-w-full">
-    <!-- <Logo /> -->
     <div>
       <h1>Index</h1>
       <SelectStarRating

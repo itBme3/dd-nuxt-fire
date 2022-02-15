@@ -1,6 +1,5 @@
 <template>
   <div class="max-w-full">
-    <Logo />
     <div v-for="component in exampleComponents" :key="component.__file">
       <hr class="mt-5 mb-5" />
       <component :is="component"></component>
