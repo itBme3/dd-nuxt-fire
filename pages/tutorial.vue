@@ -9,7 +9,6 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import Logo from '~/components/Logo/index.vue'
 import Auth from '~/components/examples/Auth.vue'
 import Firestore from '~/components/examples/Firestore.vue'
 import Functions from '~/components/examples/Functions.vue'
@@ -18,7 +17,6 @@ import VuexStore from '~/components/examples/VuexStore.vue'
 
 export default Vue.extend({
   components: {
-    Logo,
     Auth,
     Firestore,
     Functions,
