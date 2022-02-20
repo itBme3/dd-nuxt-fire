@@ -1,5 +1,8 @@
 <template>
-  <div class="card">
+  <div class="card"
+    @mouseenter="$emit('mouseenter', true)"
+    @mouseleave="$emit('mouseleave', true)"
+    >
     <slot name="before" />
     <div class="card-media">
       <slot name="media" />

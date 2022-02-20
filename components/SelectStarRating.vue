@@ -49,7 +49,7 @@ export default {
     selectValue(e) {
       console.log({ e })
       this.selectedValue = e; 
-      this.$emit('selected', e)
+      this.$emit('change', e)
     }
   }
 }
