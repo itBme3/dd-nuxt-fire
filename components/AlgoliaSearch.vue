@@ -42,17 +42,14 @@
             ['card-style-' + cardStyle]: true
           }"
           :item="hit" />
-        <Card v-else
+        <CardMedia v-else-if="indexName === 'media'"
           :class="{
             'p-0': true,
             [cardClasses]: typeof cardClasses === 'string' && cardClasses.length > 0,
             ['card-style-' + cardStyle]: true
-          }">
-          <template #media
-            v-if="!!hit.downloadUrl || !!hit.image || !!hit.image">
-            <Media :media="!!hit.downloadUrl ? hit : !!hit.image ? hit.image : hit.media" />
-          </template>
-        </Card>
+          }"
+          :item="hit"
+        />
       </div>
     </div>
     <div v-else-if="hits === null">loading...</div>

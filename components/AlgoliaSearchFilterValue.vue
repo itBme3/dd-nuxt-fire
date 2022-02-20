@@ -20,12 +20,12 @@
         <template v-if="filter.attribute === 'score'">
           <SelectStarRating
             :value="!!filter && !!filter.value && !!filter.value[0] ? filter.value[0] : null"
-            @selected="(e) => updateValue(!!!filter || !!!filter.value || !Array.isArray(filter.value) || filter.value.length <= 1 ? [e, e] : [e, filter.value[1]])"
+            @change="(e) => updateValue(!!!filter || !!!filter.value || !Array.isArray(filter.value) || filter.value.length <= 1 ? [e, e] : [e, filter.value[1]])"
           /> 
           <small>TO</small>
           <SelectStarRating
             :value="!!filter && !!filter.value && !!filter.value[1] ? filter.value[1] : null"
-            @selected="(e) => updateValue(!!!filter || !!!filter.value || !Array.isArray(filter.value) || filter.value.length < 1 ? [e, e] : [filter.value[0], e])"
+            @change="(e) => updateValue(!!!filter || !!!filter.value || !Array.isArray(filter.value) || filter.value.length < 1 ? [e, e] : [filter.value[0], e])"
           /> 
         </template>
         <template v-else>
