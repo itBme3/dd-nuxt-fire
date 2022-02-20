@@ -2,7 +2,19 @@ import { NuxtConfig } from '@nuxt/types'
 
 const isDev = process.env.NODE_ENV === 'development'
 const useEmulators = false // manually change if emulators needed
-console.log({ port: isDev && useEmulators ? 12345 : undefined })
+console.log({ isDev, port: isDev && useEmulators ? 5000 : undefined })
+
+// const firebases = {
+//     apiKey: isDev ? 'AIzaSyBvdRs7O57J8c1baYHE3olZskgBxLHJtWw' : 'AIzaSyDiuv3nUpj6Z05k8ph3AbzQyHyusxknoMk',
+//     authDomain: isDev ? 'dearborn-fire-dev.firebaseapp.com' : 'dearborn-denim.firebaseapp.com',
+//     databaseURL: isDev ? 'https://dearborn-fire-dev.firebaseio.com' : 'https://dearborn-denim.firebaseio.com',
+//     projectId: isDev ? 'dearborn-fire-dev' : 'dearborn-denim',
+//     storageBucket: isDev ? 'dearborn-fire-dev.appspot.com' : 'dearborn-denim.appspot.com',
+//     messagingSenderId: isDev ? '773304666438' : '14338671750',
+//     appId: isDev ? '1:773304666438:web:ebbd2d9158bf22ee713d47' : '1:14338671750:web:0b0777f1f131edba',
+//     measurementId: '206385704',
+// }
+
 const config: NuxtConfig = {
   ssr: false,
   head: {
@@ -17,9 +29,7 @@ const config: NuxtConfig = {
       { rel: 'stylesheet', href: 'https://use.typekit.net/ptm4ahe.css' },
       { rel: 'stylesheet', href: 'https://d1azc1qln24ryf.cloudfront.net/99224/GiGIcons/style-cf.css?t0daye' }
     ],
-    script: [
-      { src: 'https://cdnjs.cloudflare.com/ajax/libs/masonry/4.0.0/masonry.pkgd.min.js', async: true, defer: true }
-    ]
+    script: []
   },
 
   server: {
@@ -42,13 +52,13 @@ const config: NuxtConfig = {
   firebase: {
     lazy: false,
     config: {
-      apiKey: 'AIzaSyDiuv3nUpj6Z05k8ph3AbzQyHyusxknoMk',
-      authDomain: 'dearborn-denim.firebaseapp.com',
-      databaseURL: 'https://dearborn-denim.firebaseio.com',
-      projectId: 'dearborn-denim',
-      storageBucket: 'dearborn-denim.appspot.com',
-      messagingSenderId: '14338671750',
-      appId: '1:14338671750:web:0b0777f1f131edba',
+      apiKey: isDev ? 'AIzaSyBvdRs7O57J8c1baYHE3olZskgBxLHJtWw' : 'AIzaSyDiuv3nUpj6Z05k8ph3AbzQyHyusxknoMk',
+      authDomain: isDev ? 'dearborn-fire-dev.firebaseapp.com' : 'dearborn-denim.firebaseapp.com',
+      databaseURL: isDev ? 'https://dearborn-fire-dev.firebaseio.com' : 'https://dearborn-denim.firebaseio.com',
+      projectId: isDev ? 'dearborn-fire-dev' : 'dearborn-denim',
+      storageBucket: isDev ? 'dearborn-fire-dev.appspot.com' : 'dearborn-denim.appspot.com',
+      messagingSenderId: isDev ? '773304666438' : '14338671750',
+      appId: isDev ? '1:773304666438:web:ebbd2d9158bf22ee713d47' : '1:14338671750:web:0b0777f1f131edba',
       measurementId: '206385704',
     },
     onFirebaseHosting: false,
@@ -68,7 +78,7 @@ const config: NuxtConfig = {
         emulatorPort: isDev && useEmulators ? 8080 : undefined,
       },
       functions: {
-        emulatorPort: 12345
+        emulatorPort: 5000
       },
       storage: {
         emulatorPort: isDev && useEmulators ? 9199 : undefined,
@@ -81,13 +91,10 @@ const config: NuxtConfig = {
   plugins: [
     '~/plugins/check-view.js',
     '~/plugins/scrollbar.js',
-    '~/plugins/tailwind-components.js',
-    { src: '~/plugins/vue-masonry', ssr: false }
+    '~/plugins/tailwind-components.js'
   ],
 
-  build: {
-    transpile: ['vue-instantsearch', 'instantsearch.js/es']
-  },
+  build: {},
 
   /*
    ** Nuxt.js Middleware

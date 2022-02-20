@@ -6,11 +6,9 @@
       'right-0 w-screen': !isMobile
     }"
     >
-    <!-- <div class="logo"> -->
-      <nuxt-link to="/" class="logo w-12 h-12 p-2">
-        <Icon :name="'logoIcon'" class="h-full w-full" />
-      </nuxt-link>
-    <!-- </div> -->
+    <nuxt-link to="/" class="logo w-12 h-12 p-2">
+      <Icon :name="'logoIcon'" class="h-full w-full" />
+    </nuxt-link>
     <div v-if="isMobile && !mobileNavCollapsed" @click="mobileNavCollapsed = true"
       :class="{
         'cursor-pointer fixed inset-0 z-99999 bg-opacity-30 dark:bg-opacity-80 bg-gray-900': true,
