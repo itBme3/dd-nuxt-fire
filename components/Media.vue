@@ -8,12 +8,15 @@
     style="background-repeat: no-repeat; background-size: cover; background-position: center;"
   >
     <template v-if="typeof mediaSrc === 'string'">
-      <img :src="mediaSrc"
+      <img 
+        ref="image"
+        :src="mediaSrc"
         class="media-image w-full h-auto relative z-0"
         :class="{ 'opacity-0': isBackground }"
         @load="imageLoaded"
-      >
+      />
     </template>
+    <slot />
   </div>
 </template>
 
@@ -35,8 +38,8 @@ export default {
     }
   },
   data () {
-    const mediaSrc = typeof this.mediaSrc !== 'undefined' ? this.mediaSrc : this.getImgSrc(this.media, typeof this.$el !== 'undefined' ? this.$el : { offsetWidth: 300, offsetHeight: 300 })
-    return { mediaSrc, imgHeight: 'auto' }
+    // const mediaSrc = typeof this.mediaSrc !== 'undefined' ? this.mediaSrc : this.getImgSrc(this.media, typeof this.$el !== 'undefined' ? this.$el : { offsetWidth: 300, offsetHeight: 300 })
+    return { mediaSrc: null, imgHeight: 'auto' }
   },
   mounted () {
     this.setImgSrc()

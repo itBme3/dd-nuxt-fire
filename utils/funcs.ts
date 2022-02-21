@@ -134,19 +134,23 @@ export const setObjectValue = (keyString: string, value: any, objct: any) => {
 
 export const getThumbImageUrl = (image: any, el: any): string | Media | undefined => {
   const elWidth = el?.offsetWidth
-  const elHeight = el?.offsetHeight
+  // const elHeight = el?.offsetHeight
+  
   if (!!!image.thumbs) {
     return !!image?.downloadUrl ? image.downloadUrl : image
   }
   const thumbSizes: number[] = Object.keys(image.thumbs)
     .map((size: string) => parseInt(size))
-    .sort();
-  
-  const smallestSize: number | undefined = !!!elWidth || !!!elHeight ? thumbSizes.shift()
-    : thumbSizes.filter((size: number) => size > elWidth && size > elHeight)
-    .sort()
-    .shift()
+    .filter((size: number) => size >= elWidth);
+  const smallestSize: number | null = thumbSizes.reduce((acc: number | null, size: number) => {
+    if (acc === null) return size;
+    if (acc === null || acc > size) return size;
+    return acc
+  }, null);
   const thumb = image.thumbs[`${smallestSize}`];
+  if (thumb === 'https://firebasestorage.googleapis.com/v0/b/dearborn-fire/o/media%2F1642777600447_relax-fit-ligt-4.jpg?alt=media&token=9b829bf6-4a32-4114-8715-fe80cb81d9f8') {
+    console.log({ elWidth, smallestSize, thumbs: image.thumbs, thumb })
+  }
   return !!thumb ? thumb : !!image?.downloadUrl ? image.downloadUrl : image
 }
 

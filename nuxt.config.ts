@@ -1,6 +1,7 @@
 import { NuxtConfig } from '@nuxt/types'
 
 const isDev = process.env.NODE_ENV === 'development'
+const fireDev = process.env.FIRE_ENV !== 'live'
 const useEmulators = false // manually change if emulators needed
 console.log({ isDev, port: isDev && useEmulators ? 5000 : undefined })
 
@@ -52,13 +53,13 @@ const config: NuxtConfig = {
   firebase: {
     lazy: false,
     config: {
-      apiKey: isDev ? 'AIzaSyBvdRs7O57J8c1baYHE3olZskgBxLHJtWw' : 'AIzaSyDiuv3nUpj6Z05k8ph3AbzQyHyusxknoMk',
-      authDomain: isDev ? 'dearborn-fire-dev.firebaseapp.com' : 'dearborn-denim.firebaseapp.com',
-      databaseURL: isDev ? 'https://dearborn-fire-dev.firebaseio.com' : 'https://dearborn-denim.firebaseio.com',
-      projectId: isDev ? 'dearborn-fire-dev' : 'dearborn-denim',
-      storageBucket: isDev ? 'dearborn-fire-dev.appspot.com' : 'dearborn-denim.appspot.com',
-      messagingSenderId: isDev ? '773304666438' : '14338671750',
-      appId: isDev ? '1:773304666438:web:ebbd2d9158bf22ee713d47' : '1:14338671750:web:0b0777f1f131edba',
+      apiKey: fireDev ? 'AIzaSyBvdRs7O57J8c1baYHE3olZskgBxLHJtWw' : 'AIzaSyDiuv3nUpj6Z05k8ph3AbzQyHyusxknoMk',
+      authDomain: fireDev ? 'dearborn-fire-dev.firebaseapp.com' : 'dearborn-denim.firebaseapp.com',
+      databaseURL: fireDev ? 'https://dearborn-fire-dev.firebaseio.com' : 'https://dearborn-denim.firebaseio.com',
+      projectId: fireDev ? 'dearborn-fire-dev' : 'dearborn-denim',
+      storageBucket: fireDev ? 'dearborn-fire-dev.appspot.com' : 'dearborn-denim.appspot.com',
+      messagingSenderId: fireDev ? '773304666438' : '14338671750',
+      appId: fireDev ? '1:773304666438:web:ebbd2d9158bf22ee713d47' : '1:14338671750:web:0b0777f1f131edba',
       measurementId: '206385704',
     },
     onFirebaseHosting: false,
