@@ -1,21 +1,10 @@
 <template>
   <div class="page-content products">
     <Title>Products:
-      <div
-        class="buttons float-right flex text-xs nowrap items-center justify-end py-2 space-x-2">
-          <gButton  
-            v-for="indexName in ['products_live', 'products_dev']"
-            :key="indexName"
-            :class="{
-              ['hover:text-gray-900 uppercase']: true,
-              ['hover:bg-blue-400']: indexName.includes('dev'),
-              ['hover:bg-green-400']: indexName.includes('live'),
-              ['bg-blue-400']: indexName.includes('dev') && shopEnv === 'dev',
-              ['bg-green-400']: indexName.includes('live') && shopEnv === 'live',
-              ['text-gray-900']: indexName.includes(shopEnv)
-            }"
-            @click="() => toggleEnv(indexName.replace('products_', ''))">{{ indexName.replace('products_', '') }}</gButton>
-      </div>
+      <ShopifyToggleEnv 
+        :env="shopEnv"
+        @change="toggleEnv" 
+        />
     </Title>
     
     <template v-for="indexName in ['products_live', 'products_dev']">
