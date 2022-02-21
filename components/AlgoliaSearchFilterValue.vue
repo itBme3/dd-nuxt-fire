@@ -1,11 +1,17 @@
 <template>
   <div v-if="!!filter"
-    class="algolia-filter-value relative p-2 rounded border border-white border-opacity-5">
+    class="algolia-filter-value relative p-2"
+    :class="{
+      'border border-white border-opacity-5 rounded mb-2 shadow-lg': !isOr,
+      'bg-black bg-opacity-5': isOr
+    }">
     <gButton
+      v-if="!isOr || filter.value === undefined"
       class="remove-filter rounded-full p-0 text-xs scale-90 text-opacity-60 bg-black bg-opacity-5 hover:bg-red-500 hover:bg-opacity-100 hover:text-red-900 hover:text-opacity-100 h-6 w-6 text-center flex items-center content-center absolute right-1 top-1"
       @click="$emit('change', null)">
       <Icon :name="'close'" class="m-auto" /></gButton>
-    <h4>{{ filter.attribute }}</h4>
+    <h4 v-if="filter.value === undefined">{{ filter.attribute }}</h4>
+    <small v-if="isOr">or</small> 
     <div :class="{
         'a-filter': true,
         [filter.type]: true,
@@ -13,11 +19,27 @@
       }">
 
       <template v-if="filter.type === 'refinement_list'">
-        <code>todo: refinement_list</code>
+        <template  v-if="filter.value !== undefined">
+          <gButton v-if="isOr"
+            @click="() => $emit('change', null)">
+            <small class="my-auto mr-2">{{ filter.attribute }}:</small> <span class="my-auto">{{ filter.value }}</span> <Icon :name="'close'" class="ml-2 mr-0 transform scale-90 text-red-500" />
+          </gButton>
+          <h4 v-else>
+            <small class="my-auto mr-2">{{ filter.attribute }}:</small> <span class="my-auto">{{ filter.value }}</span>
+          </h4>
+        </template>
+        <AlgoliaSearchRefinements 
+          v-else
+          :index-name="indexName"
+          :index="index"
+          :index-filters="filter.not ? null : indexFilters"
+          :attribute="filter.attribute"
+          @change="(e) => e === undefined ? $emit('change', null) : updateValue(e)"
+        />
       </template>
 
       <template v-else-if="filter.type === 'range'">
-        <template v-if="filter.attribute === 'score'">
+        <template v-if="[ 'score', 'rating'].includes(filter.attribute)">
           <SelectStarRating
             :value="!!filter && !!filter.value && !!filter.value[0] ? filter.value[0] : null"
             @change="(e) => updateValue(!!!filter || !!!filter.value || !Array.isArray(filter.value) || filter.value.length <= 1 ? [e, e] : [e, filter.value[1]])"
@@ -73,6 +95,14 @@ export default {
     indexName: {
       type: String,
       default: null
+    },
+    index: {
+      type: Object,
+      default: null
+    },
+    indexFilters: {
+      type: Array,
+      default: () => []
     }
   },
   data() {
@@ -95,7 +125,7 @@ export default {
     },
     updateValue(val) {
        this.filter.value = val
-      if(this.filter.value !== undefined)
+      // if(this.filter.value !== undefined)
         this.$emit('change', this.filter)
     }
   }

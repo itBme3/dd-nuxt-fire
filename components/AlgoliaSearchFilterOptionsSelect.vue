@@ -46,13 +46,13 @@ export default {
       return this.options.length > 0 
         ? this.options 
         : Object.keys(filterOptionsByIndex).includes(indexName) 
-          ? filterOptionsByIndex[indexName] 
+          ? JSON.parse(JSON.stringify(filterOptionsByIndex[indexName])) 
           : null
     }
   },
   methods: {
     addFilter(key) {
-      this.$emit('change', filterOptions[key]); 
+      this.$emit('change', JSON.parse(JSON.stringify(filterOptions[key]))); 
       this.selectingOptions = false
     }
   }

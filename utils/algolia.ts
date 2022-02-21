@@ -5,11 +5,11 @@ import qs from 'qs'
 import {AlgoliaFilterObjectType, AlgoliaFilterObject} from '~/models/algolia.model'
 
 export const filterOptions:{[key:string]: any} = {
-  ...['tags', 'product.tags', 'materials', 'fits', 'colors', 'product', 'score', 'updatedAt', 'createdAt'].reduce((acc, attribute) => {
+  ...['tags', 'product.tags', 'materials', 'fits', 'colors', 'product', 'score', 'rating', 'updatedAt', 'createdAt'].reduce((acc, attribute) => {
       return {...acc, [attribute]: {
             attribute, 
             value: undefined,
-            type: ['score', 'updatedAt', 'createdAt'].includes(attribute)
+            type: ['score', 'rating', 'updatedAt', 'createdAt'].includes(attribute)
                   ? AlgoliaFilterObjectType.RANGE : AlgoliaFilterObjectType.REFINEMENT_LIST,
             not: false,
             or: []
@@ -21,7 +21,7 @@ export const filterOptionsByIndex = (() => {
       const products = ['tags', 'fits', 'materials', 'colors', 'wash', 'updatedAt', 'createdAt']
       return {
             products,
-            media: [...products, 'products'],
+            media: [...products, 'products', 'rating'],
             reviews: ['tags', 'score', 'product.tags', 'product'],
       }
 })()
@@ -36,7 +36,7 @@ export const stringifyAlgoliaFilters = (filterArr: AlgoliaFilterObject[], operat
                   filterString += `${ filterObj.attribute } = ${ filterObj.value }`
             }
             if (filterObj.type === AlgoliaFilterObjectType.RANGE && Array.isArray(filterObj.value)) {
-                  const filterType = ['score'].includes(filterObj.attribute)
+                  const filterType = ['score', 'rating'].includes(filterObj.attribute)
                         ? 'number'
                         : ['createdAt', 'updatedAt'].includes(filterObj.attribute)
                               ? 'date'

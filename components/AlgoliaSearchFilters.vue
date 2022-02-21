@@ -1,11 +1,18 @@
 <template>
   <scrollbar
     v-if="!!filterOptions"
-    class="algolia-search-filters overflow-y-scroll px-2">
+    class="algolia-search-filters overflow-y-scroll px-2 pt-2">
     <AlgoliaSearchFilterOptionsSelect
+      v-if="filterValues.length === 0"
       :index-name="indexName"
       @change="addFilter"
     />
+    <gButton
+      v-else
+      class="w-full rounded bg-white bg-opacity-5 hover:bg-opacity-100 hover:bg-red-400 hover:text-red-900 mb-1"
+      @click="filterValues = []; $emit('change', [])">
+      Clear Filters
+    </gButton>
     <div 
       v-if="Array.isArray(filterValues) && filterValues.length > 0"
       class="filter-values flex flex-col content-start">
@@ -17,6 +24,8 @@
             v-if="!updatingValues"
             :value="value"
             :index-name="indexName"
+            :index-filters="filters"
+            :index="index"
             @change="(e) => updateFilter(i, e)">
 
             <template v-if="!updatingValues && Array.isArray(value.or) && value.or.length > 0">
@@ -25,6 +34,8 @@
                 :key="'or-filter-' + ii"
                 :value="orValue"
                 :index-name="indexName"
+                :index-filters="filters"
+                :index="index"
                 :is-or="true"
                 @change="(e) => updateOrFilter(i, ii, e)" />
             </template>
@@ -32,7 +43,7 @@
           </AlgoliaSearchFilterValue>
 
           <AlgoliaSearchFilterOptionsSelect
-            v-if="!updatingValues"
+            v-if="!updatingValues && i === filterValues.length - 1"
             :index-name="indexName"
             :button-text="'and'"
             @change="addFilter"
