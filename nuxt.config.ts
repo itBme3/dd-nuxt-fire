@@ -28,7 +28,7 @@ const config: NuxtConfig = {
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/media/fire.png' },
       { rel: 'stylesheet', href: 'https://use.typekit.net/ptm4ahe.css' },
-      { rel: 'stylesheet', href: 'https://d1azc1qln24ryf.cloudfront.net/99224/GiGIcons/style-cf.css?t0daye' }
+      { rel: 'stylesheet', href: 'https://d1azc1qln24ryf.cloudfront.net/99224/GiGIcons/style-cf.css?em03gt' }
     ],
     script: []
   },
@@ -92,7 +92,8 @@ const config: NuxtConfig = {
   plugins: [
     '~/plugins/check-view.js',
     '~/plugins/scrollbar.js',
-    '~/plugins/tailwind-components.js'
+    '~/plugins/tailwind-components.js',
+    '~/plugins/tooltip.js'
   ],
 
   build: {},

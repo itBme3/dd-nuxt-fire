@@ -1,0 +1,12 @@
+.tooltip {
+  @apply block shadow-lg z-999999;
+  .tooltip-inner {
+    @apply bg-gray-700 shadow-lg text-gray-300 rounded px-2 py-1 text-xs;
+  }
+
+  .tooltip-arrow {
+    @apply w-0 h-0 border-gray-700 z-1 absolute;
+    border-style: solid;
+    margin: 5px;
+  }
+}
