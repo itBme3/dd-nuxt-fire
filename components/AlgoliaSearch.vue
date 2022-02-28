@@ -1,19 +1,33 @@
 <template>
   <div 
-    :class="{'algolia-search': true, [indexName]: typeof indexName === 'string' }">
-    <div class="search-bar">
-      <input
-        v-model="search"
-        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline w-full bg-transparent border-none shadow-none"
-        placeholder="search..."
-        type="search"
-        autocomplete="on"
-      />
-      <span v-if="hitCount > 0" class="hit-count">{{ hitCount }}</span>
-      <Btn class="center bg-transparent icon-button ml-1"
-        @click="!!search && search.length > 0 ? search = '' : ''">
-        <Icon :name="!!search && search.length > 0 ? 'close' : 'search'" />
-      </Btn>
+    :class="{
+      'algolia-search': true, [indexName]: typeof indexName === 'string',
+      'hide-selected': selectingOptions.hideSelected,
+      'is-selecting': !!selectingOptions
+    }">
+    <div class="search-header">
+      <div class="search-header-inner">
+        <slot name="headerStart" />
+        <div v-if="searchBar"
+          class="search-bar">
+          <input
+            v-model="search"
+            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline w-full bg-transparent border-none shadow-none"
+            placeholder="search..."
+            type="search"
+            autocomplete="on"
+          />
+          <span v-if="hitCount > 0" class="hit-count">{{ hitCount }}</span>
+          <Btn class="center bg-transparent icon-button ml-1"
+            @click="!!search && search.length > 0 ? search = '' : ''">
+            <Icon :name="!!search && search.length > 0 ? 'close' : 'search'" />
+          </Btn>
+        </div>
+        <slot name="headerEnd" />
+      </div>
+      <div class="search-header-after">
+        <slot name="headerAfter" />
+      </div>
     </div>
     <AlgoliaSearchFilters 
       v-if="filtering"
@@ -28,7 +42,10 @@
     <div v-if="!!hits && !!hits.length"
       class="hits">
       <div v-for="(hit, i) in hits" :key="hit.id"
-        class="hit"
+        :class="{
+          'hit cursor-pointer': true,
+          'selected': selected.map(s => s[selectingOptions.identifier]).includes(hit[selectingOptions.identifier])
+        }"
         @click="hitClicked(i)">
         <CardProduct v-if="indexName.includes('product')"
           :class="{
@@ -64,14 +81,9 @@
 </template>
 
 <script>
-import algoliasearch from 'algoliasearch/lite';
-import _ from 'lodash'
-import { parseUrlParamFilters, stringifyAlgoliaFilters, stringifyUrlParamFilters } from '~/utils/algolia'
 
-const searchClient = algoliasearch(
-  '010RMUCHO8',
-  '9610abb7baa7ae39ae7bc28dc246aaa7'
-);
+import _ from 'lodash'
+import { $algolia, parseUrlParamFilters, stringifyAlgoliaFilters, stringifyUrlParamFilters } from '~/utils/algolia'
 
 export default {
   props: {
@@ -115,6 +127,10 @@ export default {
       type: Array,
       default: () => []
     },
+    fetchNextPage: {
+      type: Boolean,
+      default: false
+    },
     selecting: {
       type: [Object, Boolean],
       default: () => true
@@ -152,7 +168,7 @@ export default {
     index() {
       if (this.algoliaIndex !== null) return this.algoliaIndex
       if (!this.indexName?.length) return null;
-      const index = searchClient.initIndex(this.indexName)
+      const index = $algolia.initIndex(this.indexName)
       return index;
     },
     selectingOptions() {
@@ -183,6 +199,10 @@ export default {
     selectedValues(val) {
       this.selected = val
     },
+    fetchNextPage() {
+      if(this.fetchNextPage === false || this.nextPage === false) {return};
+      this.getNextPage();
+    }
   },
   mounted() {
     this.getHits();
@@ -260,13 +280,14 @@ export default {
     },
     hitClicked(index) {
       const item = this.hits[index];
-      const slug = this.indexName.includes('product') ? item.handle : item.id
+      const slug = this.indexName.includes('product') ? item.handle : item?.objectID || item.id
       if(!this.selectingOptions) {
-        this.$router.push({ path: `/products/${slug}${this.$route.hash}` })
+        this.$router.push({ path: `${this.$route.path}/${slug}${this.$route.hash}` })
       } else {
-        const identifier = Object.keys(item).includes('objectID') ? 'objectID' : Object.keys(item).includes('id') ? 'id' : 'docId';
+        const { identifier } = this.selectingOptions;
         if(this.selected.map(itm => itm[identifier]).includes(item[identifier])) {
-          this.selected.splice(index, 1)
+          this.selected = this.selected.filter(s => s[identifier] !== item[identifier])
+          console.log(this.selected);
         } else {
           this.selected.push(item)
         }
@@ -278,8 +299,19 @@ export default {
 </script>
 
 <style lang="scss">
-.search-bar {
-  @apply sticky top-[2.98rem] shadow-lg z-999 rounded bg-white focus-within:bg-gray-200 dark:bg-gray-900 shadow-xl focus-within:shadow-sm dark:focus-within:bg-gray-800 p-2 flex items-center justify-start border border-gray-200 dark:border-gray-800;
+
+.search-header {
+  @apply sticky z-9999 top-[2.98rem] flex flex-col content-start items-stretch;
+  .search-header-inner {
+    @apply flex items-center justify-start;
+    .search-bar {
+      @apply  w-full rounded bg-white focus-within:bg-gray-200 dark:bg-gray-900 shadow-xl focus-within:shadow-sm dark:focus-within:bg-gray-800 p-2 flex items-center justify-start border border-gray-200 dark:border-gray-800;
+    }
+  }
+  .search-header-after {
+    @apply w-full;
+  }
+  
 }
 .hit-count {
   padding: .13em .25em .13em .2em;
@@ -293,6 +325,9 @@ export default {
 }
 .hit {
   @apply col-span-12 sm:col-span-6 md:col-span-4 p-1;
+  .card {
+    @apply border-2 border-transparent;
+  }
 }
 .algolia-search {
   &.media {
@@ -306,6 +341,19 @@ export default {
     }
     .hit {
       @apply shadow-xl col-span-12 p-4 rounded-lg bg-white dark:bg-gray-800 dark:bg-opacity-50 mx-auto max-w-prose w-full;
+    }
+  }
+  &.is-selecting {
+    .selected {
+      .card {
+        @apply border-purple-500;
+        box-shadow: 0 0 3px 1px rgb(93 166 255);
+      }
+    }
+    &.hide-selected {
+      .selected {
+        @apply hidden;
+      }
     }
   }
 }

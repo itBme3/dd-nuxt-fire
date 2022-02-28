@@ -1,8 +1,18 @@
 
 
+import algoliasearch, { SearchClient } from 'algoliasearch/lite'
 import qs from 'qs'
 
 import {AlgoliaFilterObjectType, AlgoliaFilterObject} from '~/models/algolia.model'
+
+export function initializeAlgoliaClient (clientCredentials: { appId: string, apiKey: string }): SearchClient {
+  return algoliasearch(
+            clientCredentials.appId,
+            clientCredentials.apiKey
+      );
+}
+
+export const $algolia:SearchClient = initializeAlgoliaClient({ appId: '010RMUCHO8', apiKey: '9610abb7baa7ae39ae7bc28dc246aaa7'});
 
 export const filterOptions:{[key:string]: any} = {
   ...['tags', 'product.tags', 'materials', 'fits', 'colors', 'product', 'score', 'rating', 'updatedAt', 'createdAt'].reduce((acc, attribute) => {
