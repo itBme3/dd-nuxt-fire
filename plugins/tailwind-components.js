@@ -123,24 +123,27 @@ export const TailwindComponentsSettings = {
       fixedClasses: {
         wrapper: 'relative',
         buttonWrapper: 'inline-block relative w-full',
-        selectButton: 'w-full flex text-left justify-between items-center px-3 py-2 text-black transition duration-100 ease-in-out border rounded shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed',
+        selectButton: 'w-full flex text-left justify-between bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-900 items-center px-3 py-2 text-black transition duration-100 ease-in-out border rounded shadow-sm focus:ring-2 focus:outline-none focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed',
         selectButtonLabel: 'block truncate',
+        selectButtonTagWrapper: 'flex flex-wrap items-start content-start',
+        selectButtonTag: 'flex px-2 disabled:cursor-not-allowed disabled:opacity-50 duration-100 ease-in-out focus:border-transparent focus:outline-none focus:ring-2 focus:ring-opacity-50 rounded shadow-sm text-sm transition white-space-no m-0.5 max-w-full overflow-hidden h-8 flex items-center',
         selectButtonPlaceholder: 'block truncate',
         selectButtonIcon: 'fill-current flex-shrink-0 ml-1 h-4 w-4',
         selectButtonClearButton: 'rounded flex flex-shrink-0 items-center justify-center absolute right-0 top-0 m-2 h-6 w-6 transition duration-100 ease-in-out',
+        selectButtonTagDeleteButtonIcon: 'w-4 h-4 ml-2 my-auto',
         selectButtonClearIcon: 'fill-current h-3 w-3',
-        dropdown: 'absolute w-full z-10 -mt-1 absolute border-b border-l border-r rounded-b shadow-sm z-10',
+        dropdown: 'absolute w-full z-10 -mt-1 absolute shadow-xl z-10',
         dropdownFeedback: '',
         loadingMoreResults: '',
-        optionsList: 'overflow-auto',
+        optionsList: 'overflow-auto list-style-none',
         searchWrapper: 'inline-block w-full',
         searchBox: 'inline-block w-full',
         optgroup: '',
         option: 'cursor-pointer',
         disabledOption: 'opacity-50 cursor-not-allowed',
         highlightedOption: 'cursor-pointer',
-        selectedOption: 'cursor-pointer',
-        selectedHighlightedOption: 'cursor-pointer',
+        selectedOption: 'cursor-pointer font-semibold bg-gray-100 font-semibold',
+        selectedHighlightedOption: 'cursor-pointer font-semibold font-semibold',
         optionContent: '',
         optionLabel: 'truncate block',
         selectedIcon: 'fill-current h-4 w-4',
@@ -154,27 +157,29 @@ export const TailwindComponentsSettings = {
       classes: {
         wrapper: '',
         buttonWrapper: '',
-        selectButton: 'bg-white border-gray-300',
-        selectButtonLabel: '',
-        selectButtonPlaceholder: 'text-gray-400',
+        selectButton: 'focus:border-yellow-500 focus:ring-yellow-500',
+        selectButtonLabel: 'text-yellow-600 dark:text-yellow-400',
+        selectButtonTag: 'bg-yellow-500 text-yellow-900 focus:ring-yellow-500',
+        selectButtonTagDeleteButtonIcon: '',
+        selectButtonPlaceholder: 'text-gray-400 dark:text-gray-600',
         selectButtonIcon: 'text-gray-600',
-        selectButtonClearButton: 'hover:bg-blue-100 text-gray-600',
-        selectButtonClearIcon: '',
-        dropdown: 'bg-white border-gray-300',
+        selectButtonClearButton: 'bg-yellow-500 text-yellow-900',
+        selectButtonClearIcon: 'w-4 h-4 fill-red-500',
+        dropdown: 'bg-white dark:bg-gray-800 shadow-lg',
         dropdownFeedback: 'pb-2 px-3 text-gray-400 text-sm',
         loadingMoreResults: 'pb-2 px-3 text-gray-400 text-sm',
-        optionsList: '',
+        optionsList: 'list-none',
         searchWrapper: 'p-2 placeholder-gray-400',
-        searchBox: 'px-3 py-2 bg-gray-50 text-sm rounded border focus:outline-none focus:shadow-outline border-gray-300',
+        searchBox: 'px-3 py-2 bg-gray-50 dark:bg-gray-900 text-sm rounded border focus:outline-none focus:shadow-outline border-gray-300 dark:border-gray-900',
         optgroup: 'text-gray-400 uppercase text-xs py-1 px-2 font-semibold',
-        option: '',
+        option: 'rounded m-1 transform scale-98 transform hover:scale-100',
         disabledOption: '',
-        highlightedOption: 'bg-blue-100',
-        selectedOption: 'font-semibold bg-gray-100 bg-blue-500 font-semibold text-white',
-        selectedHighlightedOption: 'font-semibold bg-gray-100 bg-blue-600 font-semibold text-white',
+        highlightedOption: 'bg-black bg-opacity-5 rounded m-1 transform hover:scale-100',
+        selectedOption: 'bg-yellow-500 text-yellow-90 rounded m-1 transform scale-98 hover:scale-100',
+        selectedHighlightedOption: 'bg-yellow-600 text-yellow-900 rounded m-1 transform scale-98 hover:scale-100',
         optionContent: 'flex justify-between items-center px-3 py-2',
-        optionLabel: '',
-        selectedIcon: '',
+        optionLabel: 'flex items center',
+        selectedIcon: 'w-4 h-4 my-auto ml-2',
         enterClass: 'opacity-0',
         enterActiveClass: 'transition ease-out duration-100',
         enterToClass: 'opacity-100',
@@ -183,19 +188,20 @@ export const TailwindComponentsSettings = {
         leaveToClass: 'opacity-0'
       },
       variants: {
-        danger: {
-          selectButton: 'border-red-300 bg-red-50 text-red-900',
-          selectButtonPlaceholder: 'text-red-200',
-          selectButtonIcon: 'text-red-500',
-          selectButtonClearButton: 'hover:bg-red-200 text-red-500',
-          dropdown: 'bg-red-50 border-red-300'
-        },
-        success: {
-          selectButton: 'border-green-300 bg-green-50 text-green-900',
-          selectButtonIcon: 'text-green-500',
-          selectButtonClearButton: 'hover:bg-green-200 text-green-500',
-          dropdown: 'bg-green-50 border-green-300'
-        }
+        ...['red', 'purple', 'blue', 'cyan', 'green', 'yellow', 'orange'].reduce((acc, color) => {
+          return {
+            ...acc,
+            [color]: {
+              selectButton: `focus:border-${color}-500 focus:ring-${color}-500`,
+              selectButtonClearButton: `bg-${color}-500`,
+              selectButtonClearIcon: `text-${color}-900`,
+              selectButtonLabel: `text-${color}-600 dark:text-${color}-400`,
+              selectButtonTag: `bg-${color}-500 text-${color}-900 focus:ring-${color}-500`,
+              selectedOption: `bg-${color}-500 text-${color}-900`,
+              selectedHighlightedOption: `bg-${color}-600 text-${color}-900`
+            }
+          }
+       }, {})
       }
     }
   },
@@ -349,6 +355,21 @@ export const TailwindComponentsSettings = {
         overlayLeaveToClass: 'opacity-0',
       },
       variants: {
+        selecting: {
+          wrapper: 'h-full',
+          modal: 'bg-transparent mx-w-ld p-6 rounded bg-gray-900 lg:px-12 shadow-none h-[calc(100vh-2em)] w-full mx-auto max-w-[1280px]',
+          body: 'p-0 h-full',
+          header: 'fixed top-[40px] right-0 left-auto flex space-x-1 justify-end items-center z-99999 border-transparent rounded bg-white shadow-lg dark:bg-gray-800',
+          footer: 'bg-gray-100',
+          close: 'hidden fixed z-999999 rounded-sm w-8 sm:w-12 h-8 sm:h-12 top-[40px] right-0 bg-gray-700 bg-opacity-0 hover:bg-opacity-30 text-red-400',
+          closeIcon: 'w-6 h-6 sm:w-8 sm:h-8',
+          overlayEnterClass: 'opacity-0',
+          overlayEnterActiveClass: 'transition ease-out duration-100',
+          overlayEnterToClass: 'opacity-100',
+          overlayLeaveClass: 'opacity-100',
+          overlayLeaveActiveClass: 'transition ease-in duration-75',
+          overlayLeaveToClass: 'opacity-0',
+        },
         pdf: {
           wrapper: 'h-full',
           modal: 'bg-transparent lg:px-12 shadow-none h-[calc(100vh-2em)] w-full mx-auto max-w-[1280px]',
@@ -364,7 +385,7 @@ export const TailwindComponentsSettings = {
           overlayLeaveActiveClass: 'transition ease-in duration-75',
           overlayLeaveToClass: 'opacity-0',
         }
-      }
+      },
     }
   }
 }

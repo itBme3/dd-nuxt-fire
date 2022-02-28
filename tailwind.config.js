@@ -46,6 +46,9 @@ module.exports = {
   theme: {
     
     extend: {
+      height: {
+        13: '3.25rem'
+      },
       rounded: {
         xs: '.03em',
         sm: '.13em'
