@@ -68,7 +68,9 @@
         <div
           class="dropdown-trigger"
           slot="trigger"
-          slot-scope="{ mousedownHandler, focusHandler, blurHandler, keydownHandler }">
+          slot-scope="{ mousedownHandler, focusHandler, blurHandler, keydownHandler }"
+          v-tooltip="'Text Align'"
+          >
           <gButton
             id="text-align"
             aria-label="Select text align menu"
@@ -108,52 +110,100 @@
           </gButton>
         </div>
       </gDropdown>
-      <gButton @click="editor.chain().focus().toggleBold().run()" :class="{ 'is-active': editor.isActive('bold') }">
+      <gButton 
+        v-tooltip="'Bold'"
+        @click="editor.chain().focus().toggleBold().run()" :class="{ 'is-active': editor.isActive('bold') }">
         <Icon :name="'bold'" />
       </gButton>
-      <gButton @click="editor.chain().focus().toggleItalic().run()" :class="{ 'is-active': editor.isActive('italic') }">
+      <gButton 
+        v-tooltip="'Italic'"
+        @click="editor.chain().focus().toggleItalic().run()" :class="{ 'is-active': editor.isActive('italic') }">
         <Icon :name="'italic'" />
       </gButton>
-      <gButton @click="editor.chain().focus().toggleStrike().run()" :class="{ 'is-active': editor.isActive('strike') }">
+      <gButton 
+        v-tooltip="'Strikethrough'"
+        @click="editor.chain().focus().toggleStrike().run()" :class="{ 'is-active': editor.isActive('strike') }">
         <Icon :name="'strikethrough'" />
       </gButton>
-      <gButton @click="setLink" :class="{ 'is-active': editor.isActive('link') }">
+      <gButton 
+        v-tooltip="'Link'"
+        @click="setLink" :class="{ 'is-active': editor.isActive('link') }">
         <Icon :name="'link'" />
       </gButton>
-      <gButton v-if="editor.isActive('link')" @click="editor.chain().focus().unsetLink().run()">
+      <gButton v-if="editor.isActive('link')" 
+        v-tooltip="'Remove Link'"
+        @click="editor.chain().focus().unsetLink().run()">
         <Icon :name="'remove-link'" />
       </gButton>
-      <gButton @click="editor.chain().focus().toggleBulletList().run()" :class="{ 'is-active': editor.isActive('bulletList') }">
+      <gButton 
+        v-tooltip="'List'"
+        @click="editor.chain().focus().toggleBulletList().run()" :class="{ 'is-active': editor.isActive('bulletList') }">
         <Icon :name="'list'" />
       </gButton>
-      <gButton @click="editor.chain().focus().toggleOrderedList().run()" :class="{ 'is-active': editor.isActive('orderedList') }">
+      <gButton 
+        v-tooltip="'Numbered List'"
+        @click="editor.chain().focus().toggleOrderedList().run()" :class="{ 'is-active': editor.isActive('orderedList') }">
         <Icon :name="'ordered-list'" />
       </gButton>
-      <gButton @click="selectingImage = true">
+      <gButton 
+        v-tooltip="'Insert Image'"
+        @click="selectingImage = true">
         <Icon :name="'image'" />
       </gButton>
       <input
+        v-tooltip="'Text Color'"
         type="color"
         class="rounded bg-gray-800 h-8"
         @input="editor.chain().focus().setColor($event.target.value).run()"
         :value="editor.getAttributes('textStyle').color"
       />
-      <gButton @click="editor.chain().focus().toggleBlockquote().run()" :class="{ 'is-active': editor.isActive('blockquote') }">
+      <gButton 
+        v-if="!!editor.getAttributes('textStyle').color"
+        v-tooltip="'Remove Color'"
+        @click="editor.chain().focus().unsetColor().run()">
+        <Icon name="remove-color" />
+      </gButton>
+      <input
+        v-tooltip="'Highlight Color'"
+        type="color"
+        class="rounded bg-gray-800 h-8"
+        @input="editor.chain().focus().setHighlight({color: $event.target.value}).run()"
+        :value="editor.getAttributes('highlight').color"
+      />
+      <gButton 
+        v-if="editor.isActive('highlight')"
+        v-tooltip="'Remove Highlight'"
+        @click="editor.chain().focus().unsetHighlight().run()">
+        <Icon name="remove-color" />
+      </gButton>
+      <gButton 
+        v-tooltip="'Blockquote'"
+        @click="editor.chain().focus().toggleBlockquote().run()" :class="{ 'is-active': editor.isActive('blockquote') }">
         <Icon :name="'quote'" />
       </gButton>
-      <gButton @click="editor.chain().focus().setHorizontalRule().run()">
+      <gButton 
+        v-tooltip="'Horizontal Rule'"
+        @click="editor.chain().focus().setHorizontalRule().run()">
         <Icon :name="'line'" />
       </gButton>
-      <gButton @click="editor.chain().focus().unsetAllMarks().run(); editor.chain().focus().clearNodes().run()">
+      <gButton 
+        v-tooltip="'Clear Formatting'"
+        @click="editor.chain().focus().unsetAllMarks().run(); editor.chain().focus().clearNodes().run()">
         <Icon name="clear-formatting" />
       </gButton>
-      <gButton @click="editor.chain().focus().undo().run()">
+      <gButton 
+        v-tooltip="'Undo'"
+        @click="editor.chain().focus().undo().run()">
         <Icon :name="'undo'" />
       </gButton>
-      <gButton @click="editor.chain().focus().redo().run()">
+      <gButton 
+        v-tooltip="'Redo'"
+        @click="editor.chain().focus().redo().run()">
         <Icon :name="'redo'" />
       </gButton>
-      <gButton @click="editingSrc = !editingSrc">
+      <gButton 
+        v-tooltip="'Source'"
+        @click="editingSrc = !editingSrc">
         <Icon :name="'code'" />
       </gButton>
       <!-- <gButton @click="editor.chain().focus().toggleCode().run()" :class="{ 'is-active': editor.isActive('code') }">
@@ -196,6 +246,8 @@ import Image from '@tiptap/extension-image'
 import Dropcursor from '@tiptap/extension-dropcursor'
 import TextStyle from '@tiptap/extension-text-style'
 import Color from '@tiptap/extension-color'
+import Highlight from '@tiptap/extension-highlight'
+
 
 export default {
   components: {
@@ -236,6 +288,9 @@ export default {
       extensions: [
         StarterKit,
         Dropcursor,
+        Highlight.configure({
+          multicolor: true,
+        }),
         Image,
         Color.configure({
           types: ['textStyle'],
