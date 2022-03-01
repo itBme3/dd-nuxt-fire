@@ -44,3 +44,10 @@ export interface Media {
     models?:       string[];
     thumb?:        string;
 }
+
+
+export const attributeKeys = ['products', 'tags', 'fits', 'materials', 'styles', 'colors', 'stores'];
+export const blankAttributes = attributeKeys
+  .reduce((acc, key) => {
+    return { ...acc, [key]: [] }
+  }, {});

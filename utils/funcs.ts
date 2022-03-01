@@ -1,4 +1,5 @@
 import { Media } from '~/models/media.model'
+export const imageFileTypes = ['gif', 'png', 'jpg', 'jpeg', 'tif', 'tiff', 'gif'];
 
 /* eslint-disable no-extra-boolean-cast */
 export const handleize = (strng: string, reaplceSpacesWith: string = '-'): string => {
@@ -132,10 +133,28 @@ export const setObjectValue = (keyString: string, value: any, objct: any) => {
   }
 }
 
+export const getImageFileType = ( path: any ) => {
+    if ( !!!path ) return false;
+    const potentialExtension = path.split( '.' ).pop().split( '?' )[ 0 ].toLowerCase().trim();
+    if ( !!!potentialExtension || potentialExtension === '' ) return false;
+    const foundExtension = imageFileTypes.filter( ( ex: any ) => {
+      if ( !!!path ) return false;
+      return ex === potentialExtension;
+    } )[ 0 ];
+    if ( !!!foundExtension ) return null;
+    return `image/${ foundExtension }`
+}
+  
 export const getThumbImageUrl = (image: any, el: any): string | Media | undefined => {
   const elWidth = el?.offsetWidth
-  // const elHeight = el?.offsetHeight
-  
+  /* is shopify image */
+  if (typeof image === 'string' && image.includes('cdn.shopify.com') || (image.src && image.src.includes('cdn.shopify.com'))) {
+    const src = typeof image === 'string' ? image : image.src;
+    const width = Math.ceil(elWidth / 100) * 100;
+    const segments = src.split('.');
+    const suffix = segments.pop();
+    return `${segments.join('.')}_x${width}.${suffix}`;
+  }
   if (!!!image.thumbs) {
     return !!image?.downloadUrl ? image.downloadUrl : image
   }
@@ -148,9 +167,6 @@ export const getThumbImageUrl = (image: any, el: any): string | Media | undefine
     return acc
   }, null);
   const thumb = image.thumbs[`${smallestSize}`];
-  if (thumb === 'https://firebasestorage.googleapis.com/v0/b/dearborn-fire/o/media%2F1642777600447_relax-fit-ligt-4.jpg?alt=media&token=9b829bf6-4a32-4114-8715-fe80cb81d9f8') {
-    console.log({ elWidth, smallestSize, thumbs: image.thumbs, thumb })
-  }
   return !!thumb ? thumb : !!image?.downloadUrl ? image.downloadUrl : image
 }
 
@@ -180,7 +196,15 @@ export const isJsonObject = (item: any) => {
 
   return false;
 }
+
 export const flattenArray = (arr: any) => arr.reduce((acc: any, val: any) => acc.concat(val), []);
+
+export const getRandomNumber = (min:number, max:number) => {
+  min = Math.ceil( min );
+  max = Math.floor( max );
+  return Math.floor( Math.random() * ( max - min ) ) + min;
+}
+
 
 export const decodeHtml = (function() {
   // this prevents any overhead from creating the object each time

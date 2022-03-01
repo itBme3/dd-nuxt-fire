@@ -1,4 +1,5 @@
 <template>
+<div>
   <gRichSelect
     v-model="selectedOptions"
     :options="selectOptions"
@@ -10,10 +11,10 @@
     :placeholder="placeholder"
     :max-height="maxHeight"
     :variant="variant"
+    :delay="0"
     :fetch-options="typeof fetchOptions === 'function' ? fetchOptions : undefined"
-    @change="(e) => {
-      $emit('change', e)
-    }">
+    @input="(e) => $emit('update', e)"
+    >
     <template
         v-if="canCreate"
         slot="dropdownDown"
@@ -33,6 +34,8 @@
         </div>
       </template>
   </gRichSelect>
+  <code v-if="selectedOptions && selectedOptions.length">{{JSON.stringify(selectedOptions, null, 2)}}</code>
+</div>
 </template>
 
 <script>
@@ -48,7 +51,15 @@ export default {
     },
     textAttribute: {
       type: String,
-      default: 'title'
+      default: null
+    },
+    descriptionAttribute: {
+      type: String,
+      default: null
+    },
+    mediaAttribute: {
+      type: String,
+      default: null
     },
     multiple: {
       type: Boolean,
@@ -84,13 +95,26 @@ export default {
     },
     selected: {
       type: [String, Array],
-      default: null
+      default: () => null
     }
   },
   data() {
     return {
       selectOptions: this.options,
-      selectedOptions: this.multiple
+      selectedOptions: this.multiple ? [] : null
+    }
+  },
+  watch: {
+    options() {
+      this.selectOptions = this.options
+    },
+    selected() {
+      this.selectedOptions = this.selected
+    }
+  },
+  created() {
+    setTimeout(() => {
+      this.selectedOptions = this.multiple
         ? [null, undefined, [], ''].includes(this.selected) 
           ? [] 
           : !Array.isArray(this.selected)
@@ -101,15 +125,7 @@ export default {
                 : Array.isArray(this.selected) 
                   ? this.selected[0] 
                   : null
-    }
-  },
-  watch: {
-    options() {
-      this.selectOptions = this.options
-    },
-    selected() {
-      this.selectedOptions = this.selected
-    }
+    }, 1000);
   },
   methods: {
     createOption (text) {

@@ -28,7 +28,7 @@ const config: NuxtConfig = {
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/media/fire.png' },
       { rel: 'stylesheet', href: 'https://use.typekit.net/ptm4ahe.css' },
-      { rel: 'stylesheet', href: 'https://d1azc1qln24ryf.cloudfront.net/99224/GiGIcons/style-cf.css?em03gt' }
+      { rel: 'stylesheet', href: 'https://d1azc1qln24ryf.cloudfront.net/99224/GiGIcons/style-cf.css?8ct99z' }
     ],
     script: []
   },
@@ -57,7 +57,7 @@ const config: NuxtConfig = {
       authDomain: fireDev ? 'dearborn-fire-dev.firebaseapp.com' : 'dearborn-denim.firebaseapp.com',
       databaseURL: fireDev ? 'https://dearborn-fire-dev.firebaseio.com' : 'https://dearborn-denim.firebaseio.com',
       projectId: fireDev ? 'dearborn-fire-dev' : 'dearborn-denim',
-      storageBucket: fireDev ? 'dearborn-fire-dev.appspot.com' : 'dearborn-denim.appspot.com',
+      storageBucket: fireDev ? 'dearborn-fire-dev.appspot.com' : 'dearborn-fire',
       messagingSenderId: fireDev ? '773304666438' : '14338671750',
       appId: fireDev ? '1:773304666438:web:ebbd2d9158bf22ee713d47' : '1:14338671750:web:0b0777f1f131edba',
       measurementId: '206385704',

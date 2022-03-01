@@ -1,6 +1,6 @@
 <template>
-  <div class="page-content products">
-    <Title>Upload:</Title>
+  <div class="page-content upload">
+    <MediaUploader class="mt-12" />
   </div>
 </template>
 <script>
