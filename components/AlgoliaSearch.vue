@@ -259,6 +259,9 @@ export default {
           setTimeout(() => {
             this.fetchingHits = false
           }, 250);
+          if(this.indexName.includes('products')) {
+            this.$store.commit('productsCache/set', { products: this.hits, env: this.indexName.split('_')[1] })
+          }
           return this.hits
         })
         .catch(err => {

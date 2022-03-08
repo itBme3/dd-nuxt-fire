@@ -1,24 +1,4 @@
-// import { ShopEnv } from "~/models/shopify.models";
 import { FireDb } from "~/utils/firebase";
-
-// interface StateProduct { title: string, id: number, handle: string, image: any }
-
-// interface StateEnvObj {
-//       [key:string]: StateProduct
-// }
-
-// interface State {
-//       [ShopEnv.DEV]: StateEnvObj;
-//       [ShopEnv.LIVE]: StateEnvObj;
-//       status: boolean
-// }
-
-// export const state = (): State => ({
-//       dev: {},
-//       live: {},
-//       status: false
-// })
-
 
 let db;
 
@@ -29,27 +9,22 @@ export const state = () => ({
 })
 
 export const mutations = {
-      set (state, { env, product }) {
-            if (product?.handle) {
-                  const { title, handle, id, images } = product;
-                  const image = Array.isArray(images) ? images[0] : { url: product?.image };
-                  const cached = state[env][handle] || {};
-                  if (
-                        title === cached.title
-                        && handle === cached.handle
-                        && id === cached.id
-                        && image?.url === cached?.image?.url
-                  ) {
-                        console.log('already cached');
-                  } else {
-                        console.log('stored product')
-                        // state[env] = {};
-                        // setTimeout(() => {
-                        state[env] = {...JSON.parse(JSON.stringify(state[env])), [handle]: { title, handle, id, image }};
-                        // state.productsCache[env][handle] = { title, handle, id, image };
-                        // }, 500)
-                  }
-            }
+      set (state, { env, products }) {
+            try {
+                  const newProducts = products.filter(product => {
+                        if (!product?.handle) { return false }
+                              const cached = state[env][product.handle] || {};
+                              return product.title !== cached.title
+                                    || product.handle !== cached.handle
+                                    || product.id !== cached.id
+                                    || product.images[0]?.url !== cached?.images[0]?.url
+                  }).reduce((acc, product) => {
+                        const { title, handle, id, images } = product;
+                        const image = Array.isArray(images) ? images[0] : { url: product?.image };
+                        return { ...acc, [handle]: { title, id, image } }
+                  }, {})
+                  state[env] = { ...JSON.parse(JSON.stringify(state[env])), ...newProducts };
+            }  catch(err) {}
       }
 }
 
@@ -76,7 +51,7 @@ export const actions = {
             if (!product?.handle) {
                   return null
             }
-            commit('set', { product, env });
+            commit('set', { products: [product], env });
             return product
       }
 }
