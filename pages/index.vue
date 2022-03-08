@@ -1,40 +1,135 @@
 <template>
   <div class="max-w-full">
     <div>
-      <h1>Index</h1>
-      <SelectStarRating
+      <gInput
+        v-model="handle"
+      />
+      <gButton class="bg-cyan-400 text-cyan-900" @click="setCacheProduct">GET</gButton>
+      <gButton class="bg-yellow-400 text-yellow-900" @click="reload">RELOAD</gButton>
+      <client-only>
+        <pre v-if="loaded && !fetching">
+            {{ handle }}: {{ hasHandle }}
+            <code>{{ JSON.stringify($store.state.localStorage.productsCache, null, 4) }}</code>
+        </pre>
+      </client-only>
+      
+      <!-- <code v-if="!fetching">{{ JSON.stringify(productsCache) }}</code> -->
+      <!-- <Codeblock v-if="!!docs">{{ JSON.stringify(docs, null, 2) }}</Codeblock>
+      <Codeblock v-if="!!products">{{ JSON.stringify(products, null, 2) }}</Codeblock>
+
+    <Editor :content="content"
+      @update="(e) => content = e" />
+    <Codeblock>{{ content }}</Codeblock>
+    <RichSelect
+      :close-on-select="false"
+      :multiple="true"
+      :variant="'cyan'"
+      :options="options"
+      :can-create="true"
+      :selected="selected"
+      :value-attribute="null"
+      :text-attribute="null"
+      @update="(e) => selected = e"
+    />
+
+      <ModalSelectAlgolia 
+        :index-name="'products_live'"
+        :selected="selected"
+        @change="(e) => selected = e"
+        @submit="submitSelection"
+      /> -->
+      <!-- <Codeblock>{{ JSON.stringify(products, null, 2) }}</Codeblock> -->
+      <!-- <SelectStarRating
         :value="rating"
-        @selected="updateRating"/>
+        @change="updateRating"/> -->
     </div>
   </div>
 </template>
 
 <script lang="js">
+import {Shopify} from '~/utils/shopify'
+import {$algolia} from '~/utils/algolia'
+import { FireDb } from '~/utils/firebase'
 
 export default {
   async asyncData({ app }) {
-    // INFO -> app.$fire.firestore etc. are accessible
-    const messageRef = app.$fire.firestore.collection('products_live').doc('tailored-fit-dark-wash')
-    try {
-      const snapshot = await messageRef.get()
-      const doc = snapshot.data()
-      if (!doc) {
-        // console.info('Document does not exist.')
-        return
-      }
-      // console.info(doc.message)
-    } catch (e) {
-      console.error(e)
+    const db = new FireDb(app);
+    // const docs = await db.doc('products_live/tailored-fit-dark-wash')
+    const docs = null;
+    const shops = {
+      live: new Shopify({ app, env: 'live' }),
+      dev: new Shopify({ app, env: 'dev' }),
+    }
+    const products = await shops.dev.get({ path: '/products', query: { fields: 'id,title' } })
+      .then(res => res.data)
+      console.log({ app })
+    return {
+      db, docs, products
+    }
+    
+  },
+
+  data() {
+    return {
+      content: '',
+      rating: 3,
+      selected: [],
+      index: $algolia.initIndex('media'),
+      options: [
+        {title: 'something', id: 1},
+        {title: 'another thing', id: 2},
+        {title: 'this thing', id: 3},
+        {title: 'on last thing', id: 4},
+      ].map(o => o.title),
+      handle: 'tailored-fit-dark-wash',
+      fetching: false
     }
   },
-  data: () => ({
-    rating: 3
-  }),
+  computed: {
+    loaded() {
+      return this.$store.state.localStorage.status
+    },
+    hasHandle() {
+      return {has: !!this.$store.state.localStorage.productsCache.dev[this.handle], handles: Object.keys(this.$store.state.localStorage.productsCache.dev)}
+    }
+  },
+
+  mounted() {
+    this.$store.state.localStorage.status = true
+  },
   methods: {
     updateRating(e) {
       this.rating = e
       console.log({ rating: this.rating })
+    },
+    submitSelection(e) {
+      console.log('SUbMIT: ', e)
+    },
+    fetchOptions(e) {
+      return this.index.searchForFacetValues('tags', e)
+        .then(res => res.facetHits)
+        .then(results => { return {results} });
+    },
+    async setCacheProduct() {
+
+      const product = await this.db.doc(`products_dev/${this.handle}`).then(res => {
+        if(!res?.handle) { return null }
+        const { title, id, handle, images } = res;
+        return { title, id, handle, image: images[0] }
+      })
+      if(product !== null) {
+        this.$store.state.localStorage.productsCache.dev[this.handle] = product
+      }
+      // .commit('localStorage/setCacheProduct', {app: { $fire: this.$fire }, handle: this.handle, env: 'dev'})
+      this.reload()
+    },
+    reload() {
+      this.fetching = true; 
+      setTimeout(() => { this.fetching = false }, 500)
     }
+    // getCachedProduct() {
+    //   this.$store.local
+    // }
   }
 }
 </script>

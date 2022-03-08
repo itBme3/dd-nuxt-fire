@@ -17,7 +17,6 @@ export const capitalize = (strng: string): string => {
 }
 
 export const objectsAreTheSame = (_obj1: any, _obj2: any, dblCheck: boolean = true): any => {
-
   const obj1 = (() => {
     try {
       return JSON.parse(JSON.stringify(_obj1))
@@ -226,3 +225,9 @@ export const decodeHtml = (function() {
 
   return decodeHTMLEntities;
 })();
+
+
+export const moveItemInArray = (arr:any[], oldIndex:number, newIndex:number) => {
+  const image = arr.splice(oldIndex, 1)[0];
+  return [...arr.splice(0, newIndex), image, ...arr]
+}

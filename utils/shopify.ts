@@ -1,5 +1,15 @@
 import { RequestParams, ShopEnv } from "~/models/shopify.models";
 
+export const shopDomains = {
+      live: 'https://dearborndenim.us',
+      dev: 'https://dearborn-denim-dev.myshopify.com'
+}
+
+export const shopAdminDomains = {
+      live: 'https://dearborn-denim-apparel.myshopify.com/admin',
+      dev: 'https://dearborn-denim-dev.myshopify.com/admin'
+}
+
 export class Shopify {
       env = ShopEnv.DEV
       app

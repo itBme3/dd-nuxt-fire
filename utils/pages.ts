@@ -17,8 +17,8 @@ const pages: {
             color: 'blue'
       },
       {
-            label: 'Uploads',
-            path: '/images/uploads',
+            label: 'Upload',
+            path: '/images/upload',
             icon: 'upload',
             color: 'cyan'
       },
