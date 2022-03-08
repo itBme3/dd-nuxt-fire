@@ -153,7 +153,7 @@
       <input
         v-tooltip="'Text Color'"
         type="color"
-        class="rounded bg-gray-800 h-8"
+        class="rounded bg-gray-800 h-8 w-8"
         @input="editor.chain().focus().setColor($event.target.value).run()"
         :value="editor.getAttributes('textStyle').color"
       />
@@ -166,7 +166,7 @@
       <input
         v-tooltip="'Highlight Color'"
         type="color"
-        class="rounded bg-gray-800 h-8"
+        class="rounded bg-gray-800 h-8 w-8"
         @input="editor.chain().focus().setHighlight({color: $event.target.value}).run()"
         :value="editor.getAttributes('highlight').color"
       />
@@ -342,10 +342,15 @@ export default {
 }
 </script>
 <style lang="scss">
+:root {
+  --editor-min-height: 180px;
+}
 .content-editor {
-  @apply bg-white rounded min-h-[300px] text-gray-900 shadow-md;
+  @apply bg-white rounded text-gray-900 shadow-md;
+  min-height: var(--editor-min-height);
   > .ProseMirror {
-    @apply min-h-[300px] focus:outline-none focus:ring-0 p-2;
+    @apply focus:outline-none focus:ring-0 p-2;
+    min-height: var(--editor-min-height);
     > * + * {
       margin-top: 0.75em;
     }

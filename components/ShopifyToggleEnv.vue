@@ -7,7 +7,7 @@
         :class="{
           ['hover:bg-green-500 border uppercase']: true,
           ['bg-green-500 border-green-500 border-opacity-100 text-gray-900 text-opacity-80']: shopEnv === anEnv,
-          ['bg-transparent border-gray-800 dark:border-gray-700 text-gray-900 dark:text-gray-100 hover:border-green-500 dark:hover:border-green-500']: shopEnv !== anEnv,
+          ['bg-transparent border-gray-800 dark:border-gray-700 text-gray-900 hover:text-green-900 dark:text-gray-100 dark:hover:text-green-900 hover:border-green-500 dark:hover:border-green-500']: shopEnv !== anEnv,
         }"
         @click="(e) => $emit('change', anEnv)">{{ anEnv }}</gButton>
   </div>

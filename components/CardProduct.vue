@@ -1,5 +1,5 @@
 <template>
-  <Card class="card-review">
+  <Card class="card-product">
     <template #media
       v-if="!!item.image || !!item.media">
       <Media :media="!!item.image ? item.image : item.media" />
