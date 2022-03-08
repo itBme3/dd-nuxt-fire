@@ -6,12 +6,7 @@
       />
       <gButton class="bg-cyan-400 text-cyan-900" @click="setCacheProduct">GET</gButton>
       <gButton class="bg-yellow-400 text-yellow-900" @click="reload">RELOAD</gButton>
-      <client-only>
-        <pre v-if="loaded && !fetching">
-            {{ handle }}: {{ hasHandle }}
-            <code>{{ JSON.stringify($store.state.localStorage.productsCache, null, 4) }}</code>
-        </pre>
-      </client-only>
+        <pre v-if="!fetching"><code>{{ JSON.stringify($store.state.productsCache, null, 4) }}</code></pre>
       
       <!-- <code v-if="!fetching">{{ JSON.stringify(productsCache) }}</code> -->
       <!-- <Codeblock v-if="!!docs">{{ JSON.stringify(docs, null, 2) }}</Codeblock>
@@ -55,6 +50,7 @@ export default {
   async asyncData({ app }) {
     const db = new FireDb(app);
     // const docs = await db.doc('products_live/tailored-fit-dark-wash')
+    
     const docs = null;
     const shops = {
       live: new Shopify({ app, env: 'live' }),
@@ -62,7 +58,6 @@ export default {
     }
     const products = await shops.dev.get({ path: '/products', query: { fields: 'id,title' } })
       .then(res => res.data)
-      console.log({ app })
     return {
       db, docs, products
     }
@@ -87,15 +82,12 @@ export default {
   },
   computed: {
     loaded() {
-      return this.$store.state.localStorage.status
+      return this.$store.state.productsCache.status
     },
-    hasHandle() {
-      return {has: !!this.$store.state.localStorage.productsCache.dev[this.handle], handles: Object.keys(this.$store.state.localStorage.productsCache.dev)}
-    }
   },
 
   mounted() {
-    this.$store.state.localStorage.status = true
+    this.$store.state.productsCache.status = true
   },
   methods: {
     updateRating(e) {
@@ -110,18 +102,22 @@ export default {
         .then(res => res.facetHits)
         .then(results => { return {results} });
     },
-    async setCacheProduct() {
+    setCacheProduct() {
+      this.$store.dispatch('productsCache/getProduct', {handle: this.handle, env: 'dev'})
+        .then(console.log)
+        .catch(console.error)
+      // this.$store.commit('productsCache/set', {product: {title: 'test-3', id: 123, handle: 'test-3', images: null}, env: 'dev'})
 
-      const product = await this.db.doc(`products_dev/${this.handle}`).then(res => {
-        if(!res?.handle) { return null }
-        const { title, id, handle, images } = res;
-        return { title, id, handle, image: images[0] }
-      })
-      if(product !== null) {
-        this.$store.state.localStorage.productsCache.dev[this.handle] = product
-      }
+      // const product = await this.db.doc(`products_dev/${this.handle}`).then(res => {
+      //   if(!res?.handle) { return null }
+      //   const { title, id, handle, images } = res;
+      //   return { title, id, handle, image: images[0] }
+      // })
+      // if(product !== null) {
+      //   this.$store.state.localStorage.productsCache.dev[this.handle] = product
+      // }
       // .commit('localStorage/setCacheProduct', {app: { $fire: this.$fire }, handle: this.handle, env: 'dev'})
-      this.reload()
+      // this.reload()
     },
     reload() {
       this.fetching = true; 

@@ -65,8 +65,8 @@ export default {
   },
   computed: {
     pages() {
-      const accessPages = Array.isArray(this.$store.state?.userDoc?.access?.can_access_pages) ? this.$store.state.userDoc.access.can_access_pages : [];
-      const isAdmin = !!this.$store.state?.userDoc?.access?.is_admin;
+      const accessPages = Array.isArray(this.$store.state?.auth?.user?.doc?.access?.can_access_pages) ? this.$store.state.auth.user.doc.access.can_access_pages : [];
+      const isAdmin = !!this.$store.state?.auth?.user?.doc?.access?.is_admin;
       return isAdmin ? navPages 
         : !accessPages?.length ? [] 
         : navPages.filter(p => accessPages.includes(p.path) || accessPages.includes(`${p.path}/**`))

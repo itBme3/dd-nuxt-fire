@@ -2,9 +2,8 @@
 import { Middleware } from '@nuxt/types'
 
 const testMiddleware: Middleware = ({ store, redirect, route }) => {
-  store.state.authUser != null && route.path === '/login' ? redirect('/') : ''
-  store.state.authUser == null && route.path !== '/login' ? redirect('/login') : ''
-  
+  store.state.auth?.user != null && route.path === '/login' ? redirect('/') : ''
+  store.state.auth?.user == null && route.path !== '/login' ? redirect('/login') : ''
 }
 
 export default testMiddleware

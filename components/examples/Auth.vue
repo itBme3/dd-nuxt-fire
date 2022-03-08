@@ -57,7 +57,7 @@ import { mapState, mapGetters } from 'vuex'
 export default Vue.extend({
   computed: {
     ...mapState({
-      authUser: (state: any) => state.authUser,
+      authUser: (state: any) => state.auth.user,
     }),
     ...mapGetters({
       isLoggedIn: 'isLoggedIn',
