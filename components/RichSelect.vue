@@ -34,7 +34,6 @@
         </div>
       </template>
   </gRichSelect>
-  <code v-if="selectedOptions && selectedOptions.length">{{JSON.stringify(selectedOptions, null, 2)}}</code>
 </div>
 </template>
 

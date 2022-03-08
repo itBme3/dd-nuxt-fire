@@ -146,6 +146,7 @@
         <Icon :name="'ordered-list'" />
       </gButton>
       <gButton 
+        v-if="!slim"
         v-tooltip="'Insert Image'"
         @click="selectingImage = true">
         <Icon :name="'image'" />
@@ -176,27 +177,29 @@
         @click="editor.chain().focus().unsetHighlight().run()">
         <Icon name="remove-color" />
       </gButton>
-      <gButton 
+      <!-- <gButton 
         v-tooltip="'Blockquote'"
         @click="editor.chain().focus().toggleBlockquote().run()" :class="{ 'is-active': editor.isActive('blockquote') }">
         <Icon :name="'quote'" />
-      </gButton>
-      <gButton 
+      </gButton> -->
+      <!-- <gButton 
         v-tooltip="'Horizontal Rule'"
         @click="editor.chain().focus().setHorizontalRule().run()">
         <Icon :name="'line'" />
-      </gButton>
+      </gButton> -->
       <gButton 
         v-tooltip="'Clear Formatting'"
         @click="editor.chain().focus().unsetAllMarks().run(); editor.chain().focus().clearNodes().run()">
         <Icon name="clear-formatting" />
       </gButton>
       <gButton 
+        v-if="!slim"
         v-tooltip="'Undo'"
         @click="editor.chain().focus().undo().run()">
         <Icon :name="'undo'" />
       </gButton>
       <gButton 
+        v-if="!slim"
         v-tooltip="'Redo'"
         @click="editor.chain().focus().redo().run()">
         <Icon :name="'redo'" />
@@ -257,6 +260,10 @@ export default {
     content: {
       type: String,
       default: ''
+    },
+    slim: {
+      type: Boolean,
+      default: false
     }
   },
   data() {

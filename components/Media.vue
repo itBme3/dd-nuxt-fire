@@ -41,7 +41,7 @@ export default {
     // const mediaSrc = typeof this.mediaSrc !== 'undefined' ? this.mediaSrc : this.getImgSrc(this.media, typeof this.$el !== 'undefined' ? this.$el : { offsetWidth: 300, offsetHeight: 300 })
     return { mediaSrc: null, imgHeight: 'auto' }
   },
-  mounted () {
+  created () {
     this.setImgSrc()
     window.addEventListener('resize', this.setImgSrc)
   },
