@@ -22,8 +22,8 @@ export const TailwindComponentsSettings = {
   gTextarea: {
     component: TTextarea,
     props: {
-      fixedClasses: 'block w-full px-3 py-2 transition duration-100 ease-in-out border rounded shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed',
-      classes: 'text-black placeholder-gray-400 bg-white border-gray-300 focus:border-blue-500 ',
+      fixedClasses: 'block bg-white dark:bg-gray-800 w-full px-3 py-2 transition duration-100 ease-in-out border rounded shadow-sm focus:ring-2 focus:ring-purple-500 focus:outline-none focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed',
+      classes: 'placeholder-gray-400 dark:placeholder-gray-600 border-gray-100 dark:border-gray-800',
       variants: {
         danger: 'border-red-300 bg-red-50 placeholder-red-200 text-red-900',
         success: 'border-green-300 bg-green-50 placeholder-gray-400 text-green-900'
@@ -33,8 +33,10 @@ export const TailwindComponentsSettings = {
   gCheckbox: {
     component: TCheckbox,
     props: {
-      fixedClasses: 'transition duration-100 ease-in-out rounded shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none focus:ring-opacity-50 focus:ring-offset-0 disabled:opacity-50 disabled:cursor-not-allowed',
-      classes: 'text-blue-500 border-gray-300 ',
+      fixedClasses: {
+        label: 'ml-2 text-gray-700 dark:text-gray-400 uppercase text-sm',
+        input: 'transition duration-100 ease-in-out rounded shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none focus:ring-opacity-50 focus:ring-offset-0  disabled:opacity-50 disabled:cursor-not-allowed text-blue-500 border-gray-300',
+      },
       variants: {
         error: 'text-red-500 border-red-300',
         success: 'text-green-500 border-green-300'
@@ -46,7 +48,7 @@ export const TailwindComponentsSettings = {
     props: {
       classes: {
         groupWrapper: 'flex flex-col',
-        label: 'ml-2 text-gray-700 uppercase text-sm',
+        label: 'ml-2 text-gray-700 dark:text-gray-400 uppercase text-sm',
         input: 'transition duration-100 ease-in-out rounded shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none focus:ring-opacity-50 focus:ring-offset-0  disabled:opacity-50 disabled:cursor-not-allowed text-blue-500 border-gray-300'
       },
       variants: {
@@ -123,12 +125,12 @@ export const TailwindComponentsSettings = {
       fixedClasses: {
         wrapper: 'relative',
         buttonWrapper: 'inline-block relative w-full',
-        selectButton: 'w-full flex text-left justify-between bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-900 items-center px-3 py-2 text-black transition duration-100 ease-in-out border rounded shadow-sm focus:ring-2 focus:outline-none focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed',
+        selectButton: 'w-full flex text-left justify-between bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-900 items-center pl-1 pr-9 py-2 text-black transition duration-100 ease-in-out border rounded shadow-sm focus:ring-2 focus:outline-none focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed',
         selectButtonLabel: 'block truncate',
         selectButtonTagWrapper: 'flex flex-wrap items-start content-start',
         selectButtonTag: 'flex px-2 disabled:cursor-not-allowed disabled:opacity-50 duration-100 ease-in-out focus:border-transparent focus:outline-none focus:ring-2 focus:ring-opacity-50 rounded shadow-sm text-sm transition white-space-no m-0.5 max-w-full overflow-hidden h-8 flex items-center',
         selectButtonPlaceholder: 'block truncate',
-        selectButtonIcon: 'fill-current flex-shrink-0 ml-1 h-4 w-4',
+        selectButtonIcon: 'fill-current flex-shrink-0 ml-1 h-4 w-4 absolute right-2 top-1/2 transform -translate-y-1/2',
         selectButtonClearButton: 'rounded flex flex-shrink-0 items-center justify-center absolute right-0 top-0 m-2 h-6 w-6 transition duration-100 ease-in-out',
         selectButtonTagDeleteButtonIcon: 'w-4 h-4 ml-2 my-auto',
         selectButtonClearIcon: 'fill-current h-3 w-3',
@@ -157,14 +159,14 @@ export const TailwindComponentsSettings = {
       classes: {
         wrapper: '',
         buttonWrapper: '',
-        selectButton: 'focus:border-yellow-500 focus:ring-yellow-500',
+        selectButton: 'focus:border-yellow-400 focus:ring-yellow-400',
         selectButtonLabel: 'text-yellow-600 dark:text-yellow-400',
-        selectButtonTag: 'bg-yellow-500 text-yellow-900 focus:ring-yellow-500',
+        selectButtonTag: 'bg-yellow-400 text-yellow-900 focus:ring-yellow-400',
         selectButtonTagDeleteButtonIcon: '',
         selectButtonPlaceholder: 'text-gray-400 dark:text-gray-600',
         selectButtonIcon: 'text-gray-600',
-        selectButtonClearButton: 'bg-yellow-500 text-yellow-900',
-        selectButtonClearIcon: 'w-4 h-4 fill-red-500',
+        selectButtonClearButton: 'bg-yellow-400 text-yellow-900',
+        selectButtonClearIcon: 'w-4 h-4 fill-red-400',
         dropdown: 'bg-white dark:bg-gray-800 shadow-lg',
         dropdownFeedback: 'pb-2 px-3 text-gray-400 text-sm',
         loadingMoreResults: 'pb-2 px-3 text-gray-400 text-sm',
@@ -175,7 +177,7 @@ export const TailwindComponentsSettings = {
         option: 'rounded m-1 transform scale-98 transform hover:scale-100',
         disabledOption: '',
         highlightedOption: 'bg-black bg-opacity-5 rounded m-1 transform hover:scale-100',
-        selectedOption: 'bg-yellow-500 text-yellow-90 rounded m-1 transform scale-98 hover:scale-100',
+        selectedOption: 'bg-yellow-400 text-yellow-90 rounded m-1 transform scale-98 hover:scale-100',
         selectedHighlightedOption: 'bg-yellow-600 text-yellow-900 rounded m-1 transform scale-98 hover:scale-100',
         optionContent: 'flex justify-between items-center px-3 py-2',
         optionLabel: 'flex items center',
@@ -188,17 +190,17 @@ export const TailwindComponentsSettings = {
         leaveToClass: 'opacity-0'
       },
       variants: {
-        ...['red', 'purple', 'blue', 'cyan', 'green', 'yellow', 'orange'].reduce((acc, color) => {
+        ...['red', 'purple', 'blue', 'cyan', 'green', 'yellow', 'orange', 'light'].reduce((acc, color) => {
           return {
             ...acc,
             [color]: {
-              selectButton: `focus:border-${color}-500 focus:ring-${color}-500`,
-              selectButtonClearButton: `bg-${color}-500`,
-              selectButtonClearIcon: `text-${color}-900`,
-              selectButtonLabel: `text-${color}-600 dark:text-${color}-400`,
-              selectButtonTag: `bg-${color}-500 text-${color}-900 focus:ring-${color}-500`,
-              selectedOption: `bg-${color}-500 text-${color}-900`,
-              selectedHighlightedOption: `bg-${color}-600 text-${color}-900`
+              selectButton: `focus:border-${ color === 'light' ? 'gray' : color }-400 focus:ring-${ color === 'light' ? 'gray' : color }-400${ color === 'light' ? 'gray' : color }#${color === 'light' ? ' bg-opacity-5 hover:bg-opacity-10 dark:text-gray-400' : '' }`,
+              selectButtonClearButton: `bg-${ color === 'light' ? 'gray' : color }-400#${color === 'light' ? ' bg-opacity-5 hover:bg-opacity-10 dark:text-gray-400' : '' }`,
+              selectButtonClearIcon: `text-${ color === 'light' ? 'gray' : color }-900#${color === 'light' ? ' bg-opacity-5 hover:bg-opacity-10 dark:text-gray-400' : '' }`,
+              selectButtonLabel: `text-${ color === 'light' ? 'gray' : color }-500 dark:text-${ color === 'light' ? 'gray' : color }-400#${color === 'light' ? ' bg-opacity-5 hover:bg-opacity-10 dark:text-gray-400' : '' }`,
+              selectButtonTag: `bg-${ color === 'light' ? 'gray' : color }-400 text-${ color === 'light' ? 'gray' : color }-900 focus:ring-${ color === 'light' ? 'gray' : color }-400#${color === 'light' ? ' bg-opacity-5 hover:bg-opacity-10 dark:text-gray-400' : '' }`,
+              selectedOption: `bg-${ color === 'light' ? 'gray' : color }-400 text-${ color === 'light' ? 'gray' : color }-900#${color === 'light' ? ' bg-opacity-5 hover:bg-opacity-10 dark:text-gray-400' : '' }`,
+              selectedHighlightedOption: `bg-${ color === 'light' ? 'gray' : color }-500 text-${ color === 'light' ? 'gray' : color }-900#${color === 'light' ? ' bg-opacity-5 hover:bg-opacity-10 dark:text-gray-400' : '' }`
             }
           }
        }, {})
@@ -209,10 +211,10 @@ export const TailwindComponentsSettings = {
     component: TDropdown,
     props: {
       fixedClasses: {
-        button: 'flex items-center text-white block px-4 py-2 transition duration-100 ease-in-out border border-transparent rounded shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed',
+        button: 'button transition focus:border-transparent focus:ring-0 focus:outline-0 disabled:opacity-50 disabled:cursor-not-allowed',
         wrapper: 'inline-flex flex-col',
         dropdownWrapper: 'relative z-10',
-        dropdown: 'origin-top-left absolute left-0 w-56 rounded shadow mt-1',
+        dropdown: 'dropdown bg-gray-100 dark:bg-gray-800 p-2 origin-top-left absolute left-0 rounded shadow mt-1',
         enterClass: 'opacity-0 scale-95',
         enterActiveClass: 'transition transform ease-out duration-100',
         enterToClass: 'opacity-100 scale-100',
@@ -221,14 +223,7 @@ export const TailwindComponentsSettings = {
         leaveToClass: 'opacity-0 scale-95'
       },
       classes: {
-        button: 'bg-blue-500 hover:bg-blue-600',
-        dropdown: 'bg-white'
-      },
-      variants: {
-        danger: {
-          button: 'bg-red-500 hover:bg-red-600',
-          dropdown: 'bg-red-50'
-        }
+        dropdown: 'w-56'
       }
     }
   },
@@ -331,21 +326,21 @@ export const TailwindComponentsSettings = {
     component: TModal,
     props: {
       fixedClasses: {
-        overlay: 'z-9999 overflow-auto scrolling-touch left-0 top-0 bottom-0 right-0 w-full h-full fixed',
-        wrapper: 'relative mx-auto z-99999 m-6',
-        modal: 'overflow-visible relative  rounded',
-        body: 'p-3',
-        header: 'border-b p-3 rounded-t',
-        footer: ' p-3 rounded-b',
-        close: 'flex items-center justify-center transition duration-100 ease-in-out focus:ring-0 focus:ring-transparent focus:outline-none z-999',
-        closeIcon: 'fill-current h-6 w-6'
+        overlay: 'modal-overlay z-99999 overflow-auto scrolling-touch left-0 top-0 bottom-0 right-0 w-full h-full fixed',
+        wrapper: 'modal-wrapper relative mx-auto z-99999 m-auto rounded bg-white dark:bg-gray-800 shadow-xl mt-24',
+        modal: 'modal-modal overflow-visible relative  rounded',
+        body: 'modal-body p-3 min-h-[8rem]',
+        header: 'modal-header border-b border-gray-900 border-opacity-10 p-3 rounded-t',
+        footer: 'modal-footer p-2',
+        close: 'modal-close flex items-center justify-center transition duration-100 ease-in-out focus:ring-0 focus:ring-transparent focus:outline-none z-999 transform scale-80',
+        closeIcon: 'modal-closeIcon fill-current h-6 w-6 transform scale-125'
       },
       classes: {
-        overlay: 'bg-gray-800 bg-opacity-90',
-        wrapper: 'max-w-lg mt-8 md:mt-6',
+        overlay: 'bg-gray-100 dark:bg-gray-900 bg-opacity-90',
+        wrapper: 'max-w-lg',
         modal: 'bg-transparent',
         header: 'border-gray-100',
-        footer: 'bg-gray-100',
+        footer: 'bg-transparent',
         close: 'rounded-md shadow-xl absolute right-0 top-0 h-12 w-12 bg-gray-300 bg-opacity-5 hover:bg-gray-300 hover:bg-opacity-10 text-red-400',
         overlayEnterClass: 'opacity-0',
         overlayEnterActiveClass: 'transition ease-out duration-100',
