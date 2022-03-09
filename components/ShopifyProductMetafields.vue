@@ -1,6 +1,8 @@
 <template>
   <div class="product-metafields">
-      <div class="metafield-tabs flex content-start items-center space-x-2 mb-3">
+      <div 
+        ref="metafieldTabs"
+        class="metafield-tabs flex content-start items-center space-x-2 mb-3">
 
         <gButton 
           v-for="obj in metafieldObjs"
@@ -9,7 +11,7 @@
             'hover:bg-red-400 hover:text-red-900': true,
             'bg-red-400 text-red-900': viewing === obj.label
           }"
-          @click="viewing = obj.label">
+          @click="viewing = obj.label; scrollTo('metafieldTabs', -100)">
           {{ obj.label }}
         </gButton>
 
@@ -33,25 +35,48 @@
           }"
         >
         <template v-if="viewing === obj.label && obj.doc !== null">
-            
-          <template v-if="obj.label === 'Product Details'">
+
+            <draggable 
+              v-if="obj.label === 'Product Details'"
+              v-model="obj.doc.value.blocks"
+              @change="$emit('update', obj.doc)"
+            >
             <Card
-              v-for="block in obj.doc.value.blocks"
+              v-for="(block, blockIndex) in obj.doc.value.blocks"
               :key="obj.label + '-' + block.title"
-              class="w-full mb-2"
+              :ref="obj.key + blockIndex"
+              class="w-full mb-2 hover:scale-100 relative group overflow-visible"
+              :classes="{ media: 'flex items-stretch content-center' }"
               card-style="media-left">
-              <template #media>
-                <Media 
-                  class="product-image w-full h-full rounded shadow-md max-w-sm max-h-[380px] mx-auto sm:ml-auto sm:mr-0"
-                  :media="images[block.image_index]"
-                  :is-background="true"
-                  ratio="1:1"
+              <template #before>
+                <ButtonDelete
+                  class="absolute right-1 top-1 scale-0 opacity-0 group-hover:scale-100 group-hover:opacity-100"
+                  @delete="() => {
+                    obj.doc.value.blocks.splice(blockIndex, 1);
+                    $emit('update', obj.doc);
+                  }"
                 />
               </template>
+                <template #media>
+                  <Media 
+                    v-if="block && block.image_index > -1"
+                    class="product-image w-full h-full cursor-move rounded shadow-md max-w-sm max-h-[380px] mx-auto sm:ml-auto sm:mr-0"
+                    :media="images[block.image_index]"
+                    :is-background="true"
+                    ratio="1:1"
+                  />
+                  <Icon v-else name="image" class="m-auto" />
+                  <gButton class="rounded-none bg-transparent p-0 flex items-start content-center w-full m-0 h-full absolute inset-0 z-1 text-opacity-0"
+                    @click="(e) => {
+                      selectImageIndex(e, blockIndex)
+                    }">
+                    select image
+                  </gButton>
+                </template>
               <gInput 
                 :value="block.title"
                 type="text"
-                class="w-full"
+                class="w-full text-xl mb-1"
                 @change="(e) => {
                   block.title = e.target.value;
                   $emit('update', obj.doc)
@@ -67,11 +92,54 @@
                 }"
               />
             </Card>
-          </template>
+          </draggable>
 
-          <template v-if="obj.label === 'Featured Reviews'">
-            <code>todo: featuredReviews</code>
-          </template>
+
+          <draggable 
+            v-if="obj.label === 'Featured Reviews'"
+            v-model="obj.doc.value"
+            @change="$emit('update', obj.doc)"
+          >
+            <Card
+              v-for="(review, reviewIndex) in obj.doc.value"
+              :key="obj.label + '-' + review.title"
+              :ref="obj.key + reviewIndex"
+              class="w-full mb-2 hover:scale-100 relative group overflow-visible"
+              :classes="{ media: 'flex items-stretch content-center' }">
+              <template #before>
+                <ButtonDelete
+                  class="absolute right-1 top-1 scale-0 opacity-0 group-hover:scale-100 group-hover:opacity-100"
+                  @delete="() => {
+                    obj.doc.value.splice(reviewIndex, 1);
+                    $emit('update', obj.doc);
+                  }"
+                />
+              </template>
+              
+              <Editor 
+                :content="review.title"
+                :slim="true"
+                min-height="auto"
+                class="py-1 w-full min-h-8"
+                @update="(e) => {
+                  review.title = e;
+                  $emit('update', obj.doc)
+                }"
+              />
+              <Editor 
+                :content="review.body"
+                :slim="true"
+                class="py-1 w-full"
+                min-height="auto"
+                @update="(e) => {
+                  review.body = e;
+                  $emit('update', obj.doc)
+                }"
+              />
+              <i class="text-gray-500 block mt-3">{{ review.reviewer }}</i>
+            </Card>
+          </draggable>
+
 
           <template v-if="obj.label === 'Complete The Look'">
             <code>todo: the_look</code>
@@ -79,6 +147,52 @@
 
         </template>
       </div>
+      <gModal 
+        :ref="'modelSelectImageIndex'"
+        name="modelSelectImageIndex"
+        variation="popover"
+        :style="{'top': modalTopOffset}"
+        :disable-body-scroll="false"
+        :classes="{
+          overlay: 'bg-white dark:bg-gray-900 bg-opacity-50 dark:bg-opacity-50 transition ease-out duration-100',
+          wrapper: 'bg-transparent shadow-none absolute',
+          modal: 'bg-gray-100 dark:bg-gray-800 left-4 shadow-lg max-w-sm transition-all ease-out duration-200 delay-100 ',
+          header: 'bg-transparent',
+          footer: 'bg-transparent',
+          body: 'p-6',
+          close: 'rounded-md shadow-xl absolute -right-1 -top-1 h-10 w-10 bg-gray-300 dark:bg-gray-800 dark:hover:bg-gray-700 bg-opacity-90 hover:bg-white hover:bg-opacity-100 text-red-400',
+          enterClass: 'opacity-0 scale-0',
+          enterToClass: 'opacity-50 scale-100',
+          overlayEnterActiveClass: '',
+          overlayLeaveClass: 'opacity-50',
+          overlayLeaveActiveClass: '',
+          overlayLeaveToClass: 'opacity-0',
+        }"
+        @after-close="selectingImageBlockIndex = null">
+        <div class="select-product-images grid grid-cols-2 gap-2 max-h-[60vh] min-h-24 overflow-y-scroll">
+            <gButton 
+              v-for="(image, imgIndex) in images"
+              :key="image.url"
+              :class="{
+                'col-span-1 p-0 hover:scale-95 hover:opacity-90': true,
+                'selected border-purple-500 border-2': typeof selectingImageBlockIndex === 'number' && !!metafieldObjs.filter(obj => obj.label === 'Product Details')[0] && !!metafieldObjs.filter(obj => obj.label === 'Product Details')[0].doc.value.blocks[selectingImageBlockIndex].image_index === imgIndex
+              }"
+              @click="() => {
+                if(typeof selectingImageBlockIndex === 'number' ) {
+                  metafieldObjs.filter(obj => obj.label === 'Product Details')[0].doc.value.blocks[selectingImageBlockIndex].image_index = imgIndex;
+                }
+                $emit('update', metafieldObjs.filter(obj => obj.label === 'Product Details')[0].doc);
+                $refs.modelSelectImageIndex.hide()
+              }">
+              <Media 
+                class="w-full h-full rounded shadow-md max-w-sm max-h-[380px] m-0"
+                :media="image"
+                :is-background="true"
+                ratio="1:1"
+              />
+            </gButton>
+          </div>
+      </gModal>
       <gButton
         v-if="
         (viewing === 'Product Details' && metafieldObjs.filter(obj => obj.label === viewing)[0].doc && metafieldObjs.filter(obj => obj.label === viewing)[0].doc.value && metafieldObjs.filter(obj => obj.label === viewing)[0].doc.value.blocks.length)
@@ -91,10 +205,13 @@
         <Icon name="add" />
       </gButton>
     </div>
+
+
+
     <ModalSelectAlgolia
       v-if="searchAlgolia !== null"
       :index-name="searchAlgolia"
-      :show="searchAlgolia"
+      :show="!!searchAlgolia"
       :multiple="true"
       :selecting="{
         identifier: `objectID`,
@@ -111,9 +228,14 @@
 </template>
 
 <script>
+import draggable from 'vuedraggable'
 import { FireDb } from '~/utils/firebase'
 import { handleize } from '~/utils/funcs'
+
 export default {
+   components: {
+    draggable
+  },
   props: {
     env: {
       type: String,
@@ -151,7 +273,9 @@ export default {
       db: new FireDb({ $fire: this.$fire }),
       searchAlgolia: null, /* either null or index name — media, reviews, products_{env} */
       prependSelection: false,
-      images: this.productImages
+      images: this.productImages,
+      selectingImageBlockIndex: null,
+      modalTopOffset: '200px'
     }
   },
   watch: {
@@ -173,12 +297,10 @@ export default {
       }
       const metafieldObj = this.metafieldObjs.filter(obj => obj.label === this.viewing)[0];
       const docPath = metafieldObj.docPath;
-      console.log({docPath})
       const doc = await this.db.doc(docPath).then(res => {
         if(res?.key) {
           return res
         }
-        console.log({res})
         return { 
           key: metafieldObj.key, 
           namespace: metafieldObj.namespace, 
@@ -229,6 +351,24 @@ export default {
         this.metafieldObjs.filter(d => d.label === this.viewing)[0].doc = doc;
         this.$emit('updateMetafield', doc);
       }
+    },
+    selectImageIndex(e, blockIndex) {
+      console.log({ e, modalRef: this.$refs.modelSelectImageIndex })
+       this.$refs.modelSelectImageIndex.show()
+      this.selectingImageBlockIndex = blockIndex
+      setTimeout(() => {
+        this.$refs.modelSelectImageIndex._vnode.elm.querySelector('.modal-wrapper').style.top = `${e.pageY - 200}px`
+        setTimeout(() => {
+          this.scrollTo('modelSelectImageIndex')
+      //   this.$modal.show('modelSelectImageIndex')
+        }, 200)
+      }, 50)
+    },
+    scrollTo(refName, offset = 0) {
+      console.log({ refs: this.$refs, refName })
+      const element = this.$refs[refName]?._vnode?.elm || this.$refs[refName];
+      const top = element.classList.contains('modal-overlay') ? element.childNodes[0].offsetTop - 200 : element.offsetTop + offset;
+      window.scrollTo({top, left: 0, behavior: 'smooth'});
     }
   }
 }

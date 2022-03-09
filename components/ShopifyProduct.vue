@@ -1,22 +1,30 @@
 <template>
-  <div class="product">
+  <div class="product mt-1">
     <template 
       v-if="product !== null">
       <code v-if="product.ERROR" class="text-red-500">{{ product.ERROR }}</code>
       <div v-else class="product-info flex flex-col sm:flex-row sm:space-x-2 md:space-x-8 justify-between">
         <div class="product-content w-full sm:w-[calc(66.666%-.25rem)] max-w-3xl flex flex-col space-y-2">
+
+          <label for="product-title">Title:</label>
           <gInput 
             v-model="product.title"
+            name="product-title"
             type="text"
-            class="w-full"
+            class="w-full text-lg sm:text-2xl md:text-4xl"
           />
+
+          <label for="body-html">Body Html:</label>
           <Editor :content="product.body_html"
+            name="body-html"
             class="py-1 w-full"
             @update="(e) => product.body_html = e"
           />
 
-          <small class="block uppercase">Tags:</small>
+          <label for="product-tags">Tags:</label>
           <RichSelect
+            ref="productTags"
+            name="product-tags"
             :selected="tags"
             :close-on-select="false"
             :multiple="true"
@@ -36,7 +44,7 @@
 
         <Media 
           v-if="!!product.images && product.images[0]"
-          class="w-full sm:min-h-full sm:w-[calc(33.333%-.25rem)] max-w-sm max-h-[380px] mx-auto sm:ml-auto sm:mr-0"
+          class="w-full mt-5 sm:min-h-full sm:w-[calc(33.333%-.25rem)] max-w-sm max-h-[380px] mx-auto sm:ml-auto sm:mr-0"
           :media="product.images[0]"
           :is-background="true"
           ratio="auto"
@@ -151,6 +159,18 @@ export default {
         return  { results }
       }
     },
+    scrollTo(refName, offset = 0) {
+      const element = this.$refs[refName]?._vnode?.elm || this.$refs[refName];
+      const top = element.classList.contains('modal-overlay') ? element.childNodes[0].offsetTop - 200 : element.offsetTop + offset;
+      window.scrollTo({top, left: 0, behavior: 'smooth'});
+    }
   }
 }
 </script>
+
+
+<style lang="scss" scoped>
+label {
+  @apply text-xs text-gray-500 dark:text-gray-500
+}
+</style>
