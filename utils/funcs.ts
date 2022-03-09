@@ -152,7 +152,7 @@ export const getThumbImageUrl = (image: any, el: any): string | Media | undefine
     const width = Math.ceil(elWidth / 100) * 100;
     const segments = src.split('.');
     const suffix = segments.pop();
-    return `${segments.join('.')}_x${width}.${suffix}`;
+    return `${segments.join('.')}_x${width < 100 ? '100' : width }.${suffix}`;
   }
   if (!!!image.thumbs) {
     return !!image?.downloadUrl ? image.downloadUrl : image
