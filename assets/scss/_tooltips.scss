@@ -4,6 +4,42 @@
     @apply bg-gray-700 shadow-lg text-gray-300 rounded px-2 py-1 text-xs;
   }
 
+  &.red {
+    .tooltip-inner {
+      @apply text-red-900 bg-red-500;
+    }
+  }
+  &.orange {
+    .tooltip-inner {
+      @apply text-orange-900 bg-orange-500;
+    }
+  }
+  &.yellow {
+    .tooltip-inner {
+      @apply text-yellow-900 bg-yellow-500;
+    }
+  }
+  &.green {
+    .tooltip-inner {
+      @apply text-green-900 bg-green-500;
+    }
+  }
+  &.cyan {
+    .tooltip-inner {
+      @apply text-cyan-900 bg-cyan-500;
+    }
+  }
+  &.blue {
+    .tooltip-inner {
+      @apply text-blue-900 bg-blue-500;
+    }
+  }
+  &.purple {
+    .tooltip-inner {
+      @apply text-purple-900 bg-purple-500;
+    }
+  }
+
   .tooltip-arrow {
     @apply w-0 h-0 border-gray-700 z-1 absolute;
     border-style: solid;

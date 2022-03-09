@@ -1,11 +1,11 @@
 
 :not(.hit) {
-    .card {
-        @apply transform scale-100 hover:scale-103 hover:shadow-lg rounded p-2 transition ease-quick-in overflow-hidden;
+    > .card {
+        @apply transform scale-100 hover:scale-97 hover:shadow-lg rounded p-2 transition ease-quick-in overflow-hidden;
     }
 }
 .hit {
-    @apply transition ease-quick-in transform scale-100 hover:scale-103 hover:shadow-lg ;
+    @apply transition ease-quick-in transform scale-100 hover:scale-97 hover:shadow-lg ;
     .card {
         @apply hover:scale-100 hover:shadow-none;
     }

@@ -1,12 +1,24 @@
 <template>
-  <div class="editor">
+  <div class="editor"
+    :class="{
+      'focused': (editorFocused || toolbarHovered) && !alwaysShowToolbar
+    }"
+    @mouseleave="toolbarHovered = false"
+  >
+
     <div v-if="editor"
-      class="toolbar flex flex-wrap space-x-1">
+      class="toolbar flex flex-wrap space-x-1"
+      :class="{
+        'hidden': !editorFocused && editorBlurred && !toolbarHovered && !alwaysShowToolbar
+      }"
+      @mouseenter="toolbarHovered = true"
+      >
+      
       <gDropdown :classes="{ dropdown: 'w-28' }">
         <div
-          class="dropdown-trigger"
           slot="trigger"
-          slot-scope="{ mousedownHandler, focusHandler, blurHandler, keydownHandler }">
+          slot-scope="{ mousedownHandler, focusHandler, blurHandler, keydownHandler }"
+          class="dropdown-trigger">
           <gButton
             id="text-tag"
             aria-label="Select text tag menu"
@@ -19,57 +31,57 @@
             <Icon :name="'text'" />
           </gButton>
         </div>
-        <div class="dropdown-buttons" slot-scope="{ hide }">
-          <gButton role="menuitem" @click="(e) => { 
+        <div slot-scope="{ hide }" class="dropdown-buttons">
+          <gButton role="menuitem" :class="{ 'is-active': editor.isActive('heading', { level: 1 }) }" 
+            @click="(e) => { 
               hide(e); editor.chain().focus().toggleHeading({ level: 1 }).run()
-            }" 
-            :class="{ 'is-active': editor.isActive('heading', { level: 1 }) }">
+            }">
             h1
           </gButton>
-          <gButton role="menuitem" @click="(e) => { 
+          <gButton role="menuitem" :class="{ 'is-active': editor.isActive('heading', { level: 2 }) }" 
+            @click="(e) => { 
               hide(e); editor.chain().focus().toggleHeading({ level: 2 }).run()
-            }" 
-            :class="{ 'is-active': editor.isActive('heading', { level: 2 }) }">
+            }">
             h2
           </gButton>
-          <gButton role="menuitem" @click="(e) => { 
+          <gButton role="menuitem" :class="{ 'is-active': editor.isActive('heading', { level: 3 }) }" 
+            @click="(e) => { 
               hide(e); editor.chain().focus().toggleHeading({ level: 3 }).run()
-            }" 
-            :class="{ 'is-active': editor.isActive('heading', { level: 3 }) }">
+            }">
             h3
           </gButton>
-          <gButton role="menuitem" @click="(e) => { 
+          <gButton role="menuitem" :class="{ 'is-active': editor.isActive('heading', { level: 4 }) }" 
+            @click="(e) => { 
               hide(e); editor.chain().focus().toggleHeading({ level: 4 }).run()
-            }" 
-            :class="{ 'is-active': editor.isActive('heading', { level: 4 }) }">
+            }">
             h4
           </gButton>
-          <gButton role="menuitem" @click="(e) => { 
+          <gButton role="menuitem" :class="{ 'is-active': editor.isActive('heading', { level: 5 }) }" 
+            @click="(e) => { 
               hide(e); editor.chain().focus().toggleHeading({ level: 5 }).run()
-            }" 
-            :class="{ 'is-active': editor.isActive('heading', { level: 5 }) }">
+            }">
             h5
           </gButton>
-          <gButton role="menuitem" @click="(e) => { 
+          <gButton role="menuitem" :class="{ 'is-active': editor.isActive('heading', { level: 6 }) }" 
+            @click="(e) => { 
               hide(e); editor.chain().focus().toggleHeading({ level: 6 }).run()
-            }" 
-            :class="{ 'is-active': editor.isActive('heading', { level: 6 }) }">
+            }">
             h6
           </gButton>
-          <gButton role="menuitem" @click="(e) => { 
+          <gButton role="menuitem" :class="{ 'is-active': editor.isActive('paragraph') }"
+            @click="(e) => { 
               hide(e); editor.chain().focus().setParagraph().run()
-            }"
-            :class="{ 'is-active': editor.isActive('paragraph') }">
+            }">
             p
           </gButton>
         </div>
       </gDropdown>
       <gDropdown :classes="{ dropdown: 'w-18' }">
         <div
-          class="dropdown-trigger"
           slot="trigger"
           slot-scope="{ mousedownHandler, focusHandler, blurHandler, keydownHandler }"
           v-tooltip="'Text Align'"
+          class="dropdown-trigger"
           >
           <gButton
             id="text-align"
@@ -83,51 +95,51 @@
             <Icon :name="'text-align-left'" />
           </gButton>
         </div>
-        <div class="dropdown-buttons" slot-scope="{ hide }">
+        <div slot-scope="{ hide }" class="dropdown-buttons">
           <gButton
+            :class="{ 'is-active': editor.isActive({ textAlign: 'left' }) }"
             @click="(e) => {
               hide(e);
               editor.chain().focus().setTextAlign('left').run()
-            }"
-            :class="{ 'is-active': editor.isActive({ textAlign: 'left' }) }">
+            }">
             <Icon :name="'text-align-left'" />
           </gButton>
           <gButton
+            :class="{ 'is-active': editor.isActive({ textAlign: 'center' }) }"
             @click="(e) => {
               hide(e);
               editor.chain().focus().setTextAlign('center').run()
-            }"
-            :class="{ 'is-active': editor.isActive({ textAlign: 'center' }) }">
+            }">
             <Icon :name="'text-align-center'" />
           </gButton>
           <gButton
+            :class="{ 'is-active': editor.isActive({ textAlign: 'right' }) }"
             @click="(e) => {
               hide(e);
               editor.chain().focus().setTextAlign('right').run()
-            }"
-            :class="{ 'is-active': editor.isActive({ textAlign: 'right' }) }">
+            }">
             <Icon :name="'text-align-right'" />
           </gButton>
         </div>
       </gDropdown>
       <gButton 
         v-tooltip="'Bold'"
-        @click="editor.chain().focus().toggleBold().run()" :class="{ 'is-active': editor.isActive('bold') }">
+        :class="{ 'is-active': editor.isActive('bold') }" @click="editor.chain().focus().toggleBold().run()">
         <Icon :name="'bold'" />
       </gButton>
       <gButton 
         v-tooltip="'Italic'"
-        @click="editor.chain().focus().toggleItalic().run()" :class="{ 'is-active': editor.isActive('italic') }">
+        :class="{ 'is-active': editor.isActive('italic') }" @click="editor.chain().focus().toggleItalic().run()">
         <Icon :name="'italic'" />
       </gButton>
       <gButton 
         v-tooltip="'Strikethrough'"
-        @click="editor.chain().focus().toggleStrike().run()" :class="{ 'is-active': editor.isActive('strike') }">
+        :class="{ 'is-active': editor.isActive('strike') }" @click="editor.chain().focus().toggleStrike().run()">
         <Icon :name="'strikethrough'" />
       </gButton>
       <gButton 
         v-tooltip="'Link'"
-        @click="setLink" :class="{ 'is-active': editor.isActive('link') }">
+        :class="{ 'is-active': editor.isActive('link') }" @click="setLink">
         <Icon :name="'link'" />
       </gButton>
       <gButton v-if="editor.isActive('link')" 
@@ -137,26 +149,28 @@
       </gButton>
       <gButton 
         v-tooltip="'List'"
-        @click="editor.chain().focus().toggleBulletList().run()" :class="{ 'is-active': editor.isActive('bulletList') }">
+        :class="{ 'is-active': editor.isActive('bulletList') }" @click="editor.chain().focus().toggleBulletList().run()">
         <Icon :name="'list'" />
       </gButton>
       <gButton 
         v-tooltip="'Numbered List'"
-        @click="editor.chain().focus().toggleOrderedList().run()" :class="{ 'is-active': editor.isActive('orderedList') }">
+        :class="{ 'is-active': editor.isActive('orderedList') }" @click="editor.chain().focus().toggleOrderedList().run()">
         <Icon :name="'ordered-list'" />
       </gButton>
       <gButton 
         v-if="!slim"
         v-tooltip="'Insert Image'"
-        @click="selectingImage = true">
+        @click="selectingImage = true"
+        @focus="editorFocused = true">
         <Icon :name="'image'" />
       </gButton>
       <input
         v-tooltip="'Text Color'"
         type="color"
-        class="rounded bg-gray-800 h-8 w-8"
-        @input="editor.chain().focus().setColor($event.target.value).run()"
+        class="rounded h-8 w-8"
         :value="editor.getAttributes('textStyle').color"
+        @input="editor.chain().focus().setColor($event.target.value).run()"
+        @focus="editorFocused = true"
       />
       <gButton 
         v-if="!!editor.getAttributes('textStyle').color"
@@ -167,9 +181,10 @@
       <input
         v-tooltip="'Highlight Color'"
         type="color"
-        class="rounded bg-gray-800 h-8 w-8"
-        @input="editor.chain().focus().setHighlight({color: $event.target.value}).run()"
+        class="rounded h-8 w-8"
         :value="editor.getAttributes('highlight').color"
+        @input="editor.chain().focus().setHighlight({color: $event.target.value}).run()"
+        @focus="editorFocused = true"
       />
       <gButton 
         v-if="editor.isActive('highlight')"
@@ -222,11 +237,14 @@
     <editor-content 
       v-if="!editingSrc"
       class="content-editor"
+      :style="{ minHeight: minHeight }"
       :editor="editor" />
     <gTextarea 
       v-else
-      class="content-editor source-edit"
-      v-model="value" />
+      v-model="value"
+      class="content-editor source-edit !bg-gray-200 !dark:bg-gray-200 dark:focus:bg-gray-200 dark:focus:text-800 active:bg-gray-200 dark:active:bg-gray-200 dark:active:text-800 !focus:ring-opacity-0 active:ring-opacity-0"
+      variant="light"
+      @focus="editorFocused = true" />
     <ModalSelectAlgolia
       index-name="media"
       :show="selectingImage"
@@ -264,6 +282,14 @@ export default {
     slim: {
       type: Boolean,
       default: false
+    },
+    alwaysShowToolbar: {
+      type: Boolean,
+      default: false
+    },
+    minHeight: {
+      type: String,
+      default: '180px'
     }
   },
   data() {
@@ -271,7 +297,10 @@ export default {
       editor: null,
       value: this.content,
       editingSrc: false,
-      selectingImage: false
+      selectingImage: false,
+      editorFocused: false,
+      editorBlurred: true,
+      toolbarHovered: false
     }
   },
   watch: {
@@ -311,6 +340,14 @@ export default {
           alignments: ['left', 'center', 'right'],
         })
       ],
+      onBlur: () => {
+        this.editorBlurred = true
+        this.editorFocused = false
+      },
+      onFocus: () => {
+        this.editorFocused = true
+        this.editorBlurred = false
+      },
       onUpdate: () => {
         this.$emit('update', this.editor.getHTML())
       },
@@ -333,7 +370,6 @@ export default {
       this.editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run()
     },
     addImage(media) {
-      console.log({media})
       if(!media?.downloadUrl && !media?.thumbs) { return };
       const largestThumbKey = !media?.thumbs || !Object.keys(media.thumbs).length 
         ? null
@@ -349,15 +385,17 @@ export default {
 }
 </script>
 <style lang="scss">
-:root {
-  --editor-min-height: 180px;
+
+.editor {
+  @apply bg-gray-100 dark:bg-gray-800 bg-opacity-50 rounded;
+  &.focused {
+    @apply bg-gray-200 text-gray-900 shadow-lg bg-opacity-100;
+  }
 }
 .content-editor {
-  @apply bg-white rounded text-gray-900 shadow-md;
-  min-height: var(--editor-min-height);
+  // min-height: var(--editor-min-height);
   > .ProseMirror {
-    @apply focus:outline-none focus:ring-0 p-2;
-    min-height: var(--editor-min-height);
+    @apply focus:outline-none focus:ring-0 p-2 h-full;
     > * + * {
       margin-top: 0.75em;
     }
@@ -376,9 +414,9 @@ export default {
 </style>
 <style lang="scss" scoped>
   .button {
-    @apply mb-1 hover:text-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 dark:hover:text-gray-50;
+    @apply mb-1 hover:text-gray-800 hover:bg-white bg-gray-100 text-gray-600;
     &.is-active {
-      @apply text-gray-800 bg-gray-200 dark:bg-gray-700 dark:text-gray-50;
+      @apply text-gray-800 bg-white;
     }
   }
   .dropdown-trigger {

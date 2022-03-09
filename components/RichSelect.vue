@@ -1,6 +1,7 @@
 <template>
-<div>
+
   <gRichSelect
+    ref="richSelect"
     v-model="selectedOptions"
     :options="selectOptions"
     :value-attribute="valueAttribute"
@@ -14,6 +15,7 @@
     :delay="0"
     :fetch-options="typeof fetchOptions === 'function' ? fetchOptions : undefined"
     @input="(e) => $emit('update', e)"
+    @click="scrollTo('richSelect', -100)"
     >
     <template
         v-if="canCreate"
@@ -33,8 +35,11 @@
           </gButton>
         </div>
       </template>
+      <template #arrow>
+          <i class="gicon gicon-add rounded-full transform transition-transform scale-100 hover:scale-105 p-2 dark:bg-gray-800 bg-opacity-80 dark:bg-opacity-80 hover:bg-opacity-100 dark:hover:bg-opacity-100 bg-gray-100 hover:bg-white hover:shadow-2xl shadow" />
+      </template>
   </gRichSelect>
-</div>
+
 </template>
 
 <script>
@@ -137,6 +142,11 @@ export default {
       } else {
         this.selectedOptions = newOption
       }
+    },
+    scrollTo(refName, offset = 0) {
+      const element = this.$refs[refName]?._vnode?.elm || this.$refs[refName];
+      const top = element.classList.contains('modal-overlay') ? element.childNodes[0].offsetTop - 200 : element.offsetTop + offset;
+      window.scrollTo({top, left: 0, behavior: 'smooth'});
     }
   }
 }

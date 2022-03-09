@@ -9,10 +9,12 @@
     @click="(e) => $emit('click', e)"
     >
     <slot name="before" />
-    <div class="card-media">
+    <div class="card-media"
+      :class="{ [mediaClasses]: true }">
       <slot name="media" />
     </div>
-    <div class="card-content">
+    <div class="card-content"
+      :class="{ [contentClasses]: true }">
       <slot />
     </div>
     <slot name="after" />
@@ -20,11 +22,32 @@
 </template>
 
 <script>
+const defaultClasses = {
+  media: '',
+  content: ''
+};
+
 export default {
   props: {
     cardStyle: {
       type: String,
       default: 'media-above'
+    },
+    classes: {
+      type: Object,
+      default: () => defaultClasses
+    }
+  },
+  data() {
+    return {
+      mediaClasses: typeof this.classes?.media === 'string' ? this.classes.media : defaultClasses.media,
+      contentClasses: typeof this.classes?.content === 'string' ? this.classes.content : defaultClasses.content,
+    }
+  },
+  watch: {
+    classes(val) {
+      this.mediaClasses = typeof val?.media === 'string' ? val.media : defaultClasses.media;
+      this.contentClasses = typeof val?.content === 'string' ? val.content : defaultClasses.content;
     }
   }
 }
@@ -33,6 +56,9 @@ export default {
 <style lang="scss">
 .card {
   @apply relative flex transition-all ease-quick-in duration-200 rounded bg-white bg-opacity-5 shadow-md overflow-hidden;
+  .card-media {
+    @apply relative
+  }
 }
 .card-style-overlay {
     @apply relative;
