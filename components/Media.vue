@@ -26,6 +26,7 @@ import { getThumbImageUrl } from '~/utils/funcs'
 export default {
   props: {
     media: {
+      type: Object,
       default: () => null
     },
     ratio: {
@@ -41,8 +42,15 @@ export default {
     // const mediaSrc = typeof this.mediaSrc !== 'undefined' ? this.mediaSrc : this.getImgSrc(this.media, typeof this.$el !== 'undefined' ? this.$el : { offsetWidth: 300, offsetHeight: 300 })
     return { mediaSrc: null, imgHeight: 'auto' }
   },
-  created () {
-    this.setImgSrc()
+  watch: {
+    media() {
+      this.setImgSrc()
+    }
+  },
+  created() {
+      this.setImgSrc()
+  },
+  mounted () {
     window.addEventListener('resize', this.setImgSrc)
   },
   unmounted () {
