@@ -1,5 +1,5 @@
 <template>
-  <div class="product mt-1">
+  <div class="product mt-1 sm:px-2 md:px-4 lg:px-6">
     <template 
       v-if="product !== null">
       <code v-if="product.ERROR" class="text-red-500">{{ product.ERROR }}</code>
@@ -8,21 +8,23 @@
 
           <label for="product-title">Title:</label>
           <gInput 
-            v-model="product.title"
+            :value="product.title"
             name="product-title"
             type="text"
             class="w-full text-lg sm:text-2xl md:text-4xl"
+            @input="(e) => $store.commit('productPage/setProduct', {env: env, product: {...product, title: e}})"
           />
 
           <label for="body-html">Body Html:</label>
           <Editor :content="product.body_html"
             name="body-html"
             class="py-1 w-full"
-            @update="(e) => product.body_html = e"
+            @update="(e) => $store.commit('productPage/setProduct', {env: env, product: {...product, body_html: e}})"
           />
 
-          <label for="product-tags">Tags:</label>
+          <!-- <label for="product-tags">Tags:</label>
           <RichSelect
+            v-if="showTags.includes(env) && Array.isArray(tags) && tags.length"
             ref="productTags"
             name="product-tags"
             :selected="tags"
@@ -37,9 +39,9 @@
             :placeholder="'add tags...'"
             class="mt-1 w-full"
             @update="(e) => {
-              product.tags = e.join(', ')
+              tags = e
             }"
-          />
+          /> -->
         </div>
 
         <Media 
@@ -56,25 +58,12 @@
 
         <ShopifyProductMetafields 
           :env="env" 
-          :product-images="product.images"
           class="w-full sm:w-[calc(66.666%-.25rem)] pt-8 max-w-3xl"
-          @initial="(e) => {
-            metafields[e.docId] = e;
-            $emit('initialMetafield', e)
-          }"
-          @update="(e) => {
-            metafields[e.docId] = e;
-            $emit('updateMetafield', e)
-          }"
         />
 
         <ShopifyProductImages
+          :env="env"
           class="w-full sm:w-[calc(33.333%-.25rem)] max-w-sm sm:ml-auto"
-          :product-images="product.images"
-          @update="(e) => {
-            product.images = e;
-            $emit('updateProduct', product)
-          }"
         />
 
       </div>
@@ -87,8 +76,6 @@
 </template>
 
 <script>
-import {Shopify} from '~/utils/shopify'
-import {$algolia} from '~/utils/algolia'
 
 export default {
   props: {
@@ -102,44 +89,54 @@ export default {
     },
   },
   data() {
-    const app = { $fire: this.$fire }
     return {
-      shops: {
-        live: new Shopify({ app, env: 'live' }),
-        dev: new Shopify({ app, env: 'dev' }),
-      },
-      algoliaIndex: $algolia.initIndex(`products_${ this.env === 'live' ? 'live' : 'dev' }`),
-      product: null,
-      metafields: {}
+      algoliaIndex: this.$algolia.initIndex(`products_${ this.env === 'live' ? 'live' : 'dev' }`),
+      metafields: {},
+      showTags: []
     }
   },
   computed: {
-    tags() {
-      return this.product.tags.split(', ')
+    tags: {
+      get() {
+        return this.product.tags.split(', ')
+      },
+      set(val) {
+        // const product = this.product === null ? { handle: this.$route.params.handle } : this.product
+        const tags = val?.join(', ') ? val.join(', ') : val
+        this.product = { ...([undefined, null].includes(this.product) ? {} : this.product), tags }
+      }
+    },
+    product: {
+      get() {
+        try {
+          return this.$store?.state?.productPage[this.env]?.product
+        } catch {
+          return null
+        }
+      },
+      set (product) {
+        this.$store.commit('productPage/setProduct', { env: this.env, product })
+      }
     }
   },
   watch: {
-    product(value) {
-      this.$emit('updateProduct', value)
+    env(val) {
+      if(this.showTags.includes(val)) { return };
+      setTimeout(() => {
+        this.showTags.push(val)
+      }, 2000)
     }
   },
-  created() {
-    this.getProduct()
+  mounted() {
+    this.getProduct();
+    setTimeout(() => {
+        this.showTags.push(this.env)
+      }, 2000)
   },
   methods: {
-    async getProduct() {
-      this.product = await this.shops[this.env].get({ 
-        path: '/products', 
-        query: { 
-          fields: 'id,title,body_html,product_type,handle,status,tags,images',
-          handle: this.$route.params.handle,
-          limit: 1
-        } })
-        .then(res => res.data.body.products[0])
-        .catch(err => {
-          return { ERROR: err.message }
-        });
-      return this.$emit('initialProduct', this.product)
+    getProduct() {
+      this.$store.dispatch('productPage/getProduct', { env: this.env, handle: this.$route.params.handle })
+        .catch(console.error)
     },
     async fetchTags(e) {
       const results = [];
@@ -161,7 +158,7 @@ export default {
     },
     scrollTo(refName, offset = 0) {
       const element = this.$refs[refName]?._vnode?.elm || this.$refs[refName];
-      const top = element.classList.contains('modal-overlay') ? element.childNodes[0].offsetTop - 200 : element.offsetTop + offset;
+      const top = element.offsetTop + offset;
       window.scrollTo({top, left: 0, behavior: 'smooth'});
     }
   }

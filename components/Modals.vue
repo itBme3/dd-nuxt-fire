@@ -1,0 +1,49 @@
+<template>
+  <div class="models">
+    <template v-for="algoliaIndex in ['reviews', 'media', 'products_live', 'products_dev']">
+      <LazyAlgoliaModalSelect
+          :key="algoliaIndex"
+          :show="algoliaIndex === $store.state.algoliaSelect.props.indexName"
+          :index-name="$store.state.algoliaSelect.props.indexName"
+          :filter-values="$store.state.algoliaSelect.props.filterValues"
+          :constant-values="$store.state.algoliaSelect.props.constantFilters"
+          :selecting="{
+            identifier: typeof $store.state.algoliaSelect.props.identifier === 'string' ? $store.state.algoliaSelect.props.identifier : `objectID`,
+            hideSideNav: !!$store.state.algoliaSelect.props.selecting && !!$store.state.algoliaSelect.props.selecting.hideSideNav,
+            multiple: !!$store.state.algoliaSelect.props.selecting && !!$store.state.algoliaSelect.props.selecting.multiple,
+            quick: !!$store.state.algoliaSelect.props.selecting && !!$store.state.algoliaSelect.props.selecting.quick,
+          }"
+          :classes="!!$store.state.algoliaSelect.props.classes ? $store.state.algoliaSelect.props.classes : {}"
+          :search-query="typeof $store.state.algoliaSelect.props.searchQuery === 'string' ? $store.state.algoliaSelect.props.searchQuery : ''"
+          :selected-values="!!$store.state.algoliaSelect.props.selectedValues ? $store.state.algoliaSelect.props.selectedValues : []"
+          :card-style="!!$store.state.algoliaSelect.props.cardStyle ? $store.state.algoliaSelect.props.cardStyle : 'media-above'"
+          @submit="onSubmit"
+          @update="onUpdate"
+          @cancel="onCancel"
+          @closed="(e) => {
+            $store.commit('algoliaSelect/resetState');
+          }"
+        />
+    </template>
+  </div>
+</template>
+
+<script>
+export default {
+  methods: {
+    onSubmit(e) {
+      const onSubmit = this.$store?.state?.algoliaSelect?.onSubmit ? this.$store.state.algoliaSelect.onSubmit : (val) => val
+      console.log({e})
+      onSubmit(e)
+    },
+    onUpdate(e) {
+      const onUpdate = this.$store?.state?.algoliaSelect?.onUpdate ? this.$store.state.algoliaSelect.onUpdate : (val) => val
+      onUpdate(e)
+    },
+    onCancel(e) {
+      const onCancel = this.$store?.state?.algoliaSelect?.onCancel ? this.$store.state.algoliaSelect.onCancel : (val) => val
+      onCancel(e)
+    }
+  }
+}
+</script>

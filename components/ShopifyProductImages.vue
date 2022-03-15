@@ -1,21 +1,29 @@
 <template>
   <div class="product-images">
+    <gButton 
+      v-tooltip="'add item'"
+      class="add-item-button w-full py-3 mb-2"
+      @click="selectImages()"
+      >
+      <Icon name="add" />
+    </gButton>
     <draggable 
-      v-model="images"
+      v-model="productImages"
       handle=".product-image"
       @change="(e) => imagesMoved(e)"
       >
         <Card 
-          v-for="(image, i) in images"
-          :key="'image-' + image.id"
+          v-for="(image, i) in productImages"
+          :key="'image-' + image.src"
           class="w-full mb-2 group"
           card-style="media-left">
           <template #before>
             <ButtonDelete
               class="absolute right-1 top-1 scale-0 opacity-0 group-hover:scale-100 group-hover:opacity-100"
               @delete="() => {
+                const images = JSON.parse(JSON.stringify(productImages));
                 images.splice(i, 1);
-                $emit('update', images);
+                productImages = images;
               }"
             />
           </template>
@@ -29,20 +37,38 @@
           </template>
           <gTextarea
             ref="imgTextareas"
-            v-model="image.alt"
+            :value="image.alt"
             :name="'image-' + i + '-alt'"
             @input="(e) => {
-              images[i].alt = e;
-              $emit('update', images)
+              const _product = JSON.parse(JSON.stringify(product));
+              _product.images[i].alt = e;
+              product = _product
             }"
           />
         </Card>
     </draggable>
+
+    <AlgoliaModalSelect
+      :show="selectingImages"
+      index-name="media"
+      :selecting="{
+        identifier: `objectID`,
+        hideSideNav: true,
+        multiple: true
+      }"
+      @submit="(e) => {
+        addImages(e)
+      }"
+      @after-close="(e) => {
+        selectingImages = false
+      }"
+    />
   </div>
 </template>
 
 <script>
 import draggable from 'vuedraggable'
+import { capitalize } from '~/utils/funcs';
 // import { moveItemInArray } from '~/utils/funcs'
 
 export default {
@@ -50,28 +76,74 @@ export default {
     draggable
   },
   props: {
-    productImages: {
-      type: Array,
-      default: () => null
+    env: {
+      type: String,
+      default: null
     }
   },
   data() {
     return {
-      images: Array.isArray(this.productImages) ? this.productImages : []
+      images: Array.isArray(this.productImages) ? this.productImages : [],
+      selectingImages: false,
+      appendImages: false
     }
   },
-  watch: {
-    productImages(value) {
-      const images = Array.isArray(value) ? value : [];
-      for (let i = 0; i < images.length; i++) {
-        images[i].position = i + 1
+  computed: {
+    product: {
+      get() {
+        try {
+          return this.$store?.state?.productPage[this.env]?.product || null
+        } catch {
+          return null
+        }
+      },
+      set(product) {
+        this.$store.commit('productPage/setProduct', { env: this.env, product })
       }
-      this.images = images
+    },
+    productImages: {
+      get() {
+        try {
+          return this.$store?.state?.productPage[this.env]?.product?.images || null
+        } catch {
+          return null
+        }
+      },
+      set(images) {
+        const product = {...JSON.parse(JSON.stringify(this.product)), images};
+        this.product = product
+        
+      }
     }
   },
   methods: {
+    selectImages(append = false) {
+      this.appendImages = append
+      this.selectingImages = false
+      setTimeout(() => {
+          this.selectingImages = true
+        }, !this.selectingImages ? 0 : 100)
+    },
+    addImages(selectedImages) {
+      const images = selectedImages.map(img => {
+        const alt = ['fits', 'materials', 'washes', 'colors', 'styles'].reduce((acc, key) => {
+          const keySingular = key[key.length - 1] === 's' ? key.substring(0, key.length - 1) : key;
+          if (!img[key]?.length) { return acc }
+          return `${acc}${acc?.length ? ' ' : ''}${capitalize(keySingular)}: ${img[key]
+            .map(val => val.split(' ')
+              .map(word => capitalize(word)).join(' ')
+            ).join(' + ')}`
+        }, '')
+        const { downloadUrl: src } = img;
+        return { src, alt }
+      })
+      this.productImages = (this.appendImages ? [...this.images, ...images] : [...images, ...this.images])
+        .map((img, i) => {
+          return { ...img, position: i + 1 }
+        });
+    },
     imagesMoved() {
-      this.$emit('update', this.images)
+      console.log('images moved')
     }
   }
 }
