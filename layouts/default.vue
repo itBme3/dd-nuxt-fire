@@ -7,6 +7,9 @@
       >
         <Nuxt :key="$route.fullPath" />
       </main>
+
+      <Modals />
+
     </div>
 </template>
 

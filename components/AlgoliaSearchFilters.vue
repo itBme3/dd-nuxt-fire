@@ -148,6 +148,9 @@ export default {
   :root {
     --algolia-filters-width: 200px;
   }
+  .hits {
+    @apply gap-3;
+  }
   .algolia-search-filters {
     @apply sticky float-left z-999 left-0;
     top: 100px;

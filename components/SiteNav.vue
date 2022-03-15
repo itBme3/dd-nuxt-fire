@@ -1,7 +1,7 @@
 
 <template>
   <div :class="{
-      'site-nav left-0 top-0 fixed flex justify-space-between z-999999 dark:bg-gray-900 bg-gray-100': true,
+      'site-nav left-0 top-0 fixed flex transition-all ease-quick-in justify-space-between z-999 dark:bg-gray-900 bg-gray-100': true,
       'right-0': isMobile,
       'right-0 w-screen': !isMobile
     }"
@@ -9,10 +9,10 @@
     <nuxt-link to="/" class="logo w-12 h-12 p-2">
       <Icon :name="'logoIcon'" class="h-full w-full" />
     </nuxt-link>
-    <div v-if="isMobile && !mobileNavCollapsed" @click="mobileNavCollapsed = true"
-      :class="{
+    <div v-if="isMobile && !mobileNavCollapsed" :class="{
         'cursor-pointer fixed inset-0 z-99999 bg-opacity-30 dark:bg-opacity-80 bg-gray-900': true,
-      }"></div>
+      }"
+      @click="mobileNavCollapsed = true"></div>
     <div :class="{
       'menu flex flex-col ml-auto mr-0': true,
       'absolute left-auto right-0': isMobile
@@ -24,7 +24,7 @@
       </Btn>
       <nav :class="{
         'site-navigation p-1 flex ml-auto mr-0 relative z-999999': true,
-        'flex-col space-y-1 max-w-[100px]': isMobile,
+        'flex-col space-y-1 max-w-[200px]': isMobile,
         'flex-row flex-nowrap space-x-1': !isMobile,
         'hidden': isMobile && mobileNavCollapsed
         }">
@@ -96,3 +96,11 @@ export default {
   }
 }
 </script>
+
+<style lang="scss">
+  body.modal-active {
+    .site-nav {
+      @apply -top-48 #{!important};
+    }
+  }
+</style>

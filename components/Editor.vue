@@ -245,7 +245,7 @@
       class="content-editor source-edit !bg-gray-200 !dark:bg-gray-200 dark:focus:bg-gray-200 dark:focus:text-800 active:bg-gray-200 dark:active:bg-gray-200 dark:active:text-800 !focus:ring-opacity-0 active:ring-opacity-0"
       variant="light"
       @focus="editorFocused = true" />
-    <ModalSelectAlgolia
+    <AlgoliaModalSelect
       index-name="media"
       :show="selectingImage"
       :multiple="false"
@@ -264,7 +264,7 @@ import StarterKit from '@tiptap/starter-kit'
 import Link from '@tiptap/extension-link'
 import TextAlign from '@tiptap/extension-text-align'
 import Image from '@tiptap/extension-image'
-import Dropcursor from '@tiptap/extension-dropcursor'
+// import Dropcursor from '@tiptap/extension-dropcursor'
 import TextStyle from '@tiptap/extension-text-style'
 import Color from '@tiptap/extension-color'
 import Highlight from '@tiptap/extension-highlight'
@@ -323,7 +323,6 @@ export default {
       content: this.content,
       extensions: [
         StarterKit,
-        Dropcursor,
         Highlight.configure({
           multicolor: true,
         }),

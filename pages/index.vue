@@ -1,12 +1,57 @@
 <template>
   <div class="max-w-full">
-    <div>
-      <gInput
+
+
+    <gButton
+      v-for="algoliaIndexName in ['media', 'reviews', 'products_live', 'products_dev']"
+      :key="algoliaIndexName"
+      @click="$store.commit('algoliaSelect/open', { props: {indexName: algoliaIndexName}, onSubmit: onSubmit, onUpdate: onUpdate, onCancel: onCancel })">
+      {{ algoliaIndexName }}
+    </gButton>
+    
+    <pre><code>{{ selectedValues }}</code></pre>
+
+    <!-- <ShopifyToggleEnv
+      :env="env"
+      @change="(e) => {
+        env = e
+        $store.dispatch('productPage/getProduct', {handle: productHandle, env: env })
+          .catch(console.error)
+      }" />
+
+    <div class="flex flex-wrap space-x-1 space-y-1">
+      <gButton 
+        v-for="handle in handles"
+        :key="handle"
+        class="w-auto"
+        @click="productHandle = handle">
+        {{ handle }}
+      </gButton>
+    </div>
+
+    <div class="flex flex-wrap space-x-1 space-y-1">
+      <gButton 
+        v-for="key in metafieldKeys"
+        :key="key"
+        class="w-auto"
+        @click="metafieldKey = key">
+        {{ key }}
+      </gButton>
+    </div>
+
+    <pre v-if="!!$store.state && !!$store.state.productPage"><code>
+      {{ JSON.stringify($store.state.productPage, null, 4) }}
+    </code></pre> -->
+
+
+
+    <!-- <div> -->
+      <!-- <gInput
         v-model="handle"
       />
       <gButton class="bg-cyan-400 text-cyan-900" @click="setCacheProduct">GET</gButton>
       <gButton class="bg-yellow-400 text-yellow-900" @click="reload">RELOAD</gButton>
-        <pre v-if="!fetching"><code>{{ JSON.stringify($store.state.productsCache, null, 4) }}</code></pre>
+        <pre v-if="!fetching"><code>{{ JSON.stringify($store.state.productsCache, null, 4) }}</code></pre> -->
       
       <!-- <code v-if="!fetching">{{ JSON.stringify(productsCache) }}</code> -->
       <!-- <Codeblock v-if="!!docs">{{ JSON.stringify(docs, null, 2) }}</Codeblock>
@@ -27,7 +72,7 @@
       @update="(e) => selected = e"
     />
 
-      <ModalSelectAlgolia 
+      <AlgoliaModalSelect 
         :index-name="'products_live'"
         :selected="selected"
         @change="(e) => selected = e"
@@ -37,95 +82,119 @@
       <!-- <SelectStarRating
         :value="rating"
         @change="updateRating"/> -->
-    </div>
+    <!-- </div> -->
   </div>
 </template>
 
 <script lang="js">
-import {Shopify} from '~/utils/shopify'
-import {$algolia} from '~/utils/algolia'
-import { FireDb } from '~/utils/firebase'
+
+
+
 
 export default {
-  async asyncData({ app }) {
-    const db = new FireDb(app);
-    // const docs = await db.doc('products_live/tailored-fit-dark-wash')
-    
-    const docs = null;
-    const shops = {
-      live: new Shopify({ app, env: 'live' }),
-      dev: new Shopify({ app, env: 'dev' }),
+
+  async asyncData({ $store }) {
+    try {
+      await $store.dispatch('productPage/getProduct', { handle: 'tailored-fit-dark-wash', env: 'dev' });
+      return {}
+    } catch(err) {
+      return {}
     }
-    const products = await shops.dev.get({ path: '/products', query: { fields: 'id,title' } })
-      .then(res => res.data)
-    return {
-      db, docs, products
-    }
-    
   },
 
   data() {
+      const handles = ['tailored-fit-dark-wash', 'tailored-fit=light-wash', 'tailored-fit-dark-wash-v2', 'tailored-fit-dark-wash-v3', 'tailored-fit-grey-wash']
+      const metafieldKeys = ['product_details', 'featuredReviews', 'the_look']
     return {
-      content: '',
-      rating: 3,
-      selected: [],
-      index: $algolia.initIndex('media'),
-      options: [
-        {title: 'something', id: 1},
-        {title: 'another thing', id: 2},
-        {title: 'this thing', id: 3},
-        {title: 'on last thing', id: 4},
-      ].map(o => o.title),
-      handle: 'tailored-fit-dark-wash',
-      fetching: false
+      handles, metafieldKeys,
+      productHandle: handles[0],
+      metafieldKey: metafieldKeys[0],
+      env: 'dev',
+      productPageData: this.$store.state.productPage,
+      selectedValues: {
+        media: [], reviews: [], products_live: [], products_dev: []
+      }
     }
   },
+
   computed: {
-    loaded() {
-      return this.$store.state.productsCache.status
+    indexName() {
+      return this.$store.state?.algoliaSelect?.props?.indexName
+    }
+  },
+  watch: {
+    productHandle(handle) {
+      this.$store.dispatch('productPage/getProduct', {handle, env: this.env})
+        .then(console.log)
     },
+    metafieldKey(key) {
+      this.$store.dispatch('productPage/getMetafield', {handle: this.productHandle, namespace: 'studio', key, env: this.env})
+        .then(console.log)
+    },
+    '$store.state.productPage'(val) {
+      this.productPageData  = data
+      console.log({ val })
+    }
   },
 
   mounted() {
-    this.$store.state.productsCache.status = true
+    this.$store.dispatch('productPage/getProduct', { handle: 'tailored-fit-dark-wash', env: 'dev' })
+      .then(res => console.log(res));
   },
   methods: {
-    updateRating(e) {
-      this.rating = e
-      console.log({ rating: this.rating })
-    },
-    submitSelection(e) {
-      console.log('SUbMIT: ', e)
-    },
-    fetchOptions(e) {
-      return this.index.searchForFacetValues('tags', e)
-        .then(res => res.facetHits)
-        .then(results => { return {results} });
-    },
-    setCacheProduct() {
-      this.$store.dispatch('productsCache/getProduct', {handle: this.handle, env: 'dev'})
-        .then(console.log)
-        .catch(console.error)
-      // this.$store.commit('productsCache/set', {product: {title: 'test-3', id: 123, handle: 'test-3', images: null}, env: 'dev'})
 
-      // const product = await this.db.doc(`products_dev/${this.handle}`).then(res => {
-      //   if(!res?.handle) { return null }
-      //   const { title, id, handle, images } = res;
-      //   return { title, id, handle, image: images[0] }
-      // })
-      // if(product !== null) {
-      //   this.$store.state.localStorage.productsCache.dev[this.handle] = product
-      // }
-      // .commit('localStorage/setCacheProduct', {app: { $fire: this.$fire }, handle: this.handle, env: 'dev'})
-      // this.reload()
+    onUpdate(e) {
+      console.log('UPDATE')
+      this.selectedValues[this.indexName] = e
+      console.log({ selection: e, this: this })
     },
-    reload() {
-      this.fetching = true; 
-      setTimeout(() => { this.fetching = false }, 500)
+    onSubmit(e) {
+      console.log('SUBMIT')
+      this.selectedValues[this.indexName] = e
+      console.log({ selection: e, this: this })
+    },
+    onCancel(e) {
+      console.log('CANCEL')
+      this.selectedValues[this.indexName] = e
+      console.log({ selection: e, this: this })
     }
-    // getCachedProduct() {
-    //   this.$store.local
-    // }
+
+  //   updateRating(e) {
+  //     this.rating = e
+  //     console.log({ rating: this.rating })
+  //   },
+  //   submitSelection(e) {
+  //     console.log('SUbMIT: ', e)
+  //   },
+  //   fetchOptions(e) {
+  //     return this.index.searchForFacetValues('tags', e)
+  //       .then(res => res.facetHits)
+  //       .then(results => { return {results} });
+  //   },
+  //   setCacheProduct() {
+  //     this.$store.dispatch('productsCache/getProduct', {handle: this.handle, env: 'dev'})
+  //       .then(console.log)
+  //       .catch(console.error)
+  //     // this.$store.commit('productsCache/set', {product: {title: 'test-3', id: 123, handle: 'test-3', images: null}, env: 'dev'})
+
+  //     // const product = await this.db.doc(`products_dev/${this.handle}`).then(res => {
+  //     //   if(!res?.handle) { return null }
+  //     //   const { title, id, handle, images } = res;
+  //     //   return { title, id, handle, image: images[0] }
+  //     // })
+  //     // if(product !== null) {
+  //     //   this.$store.state.localStorage.productsCache.dev[this.handle] = product
+  //     // }
+  //     // .commit('localStorage/setCacheProduct', {app: { $fire: this.$fire }, handle: this.handle, env: 'dev'})
+  //     // this.reload()
+  //   },
+  //   reload() {
+  //     this.fetching = true; 
+  //     setTimeout(() => { this.fetching = false }, 500)
+  //   }
+  //   // getCachedProduct() {
+  //   //   this.$store.local
+  //   // }
   }
 }
 </script>

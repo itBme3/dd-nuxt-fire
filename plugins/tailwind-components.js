@@ -328,9 +328,9 @@ export const TailwindComponentsSettings = {
     component: TModal,
     props: {
       fixedClasses: {
-        overlay: 'modal-overlay z-99999 overflow-auto scrolling-touch left-0 top-0 bottom-0 right-0 w-full h-full fixed',
-        wrapper: 'modal-wrapper relative mx-auto z-99999 m-auto rounded',
-        modal: 'modal-modal overflow-visible relative  rounded',
+        overlay: 'modal-overlay z-99999 overflow-auto scrolling-touch left-0 top-0 bottom-0 right-0 w-full fixed',
+        wrapper: 'modal-wrapper relative mx-auto z-99999 m-5 rounded',
+        modal: 'modal-modal relative  rounded',
         body: 'modal-body p-3 min-h-[8rem]',
         header: 'modal-header border-b border-gray-900 border-opacity-10 p-3 rounded-t',
         footer: 'modal-footer p-2',

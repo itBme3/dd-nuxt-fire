@@ -22,11 +22,6 @@
 </template>
 
 <script>
-const defaultClasses = {
-  media: '',
-  content: ''
-};
-
 export default {
   props: {
     cardStyle: {
@@ -35,19 +30,26 @@ export default {
     },
     classes: {
       type: Object,
-      default: () => defaultClasses
+      default: () => {
+        return {
+          card: '',
+          media: '',
+          title: '',
+          content: ''
+        }
+      }
     }
   },
   data() {
     return {
-      mediaClasses: typeof this.classes?.media === 'string' ? this.classes.media : defaultClasses.media,
-      contentClasses: typeof this.classes?.content === 'string' ? this.classes.content : defaultClasses.content,
+      mediaClasses: typeof this.classes?.media === 'string' ? this.classes.media : '',
+      contentClasses: typeof this.classes?.content === 'string' ? this.classes.content : '',
     }
   },
   watch: {
     classes(val) {
-      this.mediaClasses = typeof val?.media === 'string' ? val.media : defaultClasses.media;
-      this.contentClasses = typeof val?.content === 'string' ? val.content : defaultClasses.content;
+      this.mediaClasses = typeof val?.media === 'string' ? val.media : '';
+      this.contentClasses = typeof val?.content === 'string' ? val.content : '';
     }
   }
 }

@@ -62,7 +62,7 @@ export default {
     },
     setImgSrc () {
       this.setImgHeight()
-      const mediaSrc = this.getImgSrc(this.media, typeof this.$el !== 'undefined' ? this.$el : { offsetWidth: 300, offsetHeight: 300 })
+      const mediaSrc = this.getImgSrc(typeof this.media === 'string' ? { src: this.media } : this.media, typeof this.$el !== 'undefined' ? this.$el : { offsetWidth: 300, offsetHeight: 300 })
       if (this.mediaSrc === mediaSrc) {
         return
       };
@@ -72,9 +72,13 @@ export default {
       if (media === null) {
         return null
       }
+      const largestSrc = typeof media === 'string' ? media 
+        : media?.downloadUrl ? media.downloadUrl 
+        : media?.src ? media.src 
+        : null;
       const thumb = getThumbImageUrl(media, el)
-      if (typeof thumb === 'undefined') {
-        return null
+      if (!thumb?.length) {
+        return largestSrc
       }
       return thumb
     },

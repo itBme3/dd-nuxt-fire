@@ -59,8 +59,8 @@
 
 <script>
 import { blankAttributes, attributeKeys } from '~/models/media.model'
-import {$algolia} from '~/utils/algolia'
 import { getColor } from '~/utils/colors'
+
 export default {
   props: {
     current: {
@@ -71,7 +71,7 @@ export default {
   data() {
     return {
       attributes: JSON.parse(JSON.stringify(blankAttributes)),
-      index: $algolia.initIndex('media'),
+      index: this.$algolia.initIndex('media'),
       attributeKeys,
       adding: attributeKeys.filter(key => Array.isArray(this.current[key]) && this.current[key].length > 0)
     }

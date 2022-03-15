@@ -3,15 +3,19 @@
     <gButton 
       v-if="confirming"
       class="bg-red-500 text-red-900 hover:bg-red-600 text-xs mr-2"
+      :class="{
+        [classes.confirmButton]: true
+      }"
       @click="$emit('delete', true)">
-      Confirm Delete
+      {{ confirmText }}
     </gButton>
     <gButton 
-      v-tooltip="{content: confirming ? 'Cancel' : 'Delete This', placement: confirming ? 'top-end' : 'left' }"
+      v-tooltip="{content: confirming ? 'Cancel' : tooltipText, placement: confirming ? 'top-end' : 'left' }"
       tabindex="-1"
       class="icon-button rounded-full text-gray-500 bg-gray-200 dark:bg-gray-600 dark:text-gray-900 shadow-xl"
       :class="{
-        'hover:text-red-900 dark:hover:text-red-900 dark:hover:bg-red-500 hover:bg-red-500': !confirming
+        'hover:text-red-900 dark:hover:text-red-900 dark:hover:bg-red-500 hover:bg-red-500': !confirming,
+        [classes.button]: true
       }"
       @click="confirming = !confirming">
       <Icon :name="confirming ? 'close' : 'trashcan'" class="relative top-px" />
@@ -25,6 +29,24 @@ export default {
     tabindex: {
       type: String,
       default: '-1'
+    },
+    confirmText: {
+      type: String,
+      default: 'Confirm Delete'
+    },
+    tooltipText: {
+      type: String,
+      default: 'Delete This'
+    },
+    classes: {
+      type: Object,
+      default: () => {
+        return {
+          button: '',
+          tooltip: '',
+          confirmButton: ''
+        }
+      }
     }
   },
   data() {

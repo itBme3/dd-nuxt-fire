@@ -88,7 +88,10 @@ const config: NuxtConfig = {
     '~/plugins/check-view.js',
     '~/plugins/scrollbar.js',
     '~/plugins/tailwind-components.js',
-    '~/plugins/tooltip.js'
+    '~/plugins/tooltip.js',
+    '~/plugins/shops.js',
+    '~/plugins/db.js',
+    '~/plugins/algolia.js',
   ],
 
   build: {},

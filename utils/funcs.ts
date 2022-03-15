@@ -231,3 +231,7 @@ export const moveItemInArray = (arr:any[], oldIndex:number, newIndex:number) => 
   const image = arr.splice(oldIndex, 1)[0];
   return [...arr.splice(0, newIndex), image, ...arr]
 }
+
+export const asyncDelay = (ms: number) => {
+  return new Promise(resolve => setTimeout(() => { resolve(true) }, ms))
+}
