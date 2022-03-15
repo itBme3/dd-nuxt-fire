@@ -17,7 +17,6 @@
 </template>
 
 <script>
-import { FireDb } from '~/utils/firebase';
 import {Shopify} from '~/utils/shopify'
 
 export default {
@@ -25,7 +24,6 @@ export default {
     const app = { $fire: this.$fire }
     return {
       show: false,
-      db: new FireDb(app),
       shops: {
         live: new Shopify({ app, env: 'live' }),
         dev: new Shopify({ app, env: 'dev' }),
@@ -59,7 +57,7 @@ export default {
             this.errors.push(`Getting current ${env} product: ${err.message}`)
             return undefined
           }),
-        this.db.collection(`products_${env}/${this.products[env].handle}/metafields`)
+        this.$db.collection(`products_${env}/${this.products[env].handle}/metafields`)
           .then(docs => {
             this.metafields[env] = {
               product_details: docs.filter(d => d.docId === 'product_details')[0],

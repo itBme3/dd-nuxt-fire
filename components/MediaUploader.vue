@@ -45,7 +45,6 @@
 import vue2Dropzone from 'vue2-dropzone';
 import 'vue2-dropzone/dist/vue2Dropzone.min.css';
 import { getImageFileType, imageFileTypes } from '~/utils/funcs';
-import { FireDb } from '~/utils/firebase';
 import { blankAttributes } from '~/models/media.model';
 
 export default {
@@ -73,8 +72,7 @@ export default {
         addRemoveLinks: true,
         acceptedFiles: imageFileTypes.join(', ')
       },
-      bulkAttributes: JSON.parse(JSON.stringify({...blankAttributes, tags: ['modeled']})),
-      db: new FireDb({ $fire: this.$fire })
+      bulkAttributes: JSON.parse(JSON.stringify({...blankAttributes, tags: ['modeled']}))
     }
   },
   // created() {
@@ -84,7 +82,6 @@ export default {
   // },
   methods: {
     updateBulkAttributes(e) {
-      console.log({ e });
       this.bulkAttributes = e
     },
     async uploadMedia(file) {
@@ -105,7 +102,7 @@ export default {
     },
     setMediaInDb(el) {
       const downloadUrl = el.getAttribute('src');
-      const docRef = this.db.docRef(this.collectionPath);
+      const docRef = this.$db.docRef(this.collectionPath);
       const docPath = docRef.path;
       const docId = docPath.split( '/' ).pop();
       const image_width = el.naturalWidth;
@@ -133,7 +130,7 @@ export default {
         created_at: Date.now(),
         updated_at: Date.now(),
       }
-      return this.db.updateAt(docPath, data)
+      return this.$db.updateAt(docPath, data)
         .then((doc) => {
           this.imageUrls = this.imageUrls.filter(url => url !== downloadUrl);
           this.mediaDocs.push(doc)

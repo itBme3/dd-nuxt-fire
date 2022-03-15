@@ -172,7 +172,6 @@
 
 <script>
 import RadialProgressBar from 'vue-radial-progress'
-import { FireDb } from '~/utils/firebase'
 import {shopAdminDomains, shopDomains, Shopify} from '~/utils/shopify'
 
 export default {
@@ -218,7 +217,6 @@ export default {
         live: new Shopify({ app, env: 'live' }),
         dev: new Shopify({ app, env: 'dev' }),
       },
-      db: new FireDb(app),
       products: {
         dev: this.devProduct,
         live: this.liveProduct
@@ -335,7 +333,7 @@ export default {
           try {
             const missingMetafields = ['product_details', 'featured_reviews', 'the_look'].filter(k => !this.metafields[env][k] || !this.metafields[env][k]?.key);
             if (missingMetafields.length > 0) {
-              await this.db.collection(`products_${env}/${this.products[env].handle}/metafields`)
+              await this.$db.collection(`products_${env}/${this.products[env].handle}/metafields`)
                 .where( 'docId', 'in', missingMetafields )
                 .then(docs =>
                   docs.forEach(doc => {
@@ -362,7 +360,7 @@ export default {
             this.errors.push(`Getting current ${env} product: ${err.message}`)
             return undefined
           }),
-        this.db.collection(`products_${env}/${this.products[env].handle}/metafields`)
+        this.$db.collection(`products_${env}/${this.products[env].handle}/metafields`)
           .then(docs => {
             this.currentMetafields[env] = {
               product_details: docs.filter(d => d.docId === 'product_details')[0],

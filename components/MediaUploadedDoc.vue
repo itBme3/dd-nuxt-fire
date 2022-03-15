@@ -12,7 +12,6 @@
 </template>
 
 <script>
-import { FireDb } from '~/utils/firebase'
 import { objectsAreTheSame } from '~/utils/funcs'
 import { blankAttributes, attributeKeys } from '~/models/media.model'
 
@@ -37,7 +36,6 @@ export default {
             : [] 
           }
       }, {}),
-      db: new FireDb({$fire: this.$fire}),
       attributeKeys
     }
   },
@@ -45,7 +43,7 @@ export default {
     updateAttributes(value) {
       this.attributes = value;
       if(this.shouldUpdate()) { 
-        this.db.updateAt(this.doc.docPath, value)
+        this.$db.updateAt(this.doc.docPath, value)
             .catch(err => alert(err))
       }
     },
