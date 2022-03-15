@@ -2,7 +2,7 @@
   <div 
     :class="{
       'algolia-search': true, [indexName]: typeof indexName === 'string',
-      'hide-selected': selectingOptions.hideSelected,
+      'hide-selected': !selectingOptions || !selectingOptions.hideSelected,
       'is-selecting': !!selectingOptions
     }">
     <div class="search-header">
@@ -11,11 +11,14 @@
         <div v-if="searchBar"
           class="search-bar">
           <input
+            ref="searchInput"
             v-model="search"
-            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline w-full bg-transparent border-none shadow-none"
+            class="appearance-none border rounded py-2 px-3 text-gray-700 dark:text-gray-200 leading-tight focus:outline-none focus:shadow-outline w-full bg-transparent border-none shadow-none"
             placeholder="search..."
             type="search"
             autocomplete="on"
+            @focus="searchInputFocused = true"
+            @blur="searchInputFocused = false"
           />
           <span v-if="hitCount > 0" class="hit-count">{{ hitCount }}</span>
           <Btn class="center bg-transparent icon-button ml-1"
@@ -40,29 +43,42 @@
       @change="updateFilters"
     />
     <div v-if="!!hits && !!hits.length"
-      class="hits">
+      class="hits"
+      :class="{ 
+        [classes && classes.grid ? classes.grid : '']: true,
+        'hidden': !searchInputFocused && !hitsHovered && selected && selected.length && !!selectingOptions && !!selectingOptions.quick,
+        'fade-in-down': (searchInputFocused || hitsHovered) && !!selectingOptions && !!selectingOptions.quick
+      }"
+      @mouseenter="hitsHovered = true"
+      @mouseleave="hitsHovered = false"
+      >
       <div v-for="(hit, i) in hits" :key="hit.id"
         :class="{
-          'hit cursor-pointer': true,
-          'selected': selected.map(s => s[selectingOptions.identifier]).includes(hit[selectingOptions.identifier])
+          'hit cursor-pointer p-0': true,
+          'selected': selected.map(s => s[selectingOptions.identifier]).includes(hit[selectingOptions.identifier]),
+          [classes && classes.hit ? classes.hit : '']: true
         }"
         @click="hitClicked(i)">
-        <CardProduct v-if="indexName.includes('product')"
+        
+        <CardProduct 
+          v-if="indexName.includes('product')"
+          :card-style="cardStyle"
           :class="{
-            [cardClasses]: typeof cardClasses === 'string' && cardClasses.length > 0,
-            ['card-style-' + cardStyle]: true
+            [classes && classes.card ? classes.card : '']: true,
           }"
           :item="hit" />
-        <CardReview v-else-if="indexName.includes('review')"
+        <CardReview 
+          v-else-if="indexName.includes('review')"
+          :card-style="cardStyle"
+          :classes="classes"
           :class="{
-            [cardClasses]: typeof cardClasses === 'string' && cardClasses.length > 0,
-            ['card-style-' + cardStyle]: true
+            [classes && classes.card ? classes.card : '']: true,
           }"
           :item="hit" />
         <CardMedia v-else-if="indexName === 'media'"
           :class="{
             'p-0': true,
-            [cardClasses]: typeof cardClasses === 'string' && cardClasses.length > 0,
+            [classes && classes.card ? classes.card : '']: true,
             ['card-style-' + cardStyle]: true
           }"
           :item="hit"
@@ -72,7 +88,7 @@
     <div v-else-if="hits === null">loading...</div>
     <div v-else>no results found...</div>
 
-    <template v-if="nextPage !== false && fetchingHits === false">
+    <template v-if="nextPage !== false && fetchingHits === false && (searchInputFocused || !selectingOptions || !selectingOptions.quick)">
       <div v-view="infiniteScrollHandler">
         <Btn class="text-xs border-1 border-gray-400 border-opacity-20 bg-transparent" @click="getNextPage" >Get Next Page</Btn>
       </div>
@@ -83,7 +99,7 @@
 <script>
 
 import _ from 'lodash'
-import { $algolia, parseUrlParamFilters, stringifyAlgoliaFilters, stringifyUrlParamFilters } from '~/utils/algolia'
+import { parseUrlParamFilters, stringifyAlgoliaFilters, stringifyUrlParamFilters } from '~/utils/algolia'
 
 export default {
   props: {
@@ -111,15 +127,24 @@ export default {
       type: Array, /* AlgoliaFilterObject[] */
       default: () => []
     }, 
-    cardClasses: {
-      type: String,
-      default: () => ''
-    }, 
+    classes: {
+      type: Object,
+      default: () => {
+        return {
+          grid: '',
+          hit: '',
+          card: '',
+          title: '',
+          content: '',
+          media: '',
+        }
+      }
+    },
     cardStyle: {
       type: String, /* 'media-above' | 'media-left' | 'media-left' */
       default: 'media-above'
     },
-    filtersValues: {
+    filterValues: {
       type: Object,
       default: () => { return {} }
     },
@@ -140,6 +165,7 @@ export default {
             identifier: 'id',
             hideSelected: false,
             hideSideNav: false, 
+            quick: false
           } 
         */
     }
@@ -150,43 +176,37 @@ export default {
     const filters = this.updateUrl && queryFilterKeys?.length
       ? parseUrlParamFilters(queryFilterKeys.map(k => `${k}=${this.$route.query[k]}`).join('&')
       ).filters
-        : Array.isArray(this.filtersValues) 
-          ? this.filtersValues
+        : Array.isArray(this.filterValues.filters) 
+          ? this.filterValues.filters
           : [];
     return {
       algoliaIndex: null,
-      search: this.$route?.query?.s ? this.$route.query.s : '',
+      search: this.updateUrl ? this.$route?.query?.s ? this.$route.query.s : '' : this.searchQuery,
       filters: Array.isArray(filters) ? filters : [],
       hits: null,
       hitCount: 0,
       nextPage: false,
       fetchingHits: true,
-      selected: Array.isArray(this.selectedValues) ? this.selectedValues : []
+      selected: Array.isArray(this.selectedValues) ? this.selectedValues : [],
+      searchInputFocused: false,
+      selectingOptions: [null, undefined, true].includes(this.selecting) 
+        ? { 
+            selected: [],
+            identifier: 'id',
+            hideSelected: false,
+            hideSideNav: false,
+            multiple: true
+        } 
+        : this.selecting,
+        hitsHovered: false
     }
   },
   computed: {
     index() {
       if (this.algoliaIndex !== null) return this.algoliaIndex
       if (!this.indexName?.length) return null;
-      const index = $algolia.initIndex(this.indexName)
+      const index = this.$algolia.initIndex(this.indexName)
       return index;
-    },
-    selectingOptions() {
-      if(this.selecting === false) return false;
-      const defaultOptions = { 
-          selected: [],
-          identifier: 'id',
-          hideSelected: false,
-          hideSideNav: false 
-      }
-      if(this.selecting === null) {
-        return defaultOptions
-      }
-      try {
-        return {...defaultOptions, ...this.selecting}
-      } catch(err) {
-        return defaultOptions
-      }
     }
   },
   watch: {
@@ -204,11 +224,28 @@ export default {
       this.getNextPage();
     }
   },
+  
   mounted() {
     this.getHits();
+
+    window.addEventListener('keyup', this.handleEsc)
+  },
+  unmounted() {
+    window.removeEventListener('keyup', this.handleEsc)
   },
   methods: {
-    updateSearch(val = this.search) {
+    handleEsc(e) {
+      if(e.key === 'Escape') {
+        console.log({e})
+        if(this.searchInputFocused || this.hitsHovered ) {
+          console.log(this.$refs.searchInput)
+          this.$refs.searchInput.blur()
+          this.searchInputFocused = false;
+          this.hitsHovered = false
+         }
+      }
+    },
+    updateSearch(val) {
       if(this.updateUrl && window !== undefined) {
         let query = stringifyUrlParamFilters(this.filters)
         try {
@@ -283,19 +320,22 @@ export default {
     },
     hitClicked(index) {
       const item = this.hits[index];
+      const focusAfterSelect = !!this.selectingOptions?.quick
+      if (focusAfterSelect) {
+        this.$refs.searchInput.focus()
+      }
       const slug = this.indexName.includes('product') ? item.handle : item?.objectID || item.id
       if(!this.selectingOptions) {
-        this.$router.push({ path: `${this.$route.path}/${slug}${this.$route.hash}` })
+        return this.$router.push({ path: `${this.$route.path}/${slug}${this.$route.hash}` })
       } else {
         const { identifier } = this.selectingOptions;
         if(this.selected.map(itm => itm[identifier]).includes(item[identifier])) {
           this.selected = this.selected.filter(s => s[identifier] !== item[identifier])
-          console.log(this.selected);
         } else {
           this.selected.push(item)
         }
-        this.$emit('selection', this.selected)
       }
+      this.$emit('selection', this.selected)
     }
   }
 }
@@ -304,7 +344,7 @@ export default {
 <style lang="scss">
 
 .search-header {
-  @apply sticky z-9999 top-[2.98rem] flex flex-col content-start items-stretch;
+  @apply sticky z-9999 top-0 flex flex-col content-start items-stretch;
   .search-header-inner {
     @apply flex items-center justify-start;
     .search-bar {

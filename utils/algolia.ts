@@ -12,7 +12,7 @@ export function initializeAlgoliaClient (clientCredentials: { appId: string, api
       );
 }
 
-export const $algolia:SearchClient = initializeAlgoliaClient({ appId: '010RMUCHO8', apiKey: '9610abb7baa7ae39ae7bc28dc246aaa7'});
+export const algoliaSearchClient:SearchClient = initializeAlgoliaClient({ appId: '010RMUCHO8', apiKey: '9610abb7baa7ae39ae7bc28dc246aaa7'});
 
 export const filterOptions:{[key:string]: any} = {
   ...['tags', 'product.tags', 'materials', 'fits', 'colors', 'product', 'score', 'rating', 'updatedAt', 'createdAt'].reduce((acc, attribute) => {
