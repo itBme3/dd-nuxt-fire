@@ -209,14 +209,9 @@ export default {
     }
   },
   data() {
-    const app = { $fire: this.$fire }
     return {
       state: 'confirming', /* confirming, selecting, saving, saved */
       showing: this.show,
-      shops: {
-        live: new Shopify({ app, env: 'live' }),
-        dev: new Shopify({ app, env: 'dev' }),
-      },
       products: {
         dev: this.devProduct,
         live: this.liveProduct
@@ -322,7 +317,7 @@ export default {
         (async() => {
           try {
             if ([null, undefined, {}].includes(this.products[env]) && env !== this.envs.from) {
-              this.products[env] = await this.shops[env].get({ path: `/products/${this.products[env].id}`, query: { fields: 'title,id,images,body_html,tags' } })
+              this.products[env] = await this.$shops[env].get({ path: `/products/${this.products[env].id}`, query: { fields: 'title,id,images,body_html,tags' } })
             }
           } catch (err) {
             console.error(err);
@@ -351,7 +346,7 @@ export default {
     },
     getCurrent(env) {
       return Promise.all([
-        this.shops[env].get({ path: `/products/${this.products[env].id}`, query: { fields: 'title,id,handle,images,body_html,tags' } })
+        this.$shops[env].get({ path: `/products/${this.products[env].id}`, query: { fields: 'title,id,handle,images,body_html,tags' } })
           .then(res => {
             this.currentProducts[env] = res.data.body?.product;
             return res

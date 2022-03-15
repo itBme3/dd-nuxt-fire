@@ -17,17 +17,11 @@
 </template>
 
 <script>
-import {Shopify} from '~/utils/shopify'
 
 export default {
   data(){
-    const app = { $fire: this.$fire }
     return {
       show: false,
-      shops: {
-        live: new Shopify({ app, env: 'live' }),
-        dev: new Shopify({ app, env: 'dev' }),
-      },
       products: {
         live: { handle: 'tailored-fit-dark-wash', id: 10562886470 },
         dev: { handle: 'tailored-fit-dark-wash', id: 1572676337757 },
@@ -48,7 +42,7 @@ export default {
   methods: {
     getCurrent(env) {
       return Promise.all([
-        this.shops[env].get({ path: `/products/${this.products[env].id}`, query: { fields: 'title,id,handle,images,body_html,tags' } })
+        this.$shops[env].get({ path: `/products/${this.products[env].id}`, query: { fields: 'title,id,handle,images,body_html,tags' } })
           .then(res => {
             this.products[env] = res.data.body?.product;
             return res
