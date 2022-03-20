@@ -1,8 +1,7 @@
 <template>
-
   <gRichSelect
     ref="richSelect"
-    v-model="selectedOptions"
+    :value="selectedOptions"
     :options="selectOptions"
     :value-attribute="valueAttribute"
     :text-attribute="textAttribute"
@@ -14,7 +13,6 @@
     :variant="variant"
     :delay="0"
     :fetch-options="typeof fetchOptions === 'function' ? fetchOptions : undefined"
-    @input="(e) => $emit('update', e)"
     @click="scrollTo('richSelect', -100)"
     >
     <template
@@ -22,8 +20,11 @@
         slot="dropdownDown"
         slot-scope="{ query }"
       >
+      
         <div
-          v-if="query"
+          v-if="query 
+            && !selectedOptions.map(o => valueAttribute === null ? o.toLowerCase() : o[valueAttribute].toLowerCase()).includes(query.toLowerCase())
+            && !$refs.richSelect.filteredOptions.map(o => o.value.toLowerCase()).includes(query.toLowerCase())"
           class="text-center"
         >
           <gButton
@@ -39,10 +40,10 @@
           <i class="gicon gicon-add rounded-full transform transition-transform scale-100 hover:scale-105 p-2 dark:bg-gray-800 bg-opacity-80 dark:bg-opacity-80 hover:bg-opacity-100 dark:hover:bg-opacity-100 bg-gray-100 hover:bg-white hover:shadow-2xl shadow" />
       </template>
   </gRichSelect>
-
 </template>
 
 <script>
+import { objectsAreTheSame } from '~/utils/funcs'
 export default {
   props: {
     options: {
@@ -105,15 +106,19 @@ export default {
   data() {
     return {
       selectOptions: this.options,
-      selectedOptions: this.multiple ? [] : null
+      selectedOptions: this.selected === null && this.multiple ? [] : JSON.parse(JSON.stringify(this.selected)),
     }
   },
   watch: {
-    options() {
-      this.selectOptions = this.options
+    options(val) {
+      this.selectOptions = val
     },
-    selected() {
-      this.selectedOptions = this.selected
+    selected(val) {
+      if(objectsAreTheSame(val, this.selectedOptions)) { return;}
+      this.selectedOptions = JSON.parse(JSON.stringify(val))
+    },
+    selectedOptions(val) {
+      this.$emit('update', val)
     }
   },
   created() {
@@ -128,7 +133,7 @@ export default {
                 ? null
                 : Array.isArray(this.selected) 
                   ? this.selected[0] 
-                  : null
+                  : null;
     }, 1000);
   },
   methods: {

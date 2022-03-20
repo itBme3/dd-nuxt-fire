@@ -22,26 +22,9 @@
             @update="(e) => $store.dispatch('productPage/setProduct', {env: env, product: {...product, body_html: e}})"
           />
 
-          <!-- <label for="product-tags">Tags:</label>
-          <RichSelect
-            v-if="showTags.includes(env) && Array.isArray(tags) && tags.length"
-            ref="productTags"
-            name="product-tags"
-            :selected="tags"
-            :close-on-select="false"
-            :multiple="true"
-            :variant="'light'"
-            :fetch-options="fetchTags"
-            :clearable="false"
-            :can-create="true"
-            :value-attribute="null"
-            :text-attribute="null"
-            :placeholder="'add tags...'"
-            class="mt-1 w-full"
-            @update="(e) => {
-              tags = e
-            }"
-          /> -->
+          <label for="product-tags">Tags:</label>
+          <ShopifyProductTags :env="env" />
+          
         </div>
 
         <Media 
