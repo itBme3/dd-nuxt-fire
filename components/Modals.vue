@@ -1,5 +1,8 @@
 <template>
   <div class="models">
+    
+    <ShopifyProductSave v-if="isProductPage"/>
+
     <template v-for="algoliaIndex in ['reviews', 'media', 'products_live', 'products_dev']">
       <LazyAlgoliaModalSelect
           :key="algoliaIndex"
@@ -30,6 +33,11 @@
 
 <script>
 export default {
+  computed: {
+    isProductPage() {
+      return this.$route.path.split('/')[1] === 'products'
+    }
+  },
   methods: {
     onSubmit(e) {
       const onSubmit = this.$store?.state?.algoliaSelect?.onSubmit ? this.$store.state.algoliaSelect.onSubmit : (val) => val

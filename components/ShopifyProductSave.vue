@@ -1,10 +1,10 @@
 <template>
-  <gModal v-model="showing" 
+  <gModal v-model="show" 
     class="product-save"
     :classes="{
-        overlay: 'bg-gray-100 dark:bg-gray-900 bg-opacity-90',
+        overlay: 'bg-gray-100 dark:bg-gray-900 bg-opacity-90 dark:bg-opacity-90',
         wrapper: 'max-w-sm',
-        modal: 'bg-transparent',
+        modal: 'bg-gray-50 dark:bg-gray-800',
         header: 'border-gray-100',
         footer: 'bg-transparent',
         close: 'rounded-md shadow-xl absolute right-0 top-0 h-12 w-12 bg-gray-300 bg-opacity-5 hover:bg-gray-300 hover:bg-opacity-10 text-red-400',
@@ -15,7 +15,8 @@
         overlayLeaveActiveClass: 'transition ease-in duration-75',
         overlayLeaveToClass: 'opacity-0',
       }"
-      @opened="() => state = envs.from === envs.to ? 'selecting' : 'confirming'"
+      @opened="onOpen"
+      @closed="onClose"
       >
 
     <template #header>
@@ -45,24 +46,24 @@
             'text-red-400': envs.from === 'live',
           }">{{ envs.from }}</strong>
         </template>
-        <small class="text-gray-400 dark:text-600 text-sm">{{ envs.to === envs.from ? 'saving to' : 'to'}}</small> 
-        <strong :class="{
-          'uppercase': true,
-          'text-purple-400': envs.to === 'dev',
-          'text-red-400': envs.to === 'live',
-        }">{{ envs.to }}</strong>
-        <small class="text-gray-400 dark:text-600 text-sm">site</small> 
+        <small class="text-gray-400 dark:text-600 text-sm">
+          {{ envs.to === envs.from ? 'saving to' : 'to'}}
+        </small> 
+        <strong 
+          v-for="env in envs.to"
+          :key="env"
+          :class="{
+            'uppercase': true,
+            'text-purple-400': env === 'dev',
+            'text-red-400': env === 'live',
+          }">
+          {{ env }}
+        </strong>
       </gTag>
 
       <div v-if="state === 'selecting'"
         class="mx-auto max-w-[260px]">
 
-        <!-- <gCheckbox wrapped 
-          label="save everything:"
-          name="save-all"
-          :checked="shouldSave.length >= shouldSaveOptions.length"
-          @input="(e) => !e ? shouldSave = [] : shouldSave = shouldSaveOptions.map(itm => itm.value)"
-        /> -->
         <small class="block text-gray-400 dark:text-gray-600 mb-3 uppercase">should save:</small>
         <gCheckboxGroup
           v-model="shouldSave"
@@ -119,21 +120,25 @@
 
         <client-only>
           <div v-if="state === 'saved'"
-            class="flex flex-col content-start items-stretch space-y-2 mb-2">
-
-              <a :href="links.admin" class="w-full" target="_blank">
-                <gButton 
-                  class="w-full text-blue-400 hover:bg-blue-400 hover:text-blue-900">
-                  View In Shopify
-                </gButton>
-              </a>
-              <a :href="links.frontend" class="w-full" target="_blank">
-                <gButton 
-                  class="w-full text-cyan-400 hover:bg-cyan-400 hover:text-cyan-900">
-                  View on Site
-                </gButton>
-              </a>
-
+            class="flex flex-col content-start items-stretch space-y-3 mb-2">
+              <div 
+                v-for="env in envs.to"
+                :key="env"
+                class="p-3 flex flex-col space-y-2">
+                <small class="uppercase">{{ env }}:</small>
+                <a :href="links[env].admin" class="w-full" target="_blank">
+                  <gButton 
+                    class="w-full text-blue-400 hover:bg-blue-400 hover:text-blue-900">
+                    View In Shopify
+                  </gButton>
+                </a>
+                <a :href="links[env].frontend" class="w-full" target="_blank">
+                  <gButton 
+                    class="w-full text-cyan-400 hover:bg-cyan-400 hover:text-cyan-900">
+                    View on Site
+                  </gButton>
+                </a>
+              </div>
           </div>
         </client-only>
 
@@ -152,7 +157,7 @@
               'text-red-400 hover:bg-red-400 hover:text-red-900': ['confirming', 'selecting'].includes(state),
               'text-blue-400 hover:bg-blue-400 hover:text-blue-900': state === 'saved'
             }"
-            @click="showing = false">
+            @click="show = false">
             {{ ['confirming', 'selecting'].includes(state) ? 'cancel' : 'done' }}
           </gButton>
           <gButton 
@@ -172,145 +177,119 @@
 
 <script>
 import RadialProgressBar from 'vue-radial-progress'
-import {shopAdminDomains, shopDomains, Shopify} from '~/utils/shopify'
+import { ShopEnv } from '~/models/shopify.models'
+import { asyncDelay } from '~/utils/funcs'
+import {shopAdminDomains, shopDomains} from '~/utils/shopify'
 
 export default {
   components: {
     RadialProgressBar
   },
-  props: {
-    liveProduct: {
-      type: Object,
-      default: () => null
-    },
-    devProduct: {
-      type: Object,
-      default: () => null
-    },
-    liveMetafields: {
-      type: Object,
-      default: () => null
-    },
-    devMetafields: {
-      type: Object,
-      default: () => null
-    },
-    fromEnv: {
-      type: String,
-      default: null
-    },
-    toEnv: {
-      type: String,
-      default: null
-    },
-    show: {
-      type: Boolean,
-      default: false
-    }
-  },
   data() {
     return {
       state: 'confirming', /* confirming, selecting, saving, saved */
-      showing: this.show,
-      products: {
-        dev: this.devProduct,
-        live: this.liveProduct
-      },
-      metafields: {
-        dev: this.devMetafields, /* is object with docId as key */
-        live: this.liveMetafields /* is object with docId as key */
-      },
-      currentProducts: {
-        live: null,
-        dev: null
-      },
-      currentMetafields: {
-        live: null,
-        dev: null
-      },
       saved: [],
       shouldSave: [],
       errors: []
     }
   },
   computed: {
-    envs() {
+    products() {
       return {
-        from: this.fromEnv,
-        to: this.toEnv
+        [ShopEnv.LIVE]: this.$store.state.productPage[ShopEnv.LIVE].product,
+        [ShopEnv.DEV]: this.$store.state.productPage[ShopEnv.DEV].product,
       }
     },
-    links() {
+    metafields() {
       return {
-        admin: `${shopAdminDomains[this.envs.to]}/products/${this.products[this.envs.to].id}`,
-        frontend: `${shopDomains[this.envs.to]}/products/${this.products[this.envs.to].handle}`
+        [ShopEnv.LIVE]: this.$store.state.productPage[ShopEnv.LIVE].metafields,
+        [ShopEnv.DEV]: this.$store.state.productPage[ShopEnv.DEV].metafields,
+      }
+    },
+    envs() {
+      return {
+        from: this.$store.state.productPage.saving.from,
+        to: this.$store.state.productPage.saving.to
       }
     },
     shouldSaveOptions() { 
       return [
-        { text: 'Content (title, text, tags)', value: 'title,body_html,tags' },
+        { text: 'Content (title, text, tags)', value: 'info' },
         { text: 'Images', value: 'images' },
-        { text: 'Product Details', value: 'metafield:product_details' },
-        { text: 'Featured Reviews', value: 'metafield:featured_reviews' },
-        { text: 'The Look', value: 'metafield:the_look' }
-      ].filter((option) => {
-        if (option.value.includes('metafield:')) {
-          return !!this.metafields[this.envs.from] && this.metafields[this.envs.from][option.value.split(':')[1]]?.docId
+        { text: 'Product Details', value: 'studio.product_details' },
+        { text: 'Featured Reviews', value: 'studio.featured_reviews' },
+        { text: 'The Look', value: 'studio.the_look' }
+      ]
+    },
+    show: {
+      get() {
+        return Array.isArray(this.$store.state.productPage.saving.to) && this.$store.state.productPage?.saving?.from?.length > 0
+      },
+      set(val) {
+        if (val === true) { return }
+        this.$store.commit('productPage/saving', { to: null, from: null })
+      }
+    },
+    links() {
+      return {
+        [ShopEnv.LIVE]: {
+          admin: this.products[ShopEnv.LIVE] ? `${shopAdminDomains[ShopEnv.LIVE]}/products/${this.products[ShopEnv.LIVE].id}` : null,
+          frontend:  this.products[ShopEnv.LIVE] ? `${shopDomains[ShopEnv.LIVE]}/products/${this.products[ShopEnv.LIVE].handle}` : null
+        },
+        [ShopEnv.DEV]: {
+          admin: this.products[ShopEnv.DEV] ? `${shopAdminDomains[ShopEnv.DEV]}/products/${this.products[ShopEnv.DEV].id}` : null,
+          frontend:  this.products[ShopEnv.DEV] ? `${shopDomains[ShopEnv.DEV]}/products/${this.products[ShopEnv.DEV].handle}` : null
         }
-        if (option.value === 'images') {
-          return this.products[this.envs.from] && this.products[this.envs.from]?.images?.length
-        }
-        const contentKeys = option.value.split(',');
-        return !!Object.keys(this.products[this.envs.from]).filter(k => contentKeys.includes(k))?.length
-      })
-    }
-  },
-  watch: {
-    liveProduct(value) {
-      this.products.live = value
-      setTimeout(() => {this.shouldSave = this.shouldSaveOptions.map(x => x.value)}, 500)
+      }
     },
-    devProduct(value) {
-      this.products.dev = value
-      setTimeout(() => {this.shouldSave = this.shouldSaveOptions.map(x => x.value)}, 500)
-    },
-    liveMetafields(value) {
-      this.metafields.live = value
-      setTimeout(() => {this.shouldSave = this.shouldSaveOptions.map(x => x.value)}, 500)
-    },
-    devMetafields(value) {
-      this.metafields.dev = value
-      setTimeout(() => {this.shouldSave = this.shouldSaveOptions.map(x => x.value)}, 500)
-    },
-    show(value) {
-      this.showing = value
-      setTimeout(() => {
-        if (this.envs.from === this.envs.to) { 
-          this.state = 'selecting'
-        }
-      }, 500);
-    },
-    showing(value) {
-      this.$emit('isOpen', value)
-    }
-  },
-  created() {
-    setTimeout(() => {
-      this.shouldSave = this.shouldSaveOptions.map(itm => itm.value)
-      console.log({ metafields: this.metafields, liveMetafields: this.liveMetafields, shouldSave: this.shouldSave })
-    }, 500);
   },
   methods: {
-    save() {
-      this.state = 'saving'
-        for (let i = 0; i < this.shouldSave.length; i++) {
-          setTimeout(() => {
-            this.saved.push(i);
-            if(this.saved.length === this.shouldSave.length) {
-              this.state = 'saved'
-            };
-          }, 500 * i)
-        }
+    async save() {
+      this.state = 'saving';
+      const {errors, saved} = await this.$store.dispatch('productPage/save', {shouldSave: this.shouldSave});
+      this.errors = errors
+      this.saved = saved
+      this.state = 'saved';
+      await asyncDelay(500);
+      this.$store.dispatch('productPage/getChanges', 'live');
+      this.$store.dispatch('productPage/getChanges', 'dev');
+    },
+    // async saveProduct() {
+    //   const product = this.shouldSave.includes('info') 
+    //     ? {
+    //       title: this.products[this.envs.from].title,
+    //       tags: this.products[this.envs.from].tags,
+    //       body_html: this.products[this.envs.from].body_html,
+    //     }
+    //     : {};
+    //   if (this.shouldSave.includes('images')) {
+    //     product.images = this.products[this.envs.from].images
+    //   }
+    //   if (!Object.keys(product)?.length) {
+    //     return
+    //   }
+
+    //   return await Promise.all(this.envs.to.map(env => {
+    //     const data = {...product, id: this.products[env].id}
+    //     console.log(data)
+    //     return this.$shops[env].put({ path: `products/${this.products[env].id}`, data  })
+    //       .then(() => ['info','images'].filter(k => this.shouldSave.includes(k)).forEach(k => this.saved.push(k)))
+    //       .catch(err => {
+    //         console.error(err)
+    //         this.errors.push(err)
+    //       })
+    //   }))
+    // },
+    onClose() {
+      this.$store.commit('productPage/saving', { to: null, from: null })
+    },
+    onOpen() {
+      this.state = this.envs.to?.length === 1 && this.envs.from === this.envs.to[0] ? 'selecting' : 'confirming'
+      this.shouldSave = this.shouldSaveOptions
+        .filter((option) => 
+          this.$store.state.productPage[this.envs.from]?.changes?.metafields?.includes(option.value)
+          || this.$store.state.productPage[this.envs.from]?.changes?.product?.includes(option.value))
+        .map(o => o.value)
     },
     getMissing(env) {
       return Promise.all([
@@ -342,32 +321,6 @@ export default {
             this.errors.push(`Getting missing ${env} metafields: ${err.message}`)
           }
         })()
-      ])
-    },
-    getCurrent(env) {
-      return Promise.all([
-        this.$shops[env].get({ path: `/products/${this.products[env].id}`, query: { fields: 'title,id,handle,images,body_html,tags' } })
-          .then(res => {
-            this.currentProducts[env] = res.data.body?.product;
-            return res
-          }).catch(err => {
-            console.error(err);
-            this.errors.push(`Getting current ${env} product: ${err.message}`)
-            return undefined
-          }),
-        this.$db.collection(`products_${env}/${this.products[env].handle}/metafields`)
-          .then(docs => {
-            this.currentMetafields[env] = {
-              product_details: docs.filter(d => d.docId === 'product_details')[0],
-              featured_reviews: docs.filter(d => d.docId === 'featured_reviews')[0],
-              the_look: docs.filter(d => d.docId === 'the_look')[0],
-            }
-          })
-          .catch(err => {
-            console.error(err);
-            this.errors.push(`Getting current ${env} product: ${err.message}`)
-            return { product_details: undefined, featured_reviews: undefined, the_look: undefined }
-          })
       ])
     }
   }

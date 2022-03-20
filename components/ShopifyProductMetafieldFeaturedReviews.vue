@@ -1,5 +1,13 @@
 <template>
   <div class="metafield-featured-reviews">
+    <gButton 
+      v-tooltip="'add item'"
+      class="add-item-button w-full py-3 mb-2"
+      @click="addItems()"
+      >
+      <Icon name="add" />
+    </gButton>
+
     <draggable 
       v-model="metafieldValue"
     >
@@ -45,6 +53,16 @@
         <i class="text-gray-500 block mt-3">{{ review.reviewer }}</i>
       </Card>
     </draggable>
+
+    <gButton 
+      v-if="metafieldValue && metafieldValue.length"
+      v-tooltip="'add item'"
+      class="add-item-button w-full py-3 mb-2"
+      @click="addItems(true)"
+      >
+      <Icon name="add" />
+    </gButton>
+
   </div>
 </template>
 
@@ -87,7 +105,7 @@ export default {
       },
       set(val) {
         const metafield = {key: this.key, namespace: this.namespace, ...(![undefined, null].includes(this.metafieldDoc) ? this.metafieldDoc : {}), ...val}
-        this.$store.commit('productPage/setMetafield', { env: this.env, metafield })
+        this.$store.dispatch('productPage/setMetafield', { env: this.env, metafield })
       }
     },
     metafieldValue: {
@@ -107,6 +125,26 @@ export default {
   mounted()  {
     const { env, namespace, key } = this
     this.$store.dispatch('productPage/getMetafield', { env, namespace, key, handle: this.product.handle })
+  },
+  methods: {
+    addItems(append = false) {
+      
+      this.$store.commit('algoliaSelect/open', { 
+        props: { indexName: 'reviews' },
+        onSubmit: (selection) => {
+          if (Array.isArray(selection)) {
+            // const value = Object.assign({}, value, this.metafieldValue)
+            const newItems = selection.map(review => {
+              const { title, content: body, score, id, name: reviewer, created_at: date } = review;
+              return { title, body, score, id, reviewer, date }
+            })
+            this.metafieldValue = append 
+              ? [...this.metafieldValue, ...newItems]
+              : [...newItems, ...this.metafieldValue]
+          }
+        }
+      })
+    }
   }
 }
 </script>

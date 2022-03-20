@@ -32,14 +32,19 @@
           class="dropdown-buttons"
           >
           <gButton role="menuitem" @click="(e) => { 
-              hide(e); savingTo = 'live'
+              hide(e); saveTo(['live'])
             }">
             LIVE
           </gButton>
           <gButton role="menuitem" @click="(e) => { 
-              hide(e); savingTo = 'dev'
+              hide(e); saveTo(['dev'])
             }">
             DEV
+          </gButton>
+          <gButton role="menuitem" @click="(e) => { 
+              hide(e); saveTo(['live', 'dev'])
+            }">
+            LIVE & DEV
           </gButton>
         </div>
       </gDropdown>
@@ -54,42 +59,26 @@
         :class="{
           'hidden': shopEnv !== env
         }"
-        @initialProduct="(e) => initial.products[env] = JSON.parse(JSON.stringify(e))"
-        @initialMetafield="(e) => initial.metafields[env][e.docId] = JSON.parse(JSON.stringify(e))"
-        @updateProduct="(e) => products[env] = e"
-        @updateMetafield="(e) => metafields[env][e.docId] = e"
       />
     </template>
-
-    <client-only>
-      <ShopifyProductSave
-        v-if="savingTo !== null"
-        :show="savingTo !== null"
-        :from-env="shopEnv"
-        :to-env="savingTo"
-        :dev-product="products.dev"
-        :live-product="products.live"
-        :dev-metafields="metafields.dev"
-        :live-metafields="metafields.live"
-        @isOpen="(e) => !e ? savingTo = null : ''"
-      />
-    </client-only>
-
   </div>
 </template>
 
 <script>
 import qs from 'qs'
-import { objectsAreTheSame } from '~/utils/funcs';
 
 export default {
   beforeRouteLeave (to, from, next) {
-    console.log({ values: Object.values(this.changesDetected), length: Object.values(this.changesDetected).filter(v => v).length  })
+    
     if (Object.values(this.changesDetected).filter(v => v).length === 0) {
+      this.$store.commit('productPage/resetState')
+      this.products = { live: null, dev: null }
       return next();
     }
     const answer = window.confirm('Unsaved changes will be lost')
     if (answer) {
+      this.$store.commit('productPage/resetState')
+      this.products = { live: null, dev: null }
       next()
     } else {
       next(false)
@@ -114,8 +103,8 @@ export default {
   computed: {
     changesDetected () {
       return {
-        live: this.detectChanges('live'),
-        dev: this.detectChanges('dev')
+        live: this.$store.state.productPage.live.changes?.product?.length || this.$store.state.productPage.live.changes?.metafields?.length,
+        dev: this.$store.state.productPage.dev.changes?.product?.length || this.$store.state.productPage.dev.changes?.metafields?.length,
       }
     }
   },
@@ -126,6 +115,9 @@ export default {
     }, 250)
   },
   methods: {
+    saveTo(to) {
+      this.$store.commit('productPage/saving', { from: this.shopEnv, to })
+    },
     toggleEnv(env) {
       const shopEnv = env.replace('#', '').trim().toLowerCase() === 'dev' ? 'dev' : 'live';
       if(this.shopEnv === shopEnv) { return }
@@ -134,31 +126,6 @@ export default {
       const queryString = qs.stringify(this.$route.query);
       const path = `${this.$route.path.split('#')[0]}#${shopEnv}${ queryString?.length ? `?${queryString}` : '' }`;
       window.history.pushState({path}, '', path);
-    },
-    detectChanges(env) {
-      const initialProduct = this.initial.products[env];
-      const product = this.products[env];
-      const initialMetafields = { product_details: null, featured_reviews: null, the_look: null , ...this.initial.metafields[env]};
-      const metafields = { product_details: null, featured_reviews: null, the_look: null , ...this.metafields[env]};
-      if ( product === null 
-          && Object.values(metafields).filter((metafield) => metafield?.value).length === 0 ) {
-        return false
-      }
-      const productImagesSame = product.images.filter(img => {
-        if(!img?.id) { return false }
-        const initialImg = initialProduct.images.filter(i => i.id === img.id)[0];
-        if (!initialImg) { return false }
-        return ['src', 'alt', 'position'].filter(k => {
-          return initialImg[k] === img[k]
-        }).length === 3
-      }).length === product.images.length;
-      if(!productImagesSame) { return true }
-      const productsSame = objectsAreTheSame(initialProduct, product);
-      const metafieldsSame = objectsAreTheSame(initialMetafields, metafields);
-      if ((productsSame || !product) && (metafieldsSame || Object.values(metafields).filter((metafield) => metafield?.value).length === 0)) { 
-        return false
-      }
-      return true
     }
   }
 }

@@ -1,6 +1,14 @@
 <template>
 <div class="metafield-product-details">
   
+  <gButton 
+    v-tooltip="'add item'"
+    class="add-item-button w-full py-3 mb-2"
+    @click="addItems()"
+    >
+    <Icon name="add" />
+  </gButton>
+
   <draggable 
     v-if="!!metafieldBlocks"
     v-model="metafieldBlocks"
@@ -43,8 +51,9 @@
         type="text"
         class="w-full text-xl mb-1"
         @change="(e) => {
-          block.title = e.target.value;
-          $emit('update', metafieldDoc)
+          const blocks = JSON.parse(JSON.stringify(metafieldBlocks))
+          blocks[blockIndex].title = e.target.value
+          metafieldBlocks = blocks
         }"
       />
       <Editor 
@@ -52,12 +61,20 @@
         :slim="true"
         class="py-1 w-full"
         @update="(e) => {
-          block.content = e;
-          $emit('update', metafieldDoc)
+          metafieldBlocks[blockIndex].content = e
         }"
       />
     </Card>
   </draggable>
+
+  <gButton 
+      v-if="metafieldBlocks && metafieldBlocks.length"
+      v-tooltip="'add item'"
+      class="add-item-button w-full py-3 mb-2"
+      @click="addItems(true)"
+      >
+      <Icon name="add" />
+    </gButton>
 
   <gModal 
     :ref="'modelSelectImageIndex'"
@@ -153,7 +170,7 @@ export default {
       },
       set(val) {
         const metafield = {key: this.key, namespace: this.namespace, ...(![undefined, null].includes(this.metafieldDoc) ? this.metafieldDoc : {}), ...val}
-        this.$store.commit('productPage/setMetafield', { env: this.env, metafield })
+        this.$store.dispatch('productPage/setMetafield', { env: this.env, metafield })
       }
     },
     metafieldBlocks: {
@@ -167,7 +184,7 @@ export default {
       set(blocks) {
         const metafield = {key: this.key, namespace: this.namespace, ...(![undefined, null].includes(this.metafieldDoc) ? this.metafieldDoc : {})}
         const value = ![undefined, null].includes(metafield.value) ? metafield.value : {}
-        this.$store.commit('productPage/setMetafield', { env: this.env, metafield: { ...metafield, value: { ...value, blocks } } })
+        this.$store.dispatch('productPage/setMetafield', { env: this.env, metafield: { ...metafield, value: { ...value, blocks } } })
         // this.metafieldDoc = metafieldDoc
       }
     },
@@ -181,7 +198,7 @@ export default {
       },
       set(value) {
         const metafield = {key: this.key, namespace: this.namespace, ...(![undefined, null].includes(this.metafieldDoc) ? this.metafieldDoc : {}), value}
-        this.$store.commit('productPage/setMetafield', { env: this.env, metafield })
+        this.$store.dispatch('productPage/setMetafield', { env: this.env, metafield })
         // this.metafieldDoc = metafieldDoc
       }
     }
@@ -189,12 +206,26 @@ export default {
   
   mounted()  {
     const { env, namespace, key } = this
-    this.$store.dispatch('productPage/getMetafield', { env, namespace, key, handle: this.product.handle })
+    setTimeout(() => {
+      this.$store.dispatch('productPage/getMetafield', { env, namespace, key, handle: this.product.handle })
+        .then(console.log)
+    }, 500)
   },
 
   methods: {
+    addItems(append = false) {
+      if(!this.metafieldValue?.blocks) {
+        doc.value = { blocks: [] }
+      }
+      const blocks = Array.isArray(this.metafieldValue?.blocks) ? JSON.parse(JSON.stringify(this.metafieldValue?.blocks)) : []
+      const newBlock = {
+        title: 'New...',
+        content: '',
+        image_index: null
+      }
+      this.metafieldValue = { blocks: append ? [...blocks, newBlock] : [newBlock, ...blocks] };
+    },
     selectImageIndex(e, blockIndex) {
-      console.log({ e, modalRef: this.$refs.modelSelectImageIndex })
       this.$refs.modelSelectImageIndex.show()
       this.selectingImageBlockIndex = blockIndex
       setTimeout(() => {

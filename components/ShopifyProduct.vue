@@ -12,14 +12,14 @@
             name="product-title"
             type="text"
             class="w-full text-lg sm:text-2xl md:text-4xl"
-            @input="(e) => $store.commit('productPage/setProduct', {env: env, product: {...product, title: e}})"
+            @input="(e) => $store.dispatch('productPage/setProduct', {env: env, product: {...product, title: e}})"
           />
 
           <label for="body-html">Body Html:</label>
           <Editor :content="product.body_html"
             name="body-html"
             class="py-1 w-full"
-            @update="(e) => $store.commit('productPage/setProduct', {env: env, product: {...product, body_html: e}})"
+            @update="(e) => $store.dispatch('productPage/setProduct', {env: env, product: {...product, body_html: e}})"
           />
 
           <!-- <label for="product-tags">Tags:</label>
@@ -115,7 +115,7 @@ export default {
         }
       },
       set (product) {
-        this.$store.commit('productPage/setProduct', { env: this.env, product })
+        this.$store.dispatch('productPage/setProduct', { env: this.env, product })
       }
     }
   },

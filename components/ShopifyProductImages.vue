@@ -47,22 +47,7 @@
           />
         </Card>
     </draggable>
-
-    <AlgoliaModalSelect
-      :show="selectingImages"
-      index-name="media"
-      :selecting="{
-        identifier: `objectID`,
-        hideSideNav: true,
-        multiple: true
-      }"
-      @submit="(e) => {
-        addImages(e)
-      }"
-      @after-close="(e) => {
-        selectingImages = false
-      }"
-    />
+    
   </div>
 </template>
 
@@ -98,7 +83,7 @@ export default {
         }
       },
       set(product) {
-        this.$store.commit('productPage/setProduct', { env: this.env, product })
+        this.$store.dispatch('productPage/setProduct', { env: this.env, product })
       }
     },
     productImages: {
@@ -119,13 +104,21 @@ export default {
   methods: {
     selectImages(append = false) {
       this.appendImages = append
-      this.selectingImages = false
-      setTimeout(() => {
-          this.selectingImages = true
-        }, !this.selectingImages ? 0 : 100)
+      this.$store.commit('algoliaSelect/open', { props: {
+        indexName: `media`,
+        selecting: {
+          multiple: true
+        }
+      }, 
+        onSubmit: this.addImages.bind(this)
+      })
+      // this.selectingImages = false
+      // setTimeout(() => {
+      //     this.selectingImages = true
+      //   }, !this.selectingImages ? 0 : 100)
     },
     addImages(selectedImages) {
-      const images = selectedImages.map(img => {
+      const newImages = selectedImages.map(img => {
         const alt = ['fits', 'materials', 'washes', 'colors', 'styles'].reduce((acc, key) => {
           const keySingular = key[key.length - 1] === 's' ? key.substring(0, key.length - 1) : key;
           if (!img[key]?.length) { return acc }
@@ -137,7 +130,7 @@ export default {
         const { downloadUrl: src } = img;
         return { src, alt }
       })
-      this.productImages = (this.appendImages ? [...this.images, ...images] : [...images, ...this.images])
+      this.productImages = (this.appendImages ? [...this.productImages, ...newImages] : [...newImages, ...this.productImages])
         .map((img, i) => {
           return { ...img, position: i + 1 }
         });

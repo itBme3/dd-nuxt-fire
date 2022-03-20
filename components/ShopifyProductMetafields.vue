@@ -29,13 +29,6 @@
         class="metafield-panels"
       >
         
-        <gButton 
-          v-tooltip="'add item'"
-          class="add-item-button w-full py-3 mb-2"
-          @click="addItem(null, true)"
-          >
-          <Icon name="add" />
-        </gButton>
 
         <div 
           v-for="obj in metafieldObjs"
@@ -76,91 +69,8 @@
         </template>
 
         </div>
-        <gButton
-          v-if="
-          (viewing === 'product_details' && metafieldObjs.filter(obj => obj.key === viewing)[0].doc && metafieldObjs.filter(obj => obj.key === viewing)[0].doc.value && metafieldObjs.filter(obj => obj.key === viewing)[0].doc.value.blocks.length)
-            || (['featuredReviews', 'Complete The Look'].includes(viewing) && metafieldObjs.filter(obj => obj.key === viewing)[0].doc && metafieldObjs.filter(obj => obj.key === viewing)[0].doc.value && metafieldObjs.filter(obj => obj.key === viewing)[0].doc.value.length)
-          "
-          v-tooltip="'add item'"
-          class="add-item-button w-full py-3 mb-2"
-          @click="addItem(null)"
-          >
-          <Icon name="add" />
-        </gButton>
+        
       </div>
-
-
-
-      <!-- <AlgoliaModalSelect
-        v-if="searchAlgolia === 'reviews'"
-        :show="true"
-        index-name="reviews"
-        :multiple="true"
-        :filter-values="{ filters: [
-          {
-            attribute: 'product.handle',
-            value: product.handle,
-            type: 'refinement_list'
-          },
-          {
-            attribute: 'score',
-            value: [4, 5],
-            type: 'range'
-          }
-        ]}"
-        :selecting="{
-          identifier: `objectID`,
-          hideSideNav: true
-        }"
-        @submit="(e) => {
-          addItem(e, prependSelection)
-        }"
-        @after-close="(e) => {
-          searchAlgolia = null
-        }"
-      />
-
-      <AlgoliaModalSelect
-        v-if="searchAlgolia === 'media'"
-        :show="true"
-        index-name="media"
-        :multiple="true"
-        :selecting="{
-          identifier: `objectID`,
-          hideSideNav: true
-        }"
-        @submit="(e) => {
-          addItem(e, prependSelection)
-        }"
-        @after-close="(e) => {
-          searchAlgolia = null
-        }"
-      />
-      
-      <AlgoliaQuickSelect 
-        v-if="searchAlgolia === 'products_' + env"
-        :index-name="'products_' + env"
-        :show="true"
-        :classes="{
-          card: 'p-0',
-          hit: 'col-span-full'
-        }"
-        :card-style="'media-left'"
-        :selection-values="lookProductHandles"
-        :selecting="{
-          quick: true,
-          identifier: 'handle',
-          multiple: true
-        }"
-        @submit="(e) => {
-          addItem(e, prependSelection);
-          scrollTo('metafieldTabs')
-        }"
-        @after-close="(e) => {
-          searchAlgolia = null
-        }"
-      /> -->
-
 
   </div>
 </template>
@@ -196,11 +106,10 @@ export default {
           doc: null
         },
       ]
-      const viewing = metafieldObjs[0].key
     return {
       metafieldObjs,
-      viewing,
-      fetched: [viewing],
+      viewing: metafieldObjs[0].key,
+      fetched: [],
       searchAlgolia: null, /* either null or index name — media, reviews, products_{env} */
       prependSelection: false,
       selectingImageBlockIndex: null
@@ -215,70 +124,16 @@ export default {
       }
     }
   },
+  mounted() {
+    this.fetched = []
+    setTimeout(() => {
+      this.fetched = [this.viewing]
+    }, 200)
+    
+  },
   methods: {
     handleize,
     
-    // async getMetafieldInFirebase() {
-    //   if (this.metafieldObjs.filter(obj => obj.key === this.viewing)[0]?.doc !== null) {
-    //     return
-    //   }
-    //   const metafieldObj = this.metafieldObjs.filter(obj => obj.key === this.viewing)[0];
-    //   const docPath = metafieldObj.docPath;
-    //   const doc = await this.db.doc(docPath).then(res => {
-    //     if(res?.key) {
-    //       return res
-    //     }
-    //     return { 
-    //       key: metafieldObj.key, 
-    //       namespace: metafieldObj.namespace, 
-    //       value: false, 
-    //       docId: docPath.split('/').pop(),
-    //       docPath
-    //     }
-    //   });
-    //   this.metafieldObjs.filter(obj => obj.key === this.viewing)[0].doc = doc;
-    //   return this.$emit('initial', doc);
-    // },
-    addItem(selection = null, prepend = false) {
-      const doc = this.metafieldObjs.filter(obj => obj.key === this.viewing)[0]?.doc || { value: this.viewing === 'Product Details' ? { blocks: [] } : [] };
-      const unshiftPush = prepend ? 'unshift' : 'push';
-      switch (this.viewing) {
-        case 'featuredReviews':
-          if(selection === null) {
-            this.prependSelection = prepend;
-            this.searchAlgolia = 'reviews';
-          } else if (Array.isArray(selection)) {
-            selection.forEach(itm => doc.value[unshiftPush](itm))
-          }
-          break;
-        case 'product_details':
-          if(!doc?.value?.blocks) {
-            doc.value = { blocks: [] }
-          }
-          doc.value.blocks[unshiftPush]({
-            title: 'New...',
-            content: '',
-            image_index: null
-          })
-          break;
-        case 'the_look':
-          if(selection === null) {
-            this.prependSelection = prepend;
-            this.searchAlgolia = `products_${this.env}`;
-          } else if (Array.isArray(selection)) {
-            const docValue = typeof doc.value === 'string' ? doc.value.split(', ') : !Array.isArray(doc.value) ? [] : doc.value;
-            selection.forEach(product => docValue[unshiftPush](product.handle));
-            doc.value = docValue.join(', ')
-          }
-          break;
-        default:
-          break;
-      }
-      if (!Array.isArray(selection) && this.viewing !== 'product_details') {
-        this.metafieldObjs.filter(d => d.key === this.viewing)[0].doc = doc;
-        this.$emit('updateMetafield', doc);
-      }
-    },
     scrollTo(refName, offset = 0) {
       const element = this.$refs[refName]?._vnode?.elm || this.$refs[refName];
       const top = element.classList.contains('modal-overlay') ? element.childNodes[0].offsetTop - 200 : element.offsetTop + offset;

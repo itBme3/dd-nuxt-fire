@@ -1,5 +1,14 @@
 <template>
   <div class="metafield-complete-look">
+
+    <gButton 
+      v-tooltip="'add item'"
+      class="add-item-button w-full py-3 mb-2"
+      @click="addItems()"
+      >
+      <Icon name="add" />
+    </gButton>
+
     <draggable 
       v-if="lookProductHandles && lookProductHandles.length"
       v-model="lookProductHandles"
@@ -31,6 +40,16 @@
         </CardProduct>
       </template>
     </draggable>
+
+    <gButton 
+      v-if="metafieldValue && metafieldValue.length"
+      v-tooltip="'add item'"
+      class="add-item-button w-full py-3 mb-2"
+      @click="addItems(true)"
+      >
+      <Icon name="add" />
+    </gButton>
+    
   </div>
 </template>
 
@@ -49,7 +68,7 @@ export default {
   },
   data() {
     const namespace = 'studio';
-    const key = 'product_details';
+    const key = 'the_look';
     return {
       namespace, key,
       keyPath: `${namespace}.${key}`,
@@ -75,7 +94,7 @@ export default {
       },
       set(val) {
         const metafield = {key: this.key, namespace: this.namespace, ...(![undefined, null].includes(this.metafieldDoc) ? this.metafieldDoc : {}), ...val}
-        this.$store.commit('productPage/setMetafield', { env: this.env, metafield })
+        this.$store.dispatch('productPage/setMetafield', { env: this.env, metafield })
       }
     },
     metafieldValue: {
@@ -94,7 +113,7 @@ export default {
     lookProductHandles: {
       get() {
         try {
-          return this.metafieldValue?.value?.split(', ') || []
+          return this.metafieldValue?.split(', ') || []
         } catch(err) {
           return []
         }
@@ -120,8 +139,31 @@ export default {
   methods: {
     scrollTo(refName, offset = 0) {
       const element = this.$refs[refName]?._vnode?.elm || this.$refs[refName];
-      const top = element.classList.contains('modal-overlay') ? element.childNodes[0].offsetTop - 200 : element.offsetTop + offset;
+      const top = element.classList.contains('modal-overlay') 
+        ? element.childNodes[0].offsetTop - 200 
+        : element.offsetTop + offset;
       window.scrollTo({top, left: 0, behavior: 'smooth'});
+    },
+    addItems(append = false) {
+      const onSubmit = (selection) => {
+          if (Array.isArray(selection)) {
+            const selectionHandles = selection
+              .map(p => p.handle)
+              .filter(h => !this.lookProductHandles.includes(h))
+            console.log({
+              selectionHandles,
+              lookProductHandles: this.lookProductHandles
+            })
+            this.metafieldValue = (append 
+              ? [...this.lookProductHandles, ...selectionHandles] 
+              : [...selectionHandles, ...this.lookProductHandles]
+              ).join(', ')
+          }
+      }
+      this.$store.commit('algoliaSelect/open', { 
+        props: { indexName: `products_${this.env}`,  },
+        onSubmit
+      })
     },
     getLookProducts() {
       if (Array.isArray(this.lookProductHandles) && this.lookProductHandles.length) {
