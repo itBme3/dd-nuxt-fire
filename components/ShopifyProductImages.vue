@@ -54,7 +54,6 @@
 <script>
 import draggable from 'vuedraggable'
 import { capitalize } from '~/utils/funcs';
-// import { moveItemInArray } from '~/utils/funcs'
 
 export default {
   components: {
@@ -95,7 +94,12 @@ export default {
         }
       },
       set(images) {
-        const product = {...JSON.parse(JSON.stringify(this.product)), images};
+        const product = {...JSON.parse(JSON.stringify(this.product)), images: images.map((image, i) => {
+          return {
+            ...image,
+            position: i + 1
+          }
+        })};
         this.product = product
         
       }
