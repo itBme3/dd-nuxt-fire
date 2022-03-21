@@ -16,6 +16,7 @@ export const capitalize = (strng: string): string => {
   return strng.split(' ').map(word => word[0].toUpperCase() + word.substring(1)).join(' ')
 }
 
+
 export const objectsAreTheSame = (_obj1: any, _obj2: any, dblCheck: boolean = true): any => {
   const obj1 = (() => {
     try {
@@ -31,35 +32,39 @@ export const objectsAreTheSame = (_obj1: any, _obj2: any, dblCheck: boolean = tr
       return _obj2
     }
   })();
-  if (obj1 === null && obj2 === null) { return true }
-  if ((obj1 === null && obj2 !== null) || (obj1 !== null && obj2 === null)) { return false }
+      if (
+            [null, undefined].includes(obj1) 
+            || [null, undefined].includes(obj2) 
+            || ['string', 'boolean', 'number'].includes(typeof obj1)
+            || ['string', 'boolean', 'number'].includes(typeof obj2)
+      ) {
+            return obj1 === obj2
+      }
+      if (Array.isArray(obj1) || Array.isArray(obj2)) {
+            if (Array.isArray(obj1) && Array.isArray(obj2)) {
+                  if (obj1.length !== obj2.length) {
+                        return false
+                  }
+                  for (let i = 0; obj1.length; i++) {
+                        if (!objectsAreTheSame(obj1[i], obj2[i])) {
+                              return false
+                        }
+                        if (i === obj1.length - 1) {
+                              return true
+                        }
+                  }
+            } else {
+                  return false
+            }
+      }
   const fields = Object.keys(obj1)
   for (const field of fields) {
-    if (typeof obj1[field] !== typeof obj2[field]) { return false }
-    if (Array.isArray(obj1[field])) {
-      if (!Array.isArray(obj2[field])) { return false }
-      if (obj1[field].sort().toString() !== obj2[field].sort().toString()) { return false }
-    } else if (typeof obj1[field] === 'object') {
-      const objs = { obj1, obj2 }
-      if (objectsAreTheSame(objs.obj1[field], objs.obj2[field])) { return false }
-    } else if (obj1[field] !== obj2[field]) { return false }
+        if (!objectsAreTheSame(obj1[field], obj2[field])) {
+              return false
+        }
   }
-  const o2 = (() => {
-    try {
-      return JSON.parse(JSON.stringify(obj2))
-    } catch (err) {
-      return obj2
-    }
-  })();
-  const o1 = (() => {
-    try {
-      return JSON.parse(JSON.stringify(obj1))
-    } catch (err) {
-      return obj1
-    }
-  })();
   return dblCheck
-    ? objectsAreTheSame(o1, o2, false)
+    ? objectsAreTheSame(obj2, obj1, false)
     : true
 }
 
