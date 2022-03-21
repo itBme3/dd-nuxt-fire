@@ -1,0 +1,8 @@
+.modal-overlay {
+	padding-top: 60px !important;
+}
+body[style*="overflow: hidden"] {
+	.site-nav {
+		z-index: 0 !important;
+	}
+}
