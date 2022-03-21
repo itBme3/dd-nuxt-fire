@@ -1,4 +1,4 @@
-import { asyncDelay } from "~/utils/funcs"
+
 
 interface State {
       props: { [key: string]: any },
@@ -65,8 +65,5 @@ export const mutations = {
             state.onUpdate = onUpdate
             state.onSubmit = onSubmit
             state.onCancel = onCancel
-      },
-      // updateSelection(state: State, selection: any[]) {
-      //       state.props = Object.assign({}, state.props, initialState.props)
-      // }
+      }
 }
