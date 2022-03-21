@@ -73,24 +73,30 @@ export default {
     }
   },
   computed: {
+    isProductPage() {
+      return !!this.$route?.params?.handle?.length
+    },
     product: {
       get() {
         try {
-          return this.$store?.state?.productPage[this.env]?.product || null
+          return this.isProductPage ? (this.$store?.state?.productPage[this.env]?.product || null)
+            : this.$store?.state?.productCreate?.product
         } catch {
           return null
         }
       },
       set(product) {
-        this.$store.dispatch('productPage/setProduct', { env: this.env, product })
+        this.isProductPage 
+          ? this.$store.dispatch('productPage/setProduct', { env: this.env, product })
+          : this.$store.commit('productCreate/setProduct', { value: product })
       }
     },
     productImages: {
       get() {
         try {
-          return this.$store?.state?.productPage[this.env]?.product?.images || null
+          return this?.product?.images || []
         } catch {
-          return null
+          return []
         }
       },
       set(images) {
@@ -116,10 +122,6 @@ export default {
       }, 
         onSubmit: this.addImages.bind(this)
       })
-      // this.selectingImages = false
-      // setTimeout(() => {
-      //     this.selectingImages = true
-      //   }, !this.selectingImages ? 0 : 100)
     },
     addImages(selectedImages) {
       const newImages = selectedImages.map(img => {

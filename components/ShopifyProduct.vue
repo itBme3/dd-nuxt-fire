@@ -2,7 +2,7 @@
   <div class="product mt-1 sm:px-2 md:px-4 lg:px-6">
     <template 
       v-if="product !== null">
-      <code v-if="product.ERROR" class="text-red-500">{{ product.ERROR }}</code>
+      <code v-if="product.ERROR" class="text-red-400 rounded p-6 shadow-lg">{{ product.ERROR }}</code>
       <div v-else class="product-info flex flex-col sm:flex-row sm:space-x-2 md:space-x-8 justify-between">
         <div class="product-content w-full sm:w-[calc(66.666%-.25rem)] max-w-3xl flex flex-col space-y-2">
 

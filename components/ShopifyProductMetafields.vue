@@ -1,28 +1,34 @@
 <template>
   <div class="product-metafields">
-      <div 
+       <scrollbar 
         ref="metafieldTabs"
-        class="metafield-tabs flex content-start items-center space-x-2 mb-3">
+        class="metafield-tabs flex content-start items-center space-x-2 my-auto overflow-x-scroll ml-0 mb-3">
 
         <gButton 
           v-for="(obj, objIndex) in metafieldObjs"
           :key="obj.key"
           :class="{
-            'font-normal': true,
+            'font-normal text-sm md:text-base': true,
             'text-red-400 hover:bg-red-400 hover:text-red-900': objIndex === 0,
-            'text-purple-400 hover:bg-purple-400 hover:text-purple-900': objIndex === 1,
-            'text-blue-400 hover:bg-blue-400 hover:text-blue-900': objIndex === 2,
-            'text-green-400 hover:bg-green-400 hover:text-green-900': objIndex === 3,
             'bg-red-400 text-red-900': objIndex === 0 && viewing === obj.key,
-            'bg-purple-400 text-purple-900': objIndex === 1 && viewing === obj.key,
-            'bg-blue-400 text-blue-900': objIndex === 2 && viewing === obj.key,
-            'bg-green-400 text-green-900': objIndex === 3 && viewing === obj.key,
+            'text-purple-400 hover:bg-purple-400 hover:text-purple-900': objIndex === 4,
+            'bg-purple-400 text-purple-900': objIndex === 4 && viewing === obj.key,
+            'text-orange-300 hover:bg-orange-300 hover:text-orange-900': objIndex === 6,
+            'bg-orange-300 text-orange-900': objIndex === 6 && viewing === obj.key,
+            'text-blue-300 hover:bg-blue-300 hover:text-blue-900': objIndex === 3,
+            'bg-blue-300 text-blue-900': objIndex === 3 && viewing === obj.key,
+            'text-cyan-300 hover:bg-cyan-300 hover:text-cyan-900': objIndex === 1,
+            'bg-cyan-300 text-cyan-900': objIndex === 1 && viewing === obj.key,
+            'bg-yellow-200 text-yellow-900': objIndex === 2 && viewing === obj.key,
+            'text-yellow-200 hover:bg-yellow-200 hover:text-yellow-900': objIndex === 2,
+            'bg-green-200 text-green-900': objIndex === 5 && viewing === obj.key,
+            'text-green-300 hover:bg-green-300 hover:text-green-900': objIndex === 5,
           }"
           @click="viewing = obj.key; scrollTo('metafieldTabs', -100); fetched.includes(obj.key) ? '' : fetched.push(obj.key)">
           {{ obj.label }}
         </gButton>
 
-      </div>
+       </scrollbar>
 
       <div
         ref="metafieldPanels"
@@ -89,19 +95,19 @@ export default {
     const metafieldObjs = [
         { 
           label: 'Product Details',
-          docPath: `products_${this.env}/${this.$route.params.handle}/metafields/product_details`,
+          docPath: this.isProductPage ? `products_${this.env}/${this.$route.params.handle}/metafields/product_details` : null,
           key: 'product_details', namespace: 'studio',
           doc: null
         },
         { 
           label: 'Featured Reviews',
-          docPath: `products_${this.env}/${this.$route.params.handle}/metafields/featured_reviews`,
+          docPath: this.isProductPage ? `products_${this.env}/${this.$route.params.handle}/metafields/featured_reviews` : null,
           key: 'featuredReviews', namespace: 'studio',
           doc: null
         },
         { 
           label: 'Complete The Look',
-          docPath: `products_${this.env}/${this.$route.params.handle}/metafields/the_look`,
+          docPath: this.isProductPage ? `products_${this.env}/${this.$route.params.handle}/metafields/the_look` : null,
           key: 'the_look', namespace: 'studio',
           doc: null
         },
@@ -116,9 +122,14 @@ export default {
     }
   },
   computed: {
+    isProductPage() {
+      return !!this.$route?.params?.handle?.length
+    },
     product() {
       try {
-        return this.$store?.state?.productPage[this.env]?.product?.images || []
+        return this.isProductPage 
+          ? this.$store?.state?.productPage[this.env]?.product
+          : this.$store?.state?.productCreate?.product
       } catch {
         return null
       }

@@ -232,6 +232,10 @@ export const decodeHtml = (function() {
 })();
 
 
+export const stripHtml = (strng: string) => {
+  return strng.replace(/(<([^>]+)>)/gi, '').replace(/\r?\n|\r/g, '');
+}
+
 export const moveItemInArray = (arr:any[], oldIndex:number, newIndex:number) => {
   const image = arr.splice(oldIndex, 1)[0];
   return [...arr.splice(0, newIndex), image, ...arr]

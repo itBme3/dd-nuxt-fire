@@ -1,5 +1,8 @@
 .modal-overlay {
 	padding-top: 60px !important;
+	&.quick-select {
+		@apply pt-0 #{!important};
+	}
 }
 body[style*="overflow: hidden"] {
 	.site-nav {

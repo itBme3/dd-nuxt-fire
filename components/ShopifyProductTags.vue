@@ -29,7 +29,7 @@ export default {
   props: {
     env: {
       type: String,
-      default: null
+      default: 'live'
     }
   },
   data() {
@@ -42,6 +42,9 @@ export default {
     }
   },
   computed: {
+    isProductPage() {
+      return !!this.$route?.params?.handle?.length
+    },
     tags: {
       get() {
         if(this.product?.tags?.split) {
@@ -54,16 +57,21 @@ export default {
         this.product = { ...([undefined, null].includes(this.product) ? {} : this.product), tags }
       }
     },
+    
     product: {
       get() {
         try {
-          return this.$store?.state?.productPage[this.env]?.product
+          return this.isProductPage 
+            ? this.$store?.state?.productPage[this.env]?.product
+            : this.$store?.state?.productCreate?.product
         } catch {
           return null
         }
       },
       set (product) {
-        this.$store.dispatch('productPage/setProduct', { env: this.env, product })
+        this.isProductPage 
+          ? this.$store.dispatch('productPage/setProduct', { env: this.env, product })
+          : this.$store.commit('productCreate/setProduct', { value: product })
       }
     }
   },

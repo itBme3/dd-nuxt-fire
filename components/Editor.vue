@@ -5,7 +5,11 @@
     }"
     @mouseleave="toolbarHovered = false"
   >
-
+    <style>
+      :root {
+        --editor-min-height: {{ minHeight }} !important;
+      }
+    </style>
     <div v-if="editor"
       class="toolbar flex flex-wrap space-x-1"
       :class="{
@@ -395,6 +399,7 @@ export default {
   // min-height: var(--editor-min-height);
   > .ProseMirror {
     @apply focus:outline-none focus:ring-0 p-2 h-full;
+    min-height: var(--editor-min-height);
     > * + * {
       margin-top: 0.75em;
     }

@@ -2,8 +2,7 @@
 <div class="metafield-product-details">
   
   <gButton 
-    v-tooltip="'add item'"
-    class="add-item-button w-full py-3 mb-2"
+    class="add-item-button w-full py-3 mb-2 border-2 border-gray-500 border-opacity-20 hover:border-opacity-100 hover:border-red-400 text-red-400 hover:bg-red-400 hover:text-red-900"
     @click="addItems()"
     >
     <Icon name="add" />
@@ -61,7 +60,9 @@
         :slim="true"
         class="py-1 w-full"
         @update="(e) => {
-          metafieldBlocks[blockIndex].content = e
+          const blocks = JSON.parse(JSON.stringify(metafieldBlocks))
+          blocks[blockIndex].content = e
+          metafieldBlocks = blocks
         }"
       />
     </Card>
@@ -69,8 +70,7 @@
 
   <gButton 
       v-if="metafieldBlocks && metafieldBlocks.length"
-      v-tooltip="'add item'"
-      class="add-item-button w-full py-3 mb-2"
+      class="add-item-button w-full py-3 mb-2 border-2 border-gray-500 border-opacity-20 hover:border-opacity-100 hover:border-red-400 text-red-400 hover:bg-red-400 hover:text-red-900"
       @click="addItems(true)"
       >
       <Icon name="add" />
@@ -150,9 +150,14 @@ export default {
     }
   },
   computed: {
+    isProductPage() {
+      return !!this.$route.params?.handle?.length
+    },
     product() {
       try {
-          return this.$store?.state.productPage[this.env]?.product
+          return this.isProductPage 
+            ? this.$store.state.productPage[this.env]?.product
+            : this.$store.state.productCreate?.product
         } catch {
           return null
         }
@@ -163,20 +168,24 @@ export default {
     metafieldDoc: {
       get() {
         try {
-          return this.$store?.state.productPage[this.env]?.metafields[this.keyPath]
+          return this.isProductPage 
+            ? this.$store?.state.productPage[this.env]?.metafields[this.keyPath]
+            : this.$store?.state.productCreate?.metafields[this.keyPath]
         } catch {
           return null
         }
       },
       set(val) {
         const metafield = {key: this.key, namespace: this.namespace, ...(![undefined, null].includes(this.metafieldDoc) ? this.metafieldDoc : {}), ...val}
-        this.$store.dispatch('productPage/setMetafield', { env: this.env, metafield })
+        return this.isProductPage 
+          ? this.$store.dispatch('productPage/setMetafield', { env: this.env, metafield })
+          : this.$store.commit('productCreate/setMetafield', { metafield })
       }
     },
     metafieldBlocks: {
       get() {
         try {
-          return this.$store?.state?.productPage[this.env]?.metafields[this.keyPath]?.value?.blocks
+          return this.metafieldDoc?.value?.blocks
         } catch {
           return []
         }
@@ -184,7 +193,9 @@ export default {
       set(blocks) {
         const metafield = {key: this.key, namespace: this.namespace, ...(![undefined, null].includes(this.metafieldDoc) ? this.metafieldDoc : {})}
         const value = ![undefined, null].includes(metafield.value) ? metafield.value : {}
-        this.$store.dispatch('productPage/setMetafield', { env: this.env, metafield: { ...metafield, value: { ...value, blocks } } })
+        this.isProductPage 
+          ? this.$store.dispatch('productPage/setMetafield', { env: this.env, metafield: { ...metafield, value: { ...value, blocks } } })
+          : this.$store.commit('productCreate/setMetafield', { metafield: { ...metafield, value: { ...value, blocks } } })
         // this.metafieldDoc = metafieldDoc
       }
     },
@@ -198,7 +209,9 @@ export default {
       },
       set(value) {
         const metafield = {key: this.key, namespace: this.namespace, ...(![undefined, null].includes(this.metafieldDoc) ? this.metafieldDoc : {}), value}
-        this.$store.dispatch('productPage/setMetafield', { env: this.env, metafield })
+        this.isProductPage 
+          ? this.$store.dispatch('productPage/setMetafield', { env: this.env, metafield })
+          : this.$store.commit('productCreate/setMetafield', { metafield })
         // this.metafieldDoc = metafieldDoc
       }
     }
@@ -206,24 +219,26 @@ export default {
   
   mounted()  {
     const { env, namespace, key } = this
-    setTimeout(() => {
-      this.$store.dispatch('productPage/getMetafield', { env, namespace, key, handle: this.product.handle })
-        .then(console.log)
-    }, 500)
+    if(this.isProductPage) {
+      setTimeout(() => {
+        this.$store.dispatch('productPage/getMetafield', { env, namespace, key, handle: this.product.handle })
+          .then(console.log)
+      }, 500)
+    }
   },
 
   methods: {
     addItems(append = false) {
-      if(!this.metafieldValue?.blocks) {
-        doc.value = { blocks: [] }
-      }
-      const blocks = Array.isArray(this.metafieldValue?.blocks) ? JSON.parse(JSON.stringify(this.metafieldValue?.blocks)) : []
+      const blocks = !Array.isArray(this.metafieldBlocks) ? [] : JSON.parse(JSON.stringify(this.metafieldBlocks))
       const newBlock = {
         title: 'New...',
         content: '',
         image_index: null
       }
       this.metafieldValue = { blocks: append ? [...blocks, newBlock] : [newBlock, ...blocks] };
+      setTimeout(() => {
+        window.scrollTo({top: this.$el.offsetTop + (append ? this.$el.offsetHeight : 0), left: 0, behavior: 'smooth'});
+      }, 250)
     },
     selectImageIndex(e, blockIndex) {
       this.$refs.modelSelectImageIndex.show()

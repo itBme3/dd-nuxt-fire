@@ -5,6 +5,7 @@
 
     <template v-for="algoliaIndex in ['reviews', 'media', 'products_live', 'products_dev']">
       <LazyAlgoliaModalSelect
+          v-if="algoliaIndex === $store.state.algoliaSelect.props.indexName"
           :key="algoliaIndex"
           :show="algoliaIndex === $store.state.algoliaSelect.props.indexName"
           :index-name="$store.state.algoliaSelect.props.indexName"
@@ -16,6 +17,7 @@
             multiple: !!$store.state.algoliaSelect.props.selecting && !!$store.state.algoliaSelect.props.selecting.multiple,
             quick: !!$store.state.algoliaSelect.props.selecting && !!$store.state.algoliaSelect.props.selecting.quick,
           }"
+          :selected="null"
           :classes="!!$store.state.algoliaSelect.props.classes ? $store.state.algoliaSelect.props.classes : {}"
           :search-query="typeof $store.state.algoliaSelect.props.searchQuery === 'string' ? $store.state.algoliaSelect.props.searchQuery : ''"
           :selected-values="!!$store.state.algoliaSelect.props.selectedValues ? $store.state.algoliaSelect.props.selectedValues : []"

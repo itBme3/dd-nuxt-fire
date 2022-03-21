@@ -2,8 +2,7 @@
   <div class="metafield-complete-look">
 
     <gButton 
-      v-tooltip="'add item'"
-      class="add-item-button w-full py-3 mb-2"
+      class="add-item-button w-full py-3 mb-2 border-2 border-gray-500 border-opacity-20 hover:border-opacity-100 hover:border-yellow-200 text-yellow-200 hover:bg-yellow-200 hover:text-yellow-900"
       @click="addItems()"
       >
       <Icon name="add" />
@@ -18,14 +17,14 @@
           v-for="handle in lookProductHandles"
       >
         <CardProduct 
-          v-if="$store.state.productsCache[env][handle]"
+          v-if="$store.state.productsCache[isProductPage ? env : 'live'][handle]"
           :key="handle"
           :card-style="'media-left'"
           class="bg-gray-200 p-0 text-gray-700 max-w-prose mx-auto"
           :classes="{
             media: 'max-w-[9rem]'
           }"
-          :item="$store.state.productsCache[env][handle]"
+          :item="$store.state.productsCache[isProductPage ? env : 'live'][handle]"
         >
         <template #after>
           <ButtonDelete
@@ -43,8 +42,7 @@
 
     <gButton 
       v-if="metafieldValue && metafieldValue.length"
-      v-tooltip="'add item'"
-      class="add-item-button w-full py-3 mb-2"
+      class="add-item-button w-full py-3 mb-2 border-2 border-gray-500 border-opacity-20 hover:border-opacity-100 hover:border-yellow-200 text-yellow-200 hover:bg-yellow-200 hover:text-yellow-900"
       @click="addItems(true)"
       >
       <Icon name="add" />
@@ -63,7 +61,7 @@ export default {
   props: {
     env: {
       type: String,
-      default: null
+      default: 'live'
     }
   },
   data() {
@@ -77,9 +75,14 @@ export default {
     }
   },
   computed: {
+    isProductPage() {
+      return !!this.$route?.params?.handle?.length
+    },
     product() {
       try {
-          return this.$store?.state.productPage[this.env]?.product
+        return this.isProductPage 
+          ? this.$store?.state.productPage[this.env]?.product
+          : this.$store?.state.productCreate?.product
         } catch {
           return null
         }
@@ -87,26 +90,31 @@ export default {
     metafieldDoc: {
       get() {
         try {
-          return this.$store?.state.productPage[this.env]?.metafields[this.keyPath]
+          return this.isProductPage 
+            ? this.$store?.state.productPage[this.env]?.metafields[this.keyPath]
+            : this.$store?.state.productCreate?.metafields[this.keyPath]
         } catch {
           return null
         }
       },
       set(val) {
         const metafield = {key: this.key, namespace: this.namespace, ...(![undefined, null].includes(this.metafieldDoc) ? this.metafieldDoc : {}), ...val}
-        this.$store.dispatch('productPage/setMetafield', { env: this.env, metafield })
+        this.isProductPage 
+          ? this.$store.dispatch('productPage/setMetafield', { env: this.env, metafield })
+          : this.$store.commit('productCreate/setMetafield', { metafield })
       }
     },
     metafieldValue: {
       get() {
         try {
-          return this.$store?.state.productPage[this.env]?.metafields[this.keyPath]?.value
+          return this.metafieldDoc?.value
         } catch {
           return null
         }
       },
       set(value) {
         const metafieldDoc = {key: this.key, namespace: this.namespace, ...(![undefined, null].includes(this.metafieldDoc) ? this.metafieldDoc : {}), value}
+        console.log({ metafieldDoc })
         this.metafieldDoc = metafieldDoc
       }
     },
@@ -133,7 +141,9 @@ export default {
 
   mounted()  {
     const { env, namespace, key } = this
-    this.$store.dispatch('productPage/getMetafield', { env, namespace, key, handle: this.product.handle })
+    if(this.isProductPage) {
+      this.$store.dispatch('productPage/getMetafield', { env, namespace, key, handle: this.product.handle })
+    }
   },
 
   methods: {
@@ -158,10 +168,23 @@ export default {
               ? [...this.lookProductHandles, ...selectionHandles] 
               : [...selectionHandles, ...this.lookProductHandles]
               ).join(', ')
+            setTimeout(() => {
+              window.scrollTo({top: this.$el.offsetTop + (append ? this.$el.offsetHeight : 0), left: 0, behavior: 'smooth'});
+            }, 250)
           }
       }
       this.$store.commit('algoliaSelect/open', { 
-        props: { indexName: `products_${this.env}`,  },
+        props: { 
+          indexName: this.isProductPage 
+            ? `products_${this.env}`
+            : `products_live`,
+          selected: this.lookProductHandles,
+          selecting: {
+            identifier: 'handle',
+            quick: true,
+            multiple: true
+          }
+        },
         onSubmit
       })
     },

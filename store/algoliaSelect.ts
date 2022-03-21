@@ -1,4 +1,4 @@
-
+import Vue from 'vue'
 
 interface State {
       props: { [key: string]: any },
@@ -44,15 +44,16 @@ const initialState: State = {
 }
 
 export const state = ():State => ({
-      ...initialState
+      ...JSON.parse(JSON.stringify(initialState))
 });
 
 export const mutations = {
       resetState(state: State) {
-            state.props = Object.assign({}, state.props, initialState.props)
-            state.onCancel = initialState.onCancel
-            state.onUpdate = initialState.onUpdate
-            state.onSubmit = initialState.onSubmit
+            state.props = Object.assign({}, state.props, JSON.parse(JSON.stringify(initialState.props)))
+            console.log({ state })
+            Vue.set(state, 'onCancel',  initialState.onCancel)
+            Vue.set(state, 'onUpdate',  initialState.onUpdate)
+            Vue.set(state, 'onSubmit',  initialState.onSubmit)
       },
       open(state: State, params: State) {
             const {
@@ -61,9 +62,9 @@ export const mutations = {
                   onSubmit = initialState.onSubmit,
                   onCancel = initialState.onCancel
             } = params;
-            state.props = { ...defaultProps, ...(!props ? {} : props) }
-            state.onUpdate = onUpdate
-            state.onSubmit = onSubmit
-            state.onCancel = onCancel
+            state.props =  Object.assign({ }, state.props, { ...defaultProps, ...(!props ? {} : props) })
+            Vue.set(state, 'onCancel',  onCancel)
+            Vue.set(state, 'onUpdate',  onUpdate)
+            Vue.set(state, 'onSubmit', onSubmit)
       }
 }

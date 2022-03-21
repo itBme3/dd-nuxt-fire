@@ -1,7 +1,8 @@
 <template>
+<div>
   <gRichSelect
     ref="richSelect"
-    :value="selectedOptions"
+    v-model="selectedOptions"
     :options="selectOptions"
     :value-attribute="valueAttribute"
     :text-attribute="textAttribute"
@@ -40,6 +41,7 @@
           <i class="gicon gicon-add rounded-full transform transition-transform scale-100 hover:scale-105 p-2 dark:bg-gray-800 bg-opacity-80 dark:bg-opacity-80 hover:bg-opacity-100 dark:hover:bg-opacity-100 bg-gray-100 hover:bg-white hover:shadow-2xl shadow" />
       </template>
   </gRichSelect>
+  </div>
 </template>
 
 <script>
@@ -100,13 +102,14 @@ export default {
     },
     selected: {
       type: [String, Array],
-      default: () => null
+      default: () => []
     }
   },
   data() {
     return {
       selectOptions: this.options,
-      selectedOptions: this.selected === null && this.multiple ? [] : JSON.parse(JSON.stringify(this.selected)),
+      selectedOptions: this.multiple ? [undefined, null].includes(this.selected) ? [] : JSON.parse(JSON.stringify(this.selected))
+        : typeof this.selected === 'string' ? this.selected : null,
     }
   },
   watch: {
@@ -114,8 +117,9 @@ export default {
       this.selectOptions = val
     },
     selected(val) {
-      if(objectsAreTheSame(val, this.selectedOptions)) { return;}
-      this.selectedOptions = JSON.parse(JSON.stringify(val))
+      console.log({val, selectedOptions: this.selectedOptions})
+      if(objectsAreTheSame(val, this.selectedOptions)) { return }
+      this.selectedOptions = typeof val === 'string' ? val : JSON.parse(JSON.stringify(val))
     },
     selectedOptions(val) {
       this.$emit('update', val)

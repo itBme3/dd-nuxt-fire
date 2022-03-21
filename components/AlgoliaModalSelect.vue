@@ -1,6 +1,9 @@
 <template>
 
   <gModal ref="modal"
+    :class="{
+      'quick-select': !!selecting.quick
+    }"
     :variant="'selecting'"
     :esc-to-close="!(selectingOptions && selectingOptions.quick)"
     @before-close="beforeClose"
