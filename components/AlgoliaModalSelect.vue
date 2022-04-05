@@ -53,15 +53,17 @@
 </template>
 
 <script>
+import Vue from 'vue'
+
 const defaultSelecting = { 
   identifier: 'id',
   hideSelected: true,
   hideSideNav: false,
   quick: false,
   multiple: true
-} 
+}
 
-export default {
+export default Vue.extend({
   props: {
     indexName: {
       type: String,
@@ -80,15 +82,15 @@ export default {
       default: () => []
     }, 
     filterValues: {
-      type: Object,
-      default: () => { return {} } /* { filters: AlgoliaFilterObject[] } */
+      type: Object, /* { filters: AlgoliaFilterObject[] } */
+      default: () => { return { filters: [] } } 
     },
     selecting: {
-      type: [Object, Boolean],
+      type: Object, /* SelectingOptions | boolean */
       default: () => defaultSelecting
     },
     selectedValues: {
-      type: Array,
+      type: Array, /* any[] */
       default: () => []
     },
     cardStyle: {
@@ -96,7 +98,7 @@ export default {
       default: 'media-above'
     },
     classes: {
-      type: Object,
+      type: Object, /* {[key:string]: string} */
       default: () => {
         return {
           grid: '',
@@ -117,14 +119,17 @@ export default {
     return { 
       showing: this.show,
       search: this.searchQuery,
-      selected: JSON.parse(JSON.stringify(this.selectedValues)),
       fetchNextPage: false,
-      selectingOptions: [undefined, true, null].includes(this.selecting) ? defaultSelecting : this.selecting
+      selectingOptions: this.selecting === true ? defaultSelecting : this.selecting,
+      selected: JSON.parse(JSON.stringify(this.selectedValues))
     }
   },
   computed: {
     multiple() {
-      return !!this.selecting?.multiple
+      if(!this.selectingOptions) {
+        return false;
+      }
+      return this.selecting?.multiple === true
     }
   },
   watch: {
@@ -143,14 +148,11 @@ export default {
     }
   },
   mounted() {
-    this.$refs.modal.beforeClose( function() {
-      this.showing = false;
-    })
     if(this.showing){
       this.showModal()
     }
   },
-  unmounted() {
+  beforeUnmount() {
     this.showing = false
   },
   methods: {
@@ -181,7 +183,6 @@ export default {
       this.$emit('before-open', e)
     },
     updateSelection(selected) {
-      console.log(selected)
       this.selected = selected;
       if (!this.multiple) {
         this.submitSelection();
@@ -192,15 +193,13 @@ export default {
     submitSelection() {
       this.showing = false
       this.$emit('submit', !this.multiple ? this.selected[0] : this.selected)
-      // this.$refs.modal.hide()
     },
     cancelSelection() {
       this.showing = false
       this.$emit('cancel', true)
-      // this.$refs.modal.hide()
     },
   }
-}
+})
 </script>
 
 <style lang="scss">
@@ -208,3 +207,7 @@ export default {
   @apply pt-96
 }
 </style>
+
+
+
+

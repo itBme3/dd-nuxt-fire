@@ -67,6 +67,17 @@ import Vue from 'vue'
 import { mapState, mapGetters } from 'vuex'
 
 export default Vue.extend({
+  data() {
+    return {
+      formData: {
+        email: '',
+        password: '',
+      },
+      resettingPassword: false,
+      resetPasswordEmailSent: false,
+      creatingUser: false
+    }
+  },
   computed: {
     ...mapState({
       authUser: (state: any) => state.auth.user,
@@ -79,15 +90,6 @@ export default Vue.extend({
   //   // INFO -> this.$fire.auth user etc. are accessible
   //   // INFO -> this.$store.state.authUser is accessible even on server-side
   // },
-  data: () => ({
-    formData: {
-      email: '',
-      password: '',
-    },
-    resettingPassword: false,
-    resetPasswordEmailSent: false,
-    creatingUser: false
-  }),
   methods: {
     async googleSignIn() {
       try {

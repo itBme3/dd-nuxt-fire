@@ -1,7 +1,14 @@
 .modal-overlay {
-	padding-top: 60px !important;
-	&.quick-select {
-		@apply pt-0 #{!important};
+	// padding-top: 60px !important;
+	@apply pt-0 #{!important};
+	// &.quick-select {
+	// }
+	.search-header {
+		@apply bg-gray-900 pt-2 pb-1;
+		@apply top-0 #{!important};
+	}
+	.algolia-search-filters {
+		@apply top-14 #{!important}
 	}
 }
 body[style*="overflow: hidden"] {

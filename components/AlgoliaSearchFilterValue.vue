@@ -1,17 +1,23 @@
 <template>
   <div v-if="!!filter"
-    class="algolia-filter-value relative p-2"
+    class="algolia-filter-value"
     :class="{
       'border border-white border-opacity-5 rounded mb-2 shadow-lg': !isOr,
       'bg-black bg-opacity-5': isOr
     }">
     <gButton
       v-if="!isOr || filter.value === undefined"
-      class="remove-filter rounded-full p-0 text-xs scale-90 text-opacity-60 bg-black bg-opacity-5 hover:bg-red-500 hover:bg-opacity-100 hover:text-red-900 hover:text-opacity-100 h-6 w-6 text-center flex items-center content-center absolute right-1 top-1"
+      class="remove-filter"
       @click="$emit('change', null)">
-      <Icon :name="'close'" class="m-auto" /></gButton>
-    <h4 v-if="filter.value === undefined">{{ filter.attribute }}</h4>
-    <small v-if="isOr">or</small> 
+      <Icon :name="'close'" class="m-auto transform scale-80" />
+    </gButton>
+    <p v-if="filter.value === undefined">
+      {{ filter.attribute }}
+    </p>
+    <small v-if="isOr" 
+      class="or-filter-separator text-gray-600 dark:text-gray-300">
+      or
+    </small> 
     <div :class="{
         'a-filter': true,
         [filter.type]: true,
@@ -20,13 +26,29 @@
 
       <template v-if="filter.type === 'refinement_list'">
         <template  v-if="filter.value !== undefined">
-          <gButton v-if="isOr"
-            @click="() => $emit('change', null)">
-            <small class="my-auto mr-2">{{ filter.attribute }}:</small> <span class="my-auto">{{ filter.value }}</span> <Icon :name="'close'" class="ml-2 mr-0 transform scale-90 text-red-500" />
-          </gButton>
-          <h4 v-else>
-            <small class="my-auto mr-2">{{ filter.attribute }}:</small> <span class="my-auto">{{ filter.value }}</span>
-          </h4>
+          <div
+            v-if="isOr"
+            class="rounded-md border-gray-600 px-2 py-1 relative"
+            >
+            <p class="algolia-search-filter-value-text">
+              <small class="my-auto mr-1 text-xs text-gray-600">{{ filter.attribute }}:</small>
+              <span class="my-auto">{{ filter.value }}</span>
+            </p>
+
+            <gButton
+              class="remove-filter"
+              @click="() => $emit('change', null)"
+              >
+              <Icon
+                :name="'close'"
+                class="m-auto transform scale-80"
+              />
+            </gButton>
+          </div>
+          <p v-else class="algolia-search-filter-value-text">
+            <small>{{ filter.attribute }}:</small>
+            <span>{{ filter.value }}</span>
+          </p>
         </template>
         <AlgoliaSearchRefinements 
           v-else
@@ -55,7 +77,7 @@
             :type="['updatedAt', 'createdAt'].includes(filter.attribute) ? 'date' : 'text'"
             :value="!!filter && !!filter.value && !!filter && Array.isArray(filter.value) && !!filter.value[0] ? filter.value[0] : undefined"
             @change="(e) => updateValue(!!!filter || !!!filter.value || !Array.isArray(filter.value) || filter.value.length <= 1 ? [e.target.value, e.target.value] : [e.target.value, filter.value[1]])" />
-          <small>TO</small>
+          <small class="text-sm">TO</small>
           <gInput 
             :type="['updatedAt', 'createdAt'].includes(filter.attribute) ? 'date' : 'text'"
             :value="!!filter && !!filter.value && Array.isArray(filter.value) && !!filter.value[1] ? filter.value[1] : undefined"
@@ -120,7 +142,6 @@ export default {
       const newFilter = JSON.parse(JSON.stringify(val));
       if(!Array.isArray(this.filter.or)) this.filter.or = [];
       this.filter.or.push(newFilter)
-      console.log({ filter: this.filter, newFilter })
       this.$emit('change', this.filter)
     },
     updateValue(val) {
@@ -131,3 +152,47 @@ export default {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.algolia-filter-value  {
+  @apply  relative p-2;
+  .filter-value {
+    &.parent {
+      @apply mb-4 bg-gray-800;
+    }
+  }
+}
+.parent {
+  > .algolia-filter-value {
+    @apply mb-4 bg-gray-800 bg-opacity-30 transform scale-97;
+  }
+}
+.remove-filter {
+  @apply rounded-full p-0 text-xs scale-90 text-opacity-60 bg-black bg-opacity-5 hover:bg-red-500 hover:bg-opacity-100 hover:text-red-900 hover:text-opacity-100 h-6 w-6 text-center flex items-center content-center absolute right-1 top-1;
+}
+.algolia-search-filter-value-text {
+  @apply flex items-center content-start -mx-1 shadow w-full;
+  small {
+    @apply my-auto mr-1 text-xs truncate text-gray-600 w-14;
+  }
+  span {
+    @apply my-auto;
+  }
+}
+.or-filter-separator {
+  @apply text-gray-600 dark:text-gray-300 block w-full m-0 pt-1 border border-gray-800 border-x-0 border-b-0;
+}
+/* nested "or" filter values */
+.algolia-filter-value .algolia-filter-value {
+  @apply mb-0;
+  @apply px-0 #{!important};
+  .a-filter {
+    > div {
+       @apply p-0 #{!important};
+    }
+  }
+  // .algolia-search-filter-value-text {
+  //   @apply  border border-gray-800 border-x-0 border-b-0 px-1;
+  // }
+}
+</style>

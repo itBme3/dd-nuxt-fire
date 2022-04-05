@@ -9,7 +9,7 @@
     />
     <gButton
       v-else
-      class="w-full rounded bg-white bg-opacity-5 hover:bg-opacity-100 hover:bg-red-400 hover:text-red-900 mb-1"
+      class="w-full rounded text-red-900 dark:text-red-400 dark:hover:text-red-900 border dark:border-gray-800 dark:bg-transparent bg-red-400 hover:bg-red-600 hover:dark:bg-red-400 hover:text-red-900 mb-1"
       @click="filterValues = []; $emit('change', [])">
       Clear Filters
     </gButton>
@@ -20,6 +20,10 @@
         <div :key="'filter-value-' + i"
             class="filter-value parent"
           >
+          <small
+            v-if="i > 0"
+            class="txt-xs block mb-2 text-purple-400"
+            >and</small>
           <AlgoliaSearchFilterValue
             v-if="!updatingValues"
             :value="value"
@@ -50,15 +54,16 @@
           />
         </div>
       </template>
-      <Codeblock v-if="!updatingValues">{{ JSON.stringify(filterValues, null, 2) }}</Codeblock>
     </div>
   </scrollbar>
 </template>
 
-<script>
+<script lang="ts">
+import Vue from 'vue'
+import { AlgoliaFilterObject } from '~/models/algolia.model';
 import { filterOptionsByIndex } from '~/utils/algolia'
 
-export default {
+export default Vue.extend({
   props: {
     indexName: {
       type: String,
@@ -77,23 +82,25 @@ export default {
       default: ''
     },
     constantFilters: {
-      type: Array, /* AlgoliaFilterObject[] */
+      type: Array as () => AlgoliaFilterObject[],
       default: () => []
     },
     filters: {
-      type: Array, /* AlgoliaFilterObject[] */
+      type: Array as () => AlgoliaFilterObject[],
       default: () => []
     },
   },
-  data() {
+  data(): { filterValues: AlgoliaFilterObject[]; updatingValues:boolean } {
+    const filterValues: AlgoliaFilterObject[] = Array.isArray(this.filters) ? this.filters : [];
+    const updatingValues: boolean = false
     return {
-      filterValues: this.filters,
-      updatingValues: false
+      filterValues,
+      updatingValues
     }
   },
   computed: {
-    filterOptions() {
-      const indexName = this.indexName.includes('product') ? 'products' : this.indexName;
+    filterOptions():string[] | null {
+      const indexName:string = this.indexName.includes('product') ? 'products' : this.indexName;
       return Object.keys(filterOptionsByIndex).includes(indexName) ? filterOptionsByIndex[indexName] : null
     }
   },
@@ -103,7 +110,7 @@ export default {
     }
   },
   methods: {
-    addFilter(filterVal) {
+    addFilter(filterVal:AlgoliaFilterObject) {
       this.filterValues.push(filterVal)
       console.log({ filterValues: this.filterValues })
       this.updatingValues = true;
@@ -111,7 +118,7 @@ export default {
         this.updatingValues = false;
       }, 100)
     },
-    updateFilter(indx, filter) {
+    updateFilter(indx:number, filter:AlgoliaFilterObject) {
       console.log('updateFilter: ', filter)
       this.updatingValues = true;
       if (!filter) {
@@ -126,14 +133,17 @@ export default {
         this.updatingValues = false;
       }, 100)
     },
-    updateOrFilter(indx, orIndx, filter) {
+    updateOrFilter(indx:number, orIndx:number, filter:AlgoliaFilterObject) {
       console.log('updateFilter: ', filter)
       this.updatingValues = true;
       if (!filter) {
-        this.filterValues[indx].or.splice(orIndx, 1)
-      } else {
-        this.filterValues[indx].or[orIndx].value = filter.value
-        this.filterValues[indx].or[orIndx].not = !!filter.not
+        this.filterValues[indx].or?.splice(orIndx, 1)
+      } else if(Array.isArray(this.filterValues[indx].or)) {
+        const filterValueObj: AlgoliaFilterObject = this.filterValues[indx] || null;
+        if(filterValueObj !== null && filterValueObj?.or && filterValueObj.or[orIndx]?.value) {
+          filterValueObj.or[orIndx].value = filter.value
+          filterValueObj.or[orIndx].not = !!filter.not
+        }
       }
       this.$emit('change', this.filterValues)
       setTimeout(() => {
@@ -141,7 +151,7 @@ export default {
       }, 500)
     }
   }
-}
+})
 </script>
 
 <style lang="scss">
@@ -152,8 +162,7 @@ export default {
     @apply gap-3;
   }
   .algolia-search-filters {
-    @apply sticky float-left z-999 left-0;
-    top: 100px;
+    @apply sticky float-left z-999 left-0 mt-1 top-24;
     height: calc(100vh - 120px);
     width: var(--algolia-filters-width);
     + .hits {

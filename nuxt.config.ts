@@ -3,7 +3,7 @@ import { NuxtConfig } from '@nuxt/types'
 const isDev = process.env.NODE_ENV === 'development'
 const fireDev = process.env.FIRE_ENV !== 'live'
 const useEmulators = false // manually change if emulators needed
-console.log({ isDev, port: isDev && useEmulators ? 5000 : undefined })
+// console.log({ isDev, port: isDev && useEmulators ? 5000 : undefined })
 
 
 const config: NuxtConfig = {
@@ -16,7 +16,7 @@ const config: NuxtConfig = {
       { hid: 'description', name: 'description', content: '' },
     ],
     link: [
-      { rel: 'icon', type: 'image/x-icon', href: '/media/fire.png' },
+      { rel: 'icon', type: 'image/png', href: 'media/fire.png' },
       { rel: 'stylesheet', href: 'https://use.typekit.net/ptm4ahe.css' },
       { rel: 'stylesheet', href: 'https://d1azc1qln24ryf.cloudfront.net/99224/GiGIcons/style-cf.css?8ct99z' }
     ],
@@ -92,6 +92,7 @@ const config: NuxtConfig = {
     '~/plugins/shops.js',
     '~/plugins/db.js',
     '~/plugins/algolia.js',
+    '~/plugins/clipboard.js',
   ],
 
   build: {},

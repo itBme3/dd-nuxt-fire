@@ -1,5 +1,6 @@
 <template>
-  <Card class="card-review">
+  <Card class="card-review"
+    @click="copyReview()">
     <div class="stars flex content-start items-center">
       <Icon v-for="i in [1,2,3,4,5]"
         :key="item.id + '-' + i"
@@ -25,6 +26,11 @@ export default {
       default: () => null
     }
   },
+  data() {
+    return {
+      lastClick: 0
+    }
+  },
   computed: {
     title() {
       if(this.item._highlightResult.title.matchedWords.length === 0) return decodeHtml(this.item.title)
@@ -36,13 +42,21 @@ export default {
     }
   },
   methods: {
-    decodeHtml
+    decodeHtml,
+    copyReview() {
+      const clickTime = Date.now()
+      if (Date.now() - this.lastClick < 1000) { 
+        this.$copyText(`${this.title}\n${[...Array(this.item.score).keys()].map(() => `★`).join('')}\n"${this.content}"\n- ${this.item.name}\n\n${this.item?.product?.title ? `(on ${this.item.product.title})` : ''}`)
+      }
+      this.lastClick = clickTime
+      
+    }
   }
 }
 </script>
 
 <style lang="scss">
 .title {
-  @apply mt-2 mb-1;
+  @apply my-6;
 }
 </style>

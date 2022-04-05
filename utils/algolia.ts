@@ -14,8 +14,21 @@ export function initializeAlgoliaClient (clientCredentials: { appId: string, api
 
 export const algoliaSearchClient:SearchClient = initializeAlgoliaClient({ appId: '010RMUCHO8', apiKey: '9610abb7baa7ae39ae7bc28dc246aaa7'});
 
+
+export const filterOptionsByIndex:{[key:string]: string[]} =  {
+      products: ['fit', 'tags', 'material', 'color', 'wash', 'updatedAt', 'createdAt'],
+      media: ['fits', 'tags', 'materials', 'colors', 'wash', 'updatedAt', 'createdAt', 'products', 'rating'],
+      reviews: ['product.tags', 'product.handle', 'score'],
+}
+
+const filterOptionKeys = [
+      ...Object.values(filterOptionsByIndex).reduce((acc, arr) => {
+            return [...new Set([...acc, ...arr])]
+      }, [])
+]
+
 export const filterOptions:{[key:string]: any} = {
-  ...['tags', 'product.tags', 'materials', 'fits', 'colors', 'product', 'score', 'rating', 'updatedAt', 'createdAt'].reduce((acc, attribute) => {
+  ...filterOptionKeys.reduce((acc, attribute) => {
       return {...acc, [attribute]: {
             attribute, 
             value: undefined,
@@ -27,14 +40,6 @@ export const filterOptions:{[key:string]: any} = {
   }, {})
 }
 
-export const filterOptionsByIndex = (() => {
-      const products = ['tags', 'fits', 'materials', 'colors', 'wash', 'updatedAt', 'createdAt']
-      return {
-            products,
-            media: [...products, 'products', 'rating'],
-            reviews: ['tags', 'score', 'product.tags', 'product'],
-      }
-})()
 
 export const stringifyAlgoliaFilters = (filterArr: AlgoliaFilterObject[], operator: 'AND' | 'OR' = 'AND') => {
       const objectToFilterString = (filterObj: AlgoliaFilterObject): string => {

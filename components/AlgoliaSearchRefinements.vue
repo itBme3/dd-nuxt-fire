@@ -1,8 +1,14 @@
 <template>
   <div class="algolia-search-refinements">
     <div class="search-field mb-1 pr-2 flex items-center content-start rounded bg-white dark:bg-gray-800 bg-opacity-50 shadow-lg focus-within:shadow-sm focus-within:bg-opacity-100">
-      <gInput ref="searchInput" type="text" v-model="search" />
+      <gInput
+        ref="searchInput"
+        v-model="search"
+        class="mx-0 w-full"
+        type="text" 
+      />
       <Icon :name="'search'"
+        position="absolute right-4 top-1/2 -translateY-1/2"
         @click="() => $refs.searchInput.focus()" />
     </div>
     <div v-if="hits.length"
@@ -20,11 +26,13 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import Vue from 'vue'
+// import { AlgoliaFilterObject } from '~/models/algolia.model';
 import {stringifyAlgoliaFilters} from '~/utils/algolia';
-const _ = require('lodash');
+const {debounce} = require('lodash');
 
-export default {
+export default Vue.extend({
   props: {
     indexName: {
       type: String,
@@ -39,16 +47,16 @@ export default {
       default: null
     }
   },
-  data() {
+  data(): { hits: {[key:string]: any}[]; search:string; } {
     return {
       hits: [],
-      activeFilters: this.indexFilters,
-      algoliaFilters: null,
+      // activeFilters: this.indexFilters,
+      // algoliaFilters: null,
       search: ''
     }
   },
   watch: {
-    search: _.debounce(function(){
+    search: debounce(function(){
       this.getHits();
     }, 250)
   },
@@ -61,10 +69,10 @@ export default {
   methods: {
     stringifyAlgoliaFilters,
     async getHits() {
-      this.hits = await this.index.searchForFacetValues(this.attribute, this.search).then(res => res.facetHits);
+      this.hits = await this.index.searchForFacetValues(this.attribute, this.search).then((res:any) => res.facetHits);
       console.log('hit: ', this.hits);
       return this.hits
     }
   }
-}
+})
 </script>

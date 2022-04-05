@@ -155,7 +155,7 @@ export default {
     },
     onCancel(e) {
       console.log('CANCEL')
-      this.selectedValues[this.indexName] = e
+      // this.selectedValues[this.indexName] = e
       console.log({ selection: e, this: this })
     }
 

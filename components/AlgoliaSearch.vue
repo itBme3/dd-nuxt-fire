@@ -54,7 +54,7 @@
       >
       <div v-for="(hit, i) in hits" :key="hit.id"
         :class="{
-          'hit cursor-pointer p-0': true,
+          'hit cursor-pointer': true,
           'selected': selected.map(s => s[selectingOptions.identifier]).includes(hit[selectingOptions.identifier]),
           [classes && classes.hit ? classes.hit : '']: true
         }"
@@ -236,9 +236,7 @@ export default {
   methods: {
     handleEsc(e) {
       if(e.key === 'Escape') {
-        console.log({e})
         if(this.searchInputFocused || this.hitsHovered ) {
-          console.log(this.$refs.searchInput)
           this.$refs.searchInput.blur()
           this.searchInputFocused = false;
           this.hitsHovered = false
@@ -326,6 +324,9 @@ export default {
       }
       const slug = this.indexName.includes('product') ? item.handle : item?.objectID || item.id
       if(!this.selectingOptions) {
+        if (this.indexName === 'reviews') {
+          return;
+        }
         return this.$router.push({ path: `${this.$route.path}/${slug}${this.$route.hash}` })
       } else {
         const { identifier } = this.selectingOptions;
@@ -344,7 +345,7 @@ export default {
 <style lang="scss">
 
 .search-header {
-  @apply sticky z-9999 top-0 flex flex-col content-start items-stretch;
+  @apply sticky z-9999 top-12 flex flex-col content-start items-stretch;
   .search-header-inner {
     @apply flex items-center justify-start;
     .search-bar {
@@ -367,7 +368,7 @@ export default {
   }
 }
 .hit {
-  @apply col-span-12 sm:col-span-6 md:col-span-4 p-1;
+  @apply col-span-12 sm:col-span-6 md:col-span-4 p-0;
   .card {
     @apply border-2 border-transparent;
   }
@@ -383,7 +384,10 @@ export default {
       @apply space-y-6
     }
     .hit {
-      @apply shadow-xl col-span-12 p-4 rounded-lg bg-white dark:bg-gray-800 dark:bg-opacity-50 mx-auto max-w-prose w-full;
+      @apply col-span-12;
+      .card {
+        @apply shadow-xl px-4 py-8 rounded-lg bg-white dark:bg-gray-800 dark:bg-opacity-40 mx-auto max-w-prose w-full;
+      }
     }
   }
   &.is-selecting {
@@ -400,11 +404,4 @@ export default {
     }
   }
 }
-/*
-hover:bg-purple-500
-hover:bg-blue-500
-hover:bg-cyan-500
-hover:bg-green-500
-hover:bg-yellow-500
-*/
 </style>
