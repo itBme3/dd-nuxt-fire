@@ -230,10 +230,10 @@
 </template>
 
 <script>
+import Vue from 'vue'
 import { mapMutations, mapActions } from 'vuex'
 import { handleize, capitalize } from '~/utils/funcs'
-
-export default {
+export default Vue.extend( {
   async asyncData({ $algolia }) {
     const productIndex = $algolia.initIndex('products_live');
     const productTypes = await productIndex.searchForFacetValues('product_type', '', {maxFacetHits: 100})
@@ -334,7 +334,9 @@ export default {
     }),
     copyReferenceProduct() {
       this.formState = 'fetching'
-      this.copyFrom();
+      this.copyFrom().then(() => {
+        this.formState = 'ready'
+      });
     },
     fetchProductTypeOptions(e) {
       const res = this.index.searchForFacetValues('product_type', e, { maxFacetHits: 100 })
@@ -415,7 +417,7 @@ export default {
       window.scrollTo({top, left: 0, behavior: 'smooth'});
     }
   }
-}
+})
 </script>
 
 <style lang="scss">

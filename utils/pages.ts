@@ -16,13 +16,13 @@ const pages: NavLink[] = [
                         label: 'Create Product',
                         path: '/products/create',
                         icon: 'add',
-                        color: 'cyan',
+                        color: 'purple',
                   },
                   {
                         label: 'Size Charts',
                         path: '/products/size-charts',
                         icon: 'notes',
-                        color: 'yellow',
+                        color: 'purple',
                   }
             ]
       },

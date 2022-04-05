@@ -126,26 +126,31 @@ export const actions:any = {
 
       copyFrom({ state }: any, { env }: { env?: ShopEnv } = { env: ShopEnv.LIVE }) {
             console.log({ state })
-            const shopEnv = env === ShopEnv.DEV ? ShopEnv.DEV : ShopEnv.LIVE
-            const onSubmit = (product: any) => {
-                  return (() => {
-                        console.log({ product })
-                        return this.app.store.dispatch('productCreate/setProductFromCopy', { product, env: shopEnv })
-                              .catch((err: any) => console.error(err))
-                  })()
-            }
-            this.app.store.commit('algoliaSelect/open', {
-                  props: JSON.parse(JSON.stringify({
-                        indexName: `products_${shopEnv}`,
-                        selected: null,
-                        selecting: {
-                              multiple: false,
-                              quick: true
-                        }
-                  })), 
-                  onSubmit(e:any) {
-                        onSubmit(e)
+            return new Promise((resolve) => {
+                  const shopEnv = env === ShopEnv.DEV ? ShopEnv.DEV : ShopEnv.LIVE
+                  const onSubmit = (product: any) => {
+                        return (() => {
+                              return this.app.store.dispatch('productCreate/setProductFromCopy', { product, env: shopEnv })
+                                    .then(resolve)
+                                    .catch((err: any) => console.error(err))
+                        })()
                   }
+                  this.app.store.commit('algoliaSelect/open', {
+                        props: JSON.parse(JSON.stringify({
+                              indexName: `products_${shopEnv}`,
+                              selected: null,
+                              selecting: {
+                                    multiple: false,
+                                    quick: true
+                              }
+                        })), 
+                        onSubmit(e:any) {
+                              onSubmit(e)
+                        }, 
+                        onCancel() {
+                              resolve(false)
+                        }
+                  })
             })
       },
 
@@ -243,7 +248,8 @@ export const actions:any = {
 
       setVariants({ state, commit }: any) {
             
-            const product = JSON.parse(JSON.stringify(state.product))
+            const product = JSON.parse(JSON.stringify(state.product));
+            if(!product) { return }
             const productType = product?.product_type || null;
             const defaults = defaultsByProductType[productType]
             const options = product?.options?.length
@@ -261,7 +267,7 @@ export const actions:any = {
             }
             
             ['weight', 'weight_unit', 'price'].forEach((key:string) => {
-                  if (!product[key]?.length && !!defaults[key]?.length) {
+                  if (!product[key]?.length && !!defaults && !!defaults[key]?.length) {
                         product[key] = defaults[key]
                   }
             })
@@ -280,6 +286,7 @@ export const actions:any = {
             const option3 = options[2] || null;
             const excludedVariants = state?.excludedVariants || [];
             const variants: StateProductVariant[] = [];
+            if([undefined, null].includes(option1)) {return}
             if ([undefined, null].includes(option2?.name)) {
                   option1.values.forEach((value1:string) => {
                         variants.push({
