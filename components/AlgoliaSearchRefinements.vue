@@ -26,7 +26,7 @@
   </div>
 </template>
 
-<script lang="ts">
+<script>
 import Vue from 'vue'
 // import { AlgoliaFilterObject } from '~/models/algolia.model';
 import {stringifyAlgoliaFilters} from '~/utils/algolia';
@@ -47,7 +47,7 @@ export default Vue.extend({
       default: null
     }
   },
-  data(): { hits: {[key:string]: any}[]; search:string; } {
+  data() {
     return {
       hits: [],
       // activeFilters: this.indexFilters,
@@ -69,7 +69,7 @@ export default Vue.extend({
   methods: {
     stringifyAlgoliaFilters,
     async getHits() {
-      this.hits = await this.index.searchForFacetValues(this.attribute, this.search).then((res:any) => res.facetHits);
+      this.hits = await this.index.searchForFacetValues(this.attribute, this.search).then((res) => res.facetHits);
       console.log('hit: ', this.hits);
       return this.hits
     }

@@ -28,32 +28,19 @@
         'flex-row flex-nowrap space-x-1': !isMobile,
         'hidden': isMobile && mobileNavCollapsed
         }">
-        <nuxt-link
+        <SiteNavLink
           v-for="page in pages"
           :key="page.path"
-          :to="page.path">
-          <Btn :class="{
-              'text-left justify-start group w-full bg-white dark:bg-opacity-5 text-gray-700 dark:text-gray-300 dark:hover:text-gray-900 hover:text-gray-900 hover:text-opacity-70 dark:hover:text-opacity-70': true,
-              ['hover:bg-' + page.color + '-500']: true,
-              ['dark:hover:bg-' + page.color + '-500']: true,
-            }"
-          >
-            <Icon 
-              :name="page.icon" 
-              :class="{ 
-                ['text-' + page.color + '-500']: true,
-                ['group-hover:text-gray-900 group-hover:text-opacity-60']: true
-              }" /> 
-              {{ page.label }}
-            </Btn>
-        </nuxt-link>
+          :link="page" 
+        />
       </nav>
     </div>
   </div>
 </template>
 <script>
+import Vue from 'vue'
 import navPages from '~/utils/pages'
-export default {
+export default Vue.extend({
 
   data() {
     return {
@@ -94,7 +81,7 @@ export default {
       this.mobileNavCollapsed = true
     }
   }
-}
+})
 </script>
 
 <style lang="scss">

@@ -1,14 +1,30 @@
-const pages: {
-            label: string
-            path: string
-            icon: string
-            color: string
-      }[] = [
+export interface NavLink {
+      label: string;
+      path: string;
+      icon: string;
+      color: string;
+      children?: NavLink[];
+}
+const pages: NavLink[] = [
       {
             label: 'Products',
             path: '/products',
             icon: 'pictures',
-            color: 'purple'
+            color: 'purple',
+            children: [
+                  {
+                        label: 'Create Product',
+                        path: '/products/create',
+                        icon: 'add',
+                        color: 'cyan',
+                  },
+                  {
+                        label: 'Size Charts',
+                        path: '/products/size-charts',
+                        icon: 'notes',
+                        color: 'yellow',
+                  }
+            ]
       },
       {
             label: 'Images',
@@ -29,4 +45,5 @@ const pages: {
             color: 'yellow'
       }
 ]
-export default pages;
+
+export default pages
