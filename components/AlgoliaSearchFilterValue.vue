@@ -171,9 +171,9 @@ export default {
   @apply rounded-full p-0 text-xs scale-90 text-opacity-60 bg-black bg-opacity-5 hover:bg-red-500 hover:bg-opacity-100 hover:text-red-900 hover:text-opacity-100 h-6 w-6 text-center flex items-center content-center absolute right-1 top-1;
 }
 .algolia-search-filter-value-text {
-  @apply flex items-center content-start -mx-1 shadow w-full;
+  @apply flex items-center content-start -mx-1 w-full;
   small {
-    @apply my-auto mr-1 text-xs truncate text-gray-600 w-14;
+    @apply my-auto mr-1 text-xs truncate text-gray-600 w-10;
   }
   span {
     @apply my-auto;
@@ -186,11 +186,15 @@ export default {
 .algolia-filter-value .algolia-filter-value {
   @apply mb-0;
   @apply px-0 #{!important};
+  .remove-filter {
+    @apply -mt-6;
+  }
   .a-filter {
     > div {
        @apply p-0 #{!important};
     }
   }
+  
   // .algolia-search-filter-value-text {
   //   @apply  border border-gray-800 border-x-0 border-b-0 px-1;
   // }

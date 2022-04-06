@@ -5,6 +5,17 @@
       'hide-selected': !selectingOptions || !selectingOptions.hideSelected,
       'is-selecting': !!selectingOptions
     }">
+
+    <AlgoliaSearchFilters 
+      v-if="filtering"
+      :constant-filters="constantFilters"
+      :update-url="updateUrl"
+      :search="search"
+      :index-name="indexName"
+      :index="index"
+      :filters="filters"
+      @change="updateFilters"
+    />
     <div class="search-header">
       <div class="search-header-inner">
         <slot name="headerStart" />
@@ -32,16 +43,6 @@
         <slot name="headerAfter" />
       </div>
     </div>
-    <AlgoliaSearchFilters 
-      v-if="filtering"
-      :constant-filters="constantFilters"
-      :update-url="updateUrl"
-      :search="search"
-      :index-name="indexName"
-      :index="index"
-      :filters="filters"
-      @change="updateFilters"
-    />
     <div v-if="!!hits && !!hits.length"
       class="hits"
       :class="{ 
@@ -63,9 +64,7 @@
         <CardProduct 
           v-if="indexName.includes('product')"
           :card-style="cardStyle"
-          :class="{
-            [classes && classes.card ? classes.card : '']: true,
-          }"
+          :classes="classes"
           :item="hit" />
         <CardReview 
           v-else-if="indexName.includes('review')"
@@ -98,10 +97,10 @@
 
 <script>
 
-import _ from 'lodash'
+import Vue from 'vue';
+import {debounce} from 'lodash'
 import { parseUrlParamFilters, stringifyAlgoliaFilters, stringifyUrlParamFilters } from '~/utils/algolia'
-
-export default {
+export default Vue.extend({
   props: {
     indexName: {
       type: String,
@@ -210,7 +209,7 @@ export default {
     }
   },
   watch: {
-    search: _.debounce(function (value) {
+    search: debounce(function (value) {
         this.updateSearch(value)
     }, 250),
     filterValues(val) {
@@ -339,7 +338,7 @@ export default {
       this.$emit('selection', this.selected)
     }
   }
-}
+})
 </script>
 
 <style lang="scss">

@@ -1,9 +1,9 @@
 
 <template>
   <div :class="{
-      'site-nav left-0 top-0 fixed flex transition-all ease-quick-in justify-space-between z-999 dark:bg-gray-900 bg-gray-100': true,
+      'site-nav left-0 top-0 fixed flex transition-all ease-quick-in justify-space-between z-nav dark:bg-gray-900 bg-gray-100': true,
       'right-0': isMobile,
-      'right-0 w-screen': !isMobile
+      'right-0 w-screen p-2': !isMobile
     }"
     >
     <nuxt-link to="/" class="logo w-12 h-12 p-2">
@@ -24,7 +24,7 @@
       </Btn>
       <nav :class="{
         'site-navigation p-1 flex ml-auto mr-0 relative z-999999': true,
-        'flex-col space-y-1 max-w-[200px]': isMobile,
+        'flex-col space-y-1 max-w-[200px] shadow-xl rounded bg-white dark:bg-gray-900': isMobile,
         'flex-row flex-nowrap space-x-1': !isMobile,
         'hidden': isMobile && mobileNavCollapsed
         }">
@@ -79,6 +79,7 @@ export default Vue.extend({
       this.height = document.documentElement.clientHeight
       this.isMobile = this.width < 640
       this.mobileNavCollapsed = true
+      this.$store.commit('screen/setDimensions', { width: this.width, height: this.height })
     }
   }
 })

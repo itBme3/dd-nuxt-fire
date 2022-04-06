@@ -27,20 +27,20 @@ module.exports = {
   },
   
     
-    fontSize: {
-      xs: '.75rem',
-      tiny: '.875rem',
-      sm: '1rem',
-      base: '1.125rem',
-      lg: '1.25rem',
-      xl: '1.33rem',
-      '2xl': '1.5rem',
-      '3xl': '1.875rem',
-      '4xl': '2.25rem',
-      '5xl': '3rem',
-      '6xl': '4rem',
-      '7xl': '5rem'
-    },
+    // fontSize: {
+    //   xs: '.75rem',
+    //   tiny: '.875rem',
+    //   sm: '1rem',
+    //   base: '1.125rem',
+    //   lg: '1.25rem',
+    //   xl: '1.33rem',
+    //   '2xl': '1.5rem',
+    //   '3xl': '1.875rem',
+    //   '4xl': '2.25rem',
+    //   '5xl': '3rem',
+    //   '6xl': '4rem',
+    //   '7xl': '5rem'
+    // },
     darkSelector: 'dark',
     colors,
   theme: {
@@ -57,6 +57,7 @@ module.exports = {
         const obj = {
           1: '1',
           0: '0',
+          99: '99',
           999: '999',
           9999: '9999',
           99999: '99999',
@@ -109,6 +110,13 @@ module.exports = {
           'responsive',
         ],
         textColor: ['dark', 'dark-hover', 'dark-active', 'hover', 'responsive'],
+        fontSize: {
+          'xs': [
+            '8px', { letterSpacing: '0.01em' },
+            '9px', { letterSpacing: '0.01em' },
+            '11px', { letterSpacing: '0.01em' },
+          ],
+        }
       },
     },
   }

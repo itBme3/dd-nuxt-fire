@@ -181,7 +181,7 @@ export default {
           selected: this.lookProductHandles,
           selecting: {
             identifier: 'handle',
-            quick: true,
+            // quick: true,
             multiple: true
           }
         },

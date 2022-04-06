@@ -42,7 +42,7 @@ export default {
       ],
       // fetchNextPage
       selecting: {
-        quick: true,
+        // quick: true,
         identifier: 'handle',
         multiple: true
       }

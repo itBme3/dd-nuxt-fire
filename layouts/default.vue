@@ -2,7 +2,7 @@
   <div class="site-container overflow-x-hidden inline">
       <SiteNav />
       <main
-        class="w-screen transform mx-auto py-12 px-2"
+        class="w-screen max-w-4xl mx-auto py-14 px-4 sm:px-6"
         style="display: block;"
       >
         <Nuxt :key="$route.fullPath" />

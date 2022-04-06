@@ -45,17 +45,20 @@ export default {
   watch: {
     media() {
       this.setImgSrc()
+    },
+    '$store.state.screen'() {
+      this.setImgSrc()
     }
   },
   created() {
       this.setImgSrc()
   },
-  mounted () {
-    window.addEventListener('resize', this.setImgSrc)
-  },
-  unmounted () {
-    window.removeEventListener('resize', this.setImgSrc)
-  },
+  // mounted () {
+  //   window.addEventListener('resize', this.setImgSrc)
+  // },
+  // unmounted () {
+  //   window.removeEventListener('resize', this.setImgSrc)
+  // },
   methods: {
     imageLoaded () {
       this.setImgSrc()

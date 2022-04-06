@@ -1,4 +1,4 @@
-import { RequestParams, ShopEnv } from "~/models/shopify.models";
+import { DeleteRequestParams, GetRequestParams, PostRequestParams, PutRequestParams, RequestParams, ShopEnv } from "~/models/shopify.models";
 
 export const shopDomains = {
       live: 'https://dearborndenim.us',
@@ -10,28 +10,46 @@ export const shopAdminDomains = {
       dev: 'https://dearborn-denim-dev.myshopify.com/admin'
 }
 
-export class Shopify {
-      env = ShopEnv.DEV
-      app
-      constructor(props: {env: ShopEnv, app: any /* $nuxt */}) {
-            this.app = props.app
-            if (props.env === ShopEnv.LIVE) this.env = ShopEnv.LIVE
+export interface ShopApi {
+      env: ShopEnv;
+      $fire: any;
+      get(params: GetRequestParams):Promise<any>;
+      post(params: PostRequestParams):Promise<any>;
+      put(params: PutRequestParams):Promise<any>;
+      delete(params: DeleteRequestParams):Promise<any>;
+}
+
+export type ShopsApi = {
+      [key in ShopEnv]: ShopApi;
+};
+export class Shopify implements ShopApi {
+      env = ShopEnv.LIVE
+      $fire
+      constructor(props: {env: ShopEnv, app: {$fire:any, [key:string]:any} /* $nuxt */}) {
+            this.$fire = props.app.$fire
+            if (props.env === ShopEnv.DEV) {
+                  this.env = ShopEnv.DEV
+            }
       }
 
-      async get(params: RequestParams):Promise<any> {
-            return await this.app.$fire.functions.httpsCallable('shopifyApi')({ env: this.env, method: 'get', params })
+      get(params: GetRequestParams):Promise<any> {
+            return this.$fire.functions.httpsCallable('shopifyApi')({ env: this.env, method: 'get', params })
+                  .catch((err:any) => alert(err))
       }
 
-      async post(params: RequestParams):Promise<any> {
-            return await this.app.$fire.functions.httpsCallable('shopifyApi')({ env: this.env, method: 'post', params })
+      post(params: PostRequestParams):Promise<any> {
+            return this.$fire.functions.httpsCallable('shopifyApi')({ env: this.env, method: 'post', params })
+                  .catch((err:any) => alert(err))
       }
 
-      async put(params: RequestParams):Promise<any> {
-            return await this.app.$fire.functions.httpsCallable('shopifyApi')({ env: this.env, method: 'put', params })
+      put(params: PutRequestParams):Promise<any> {
+            return this.$fire.functions.httpsCallable('shopifyApi')({ env: this.env, method: 'put', params })
+                  .catch((err:any) => alert(err))
       }
 
-      async delete(params: RequestParams):Promise<any> {
-            return await this.app.$fire.functions.httpsCallable('shopifyApi')({ env: this.env, method: 'delete', params })
+      delete(params: DeleteRequestParams):Promise<any> {
+            return this.$fire.functions.httpsCallable('shopifyApi')({ env: this.env, method: 'delete', params })
+                  .catch((err:any) => alert(err))
       }
       
 }

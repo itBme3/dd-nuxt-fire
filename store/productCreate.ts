@@ -141,7 +141,7 @@ export const actions:any = {
                               selected: null,
                               selecting: {
                                     multiple: false,
-                                    quick: true
+                                    // quick: true
                               }
                         })), 
                         onSubmit(e:any) {

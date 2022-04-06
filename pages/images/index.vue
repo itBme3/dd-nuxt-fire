@@ -5,7 +5,11 @@
       :index-name="'media'" 
       :card-classes="'rounded-sm p-0'"
       :selecting="selected === null ? false : {
-        identifier: 'objectID'
+        identifier: 'objectID',
+        selecting: {
+          multiple: true,
+          selected: selected
+        }
       }"
       :selected-values="selected === null ? [] : selected"
       @selection="(e) => selected = e"
@@ -36,14 +40,15 @@
   </div>
 </template>
 <script>
-export default {
+import Vue from 'vue'
+export default Vue.extend({
   data() {
     return {selected: null}
   },
   methods: {
     
   }
-}
+})
 </script>
 <style lang="scss">
   .bulk-actions {

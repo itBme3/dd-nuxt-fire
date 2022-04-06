@@ -14,12 +14,17 @@
         :index-name="indexName"
         :filtering="true"
         :selecting="false"
+        :classes="{
+          hit: 'col-span-12',
+          card: 'p-2'
+        }"
+        card-style="media-left"
       />
     </template>
   </div>
 </template>
 <script>
-const _ = require('lodash')
+const {debounce} = require('lodash')
 export default {
   props: {
     env: {
@@ -32,7 +37,7 @@ export default {
     return { shopEnv }
   },
   watch: {
-    '$route.hash': _.debounce(function(val) {
+    '$route.hash': debounce(function(val) {
       if(this.$route.hash.replace('#', '') === this.shopEnv) return;
       this.toggleEnv(val)
     }, 250)

@@ -1,10 +1,11 @@
 <template>
+<Transition nam="up-fade">
   <div class="algolia-search-refinements">
     <div class="search-field mb-1 pr-2 flex items-center content-start rounded bg-white dark:bg-gray-800 bg-opacity-50 shadow-lg focus-within:shadow-sm focus-within:bg-opacity-100">
       <gInput
         ref="searchInput"
         v-model="search"
-        class="mx-0 w-full"
+        class="mx-0 w-full \"
         type="text" 
       />
       <Icon :name="'search'"
@@ -24,6 +25,7 @@
     </div>
     <code v-else>no hits...</code>
   </div>
+</Transition>
 </template>
 
 <script>
@@ -76,3 +78,11 @@ export default Vue.extend({
   }
 })
 </script>
+
+<style lang="scss">
+.search-field {
+  input {
+    @apply focus:ring-0 focus-visible:ring-0 #{!important};
+  }
+}
+</style>
