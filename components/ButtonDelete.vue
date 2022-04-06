@@ -10,7 +10,7 @@
       {{ confirmText }}
     </gButton>
     <gButton 
-      v-tooltip="{content: confirming ? 'Cancel' : tooltipText, placement: confirming ? 'top-end' : 'left' }"
+      v-tooltip="{content: confirming ? 'Cancel' : tooltipText, placement: confirming ? 'top-end' : 'top', offset: '5px' }"
       tabindex="-1"
       class="icon-button rounded-full text-gray-500 bg-gray-200 dark:bg-gray-600 dark:text-gray-900 shadow-xl"
       :class="{

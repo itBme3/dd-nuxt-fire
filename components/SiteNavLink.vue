@@ -1,7 +1,8 @@
 <template>
   <div v-if="link && link.path !== null"
-    class="site-nav-link flex items-center"
-    @mouseleave="showNested = false">
+    class="site-nav-link flex items-center relative"
+    @mouseleave="showNested = false"
+    @mouseenter="showNested = true">
     <nuxt-link
       :to="link.path"
       class="w-full">
@@ -83,6 +84,6 @@
 
 <style lang="scss" scoped>
 .nested-site-nav-links {
-  @apply absolute top-10 rounded dark:bg-gray-800 shadow-xl;
+  @apply absolute top-9 rounded dark:bg-gray-800 shadow-xl;
 }
 </style>

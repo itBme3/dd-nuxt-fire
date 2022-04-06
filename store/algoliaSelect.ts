@@ -50,7 +50,6 @@ export const state = ():State => ({
 export const mutations = {
       resetState(state: State) {
             state.props = Object.assign({}, state.props, JSON.parse(JSON.stringify(initialState.props)))
-            console.log({ state })
             Vue.set(state, 'onCancel',  initialState.onCancel)
             Vue.set(state, 'onUpdate',  initialState.onUpdate)
             Vue.set(state, 'onSubmit',  initialState.onSubmit)
