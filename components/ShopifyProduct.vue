@@ -1,7 +1,7 @@
 <template>
   <div class="product mt-1 sm:px-2 md:px-4 lg:px-6">
     <template 
-      v-if="product !== null">
+      v-if="product !== null && Object.keys(product).length">
       <code v-if="product.ERROR" class="text-red-400 rounded p-6 shadow-lg">{{ product.ERROR }}</code>
       <div v-else class="product-info flex flex-col sm:flex-row sm:space-x-2 md:space-x-8 justify-between">
         <div class="product-content w-full sm:w-[calc(66.666%-.25rem)] max-w-3xl flex flex-col space-y-2">
@@ -11,15 +11,27 @@
             :value="product.title"
             name="product-title"
             type="text"
-            class="w-full text-lg sm:text-2xl md:text-4xl"
-            @input="(e) => $store.dispatch('productPage/setProduct', {env: env, product: {...product, title: e}})"
+            class="w-full text-lg sm:text-2xl"
+            @input="(e) => product = {...product, title:e}"
           />
+
+          <div class="flex items-center content-start">
+            <gToggle 
+              value="active"
+              unchecked-value="draft"
+              :checked="product.status === 'active'"
+              class="w-auto mr-2"
+              name="product-status"
+              @input="(e) => product = {...product, status: e }"
+            />
+            <label for="product-status" class="capitalize mr-auto">Status: <span :class="{'text-blue-500': product.status === 'active'}">{{ product.status }}</span></label>
+          </div>
 
           <label for="body-html">Body Html:</label>
           <Editor :content="product.body_html"
             name="body-html"
             class="py-1 w-full"
-            @update="(e) => $store.dispatch('productPage/setProduct', {env: env, product: {...product, body_html: e}})"
+            @update="(e) => product = {...product, body_html:e}"
           />
 
           <label for="product-tags">Tags:</label>
@@ -28,10 +40,10 @@
         </div>
 
         <Media 
-          v-if="!!product.images && product.images[0]"
           class="w-full mt-5 sm:min-h-full sm:w-[calc(33.333%-.25rem)] max-w-sm max-h-[380px] mx-auto sm:ml-auto sm:mr-0"
           :media="product.images[0]"
           :is-background="true"
+          :editable="!product.images || !product.images.length"
           ratio="auto"
         />
 
@@ -52,8 +64,11 @@
       </div>
 
     </template>
+    <template v-else-if="product === null">
+        <Loading />
+    </template>
     <template v-else>
-        <p>Loading...</p>
+      <p class="text-center">Product not found in "{{ env }}" shop</p>
     </template>
   </div>
 </template>
@@ -94,7 +109,7 @@ export default {
         try {
           return this.$store?.state?.productPage[this.env]?.product
         } catch {
-          return null
+          return false
         }
       },
       set (product) {

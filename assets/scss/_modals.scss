@@ -4,7 +4,7 @@
 	// &.quick-select {
 	// }
 	.search-header {
-		@apply bg-gray-900 pt-2 pb-1;
+		@apply pt-2 pb-1;
 		@apply top-0 #{!important};
 	}
 	.algolia-search-filters {

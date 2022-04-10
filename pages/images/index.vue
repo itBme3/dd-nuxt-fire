@@ -1,15 +1,15 @@
 <template>
   <div class="page-content images">
     <Title>Images:</Title>
+
     <AlgoliaSearch 
       :index-name="'media'" 
       :card-classes="'rounded-sm p-0'"
       :selecting="selected === null ? false : {
         identifier: 'objectID',
-        selecting: {
-          multiple: true,
-          selected: selected
-        }
+        multiple: true,
+        selected: selected,
+        hideSelected: false
       }"
       :selected-values="selected === null ? [] : selected"
       @selection="(e) => selected = e"

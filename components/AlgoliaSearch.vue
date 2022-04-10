@@ -2,10 +2,10 @@
   <div 
     :class="{
       'algolia-search': true, [indexName]: typeof indexName === 'string',
-      'hide-selected': !selectingOptions || !selectingOptions.hideSelected,
-      'is-selecting': !!selectingOptions
+      'selecting': selectingOptions,
+      'is-selecting': !!selectingOptions,
+      'hide-selected': !!selectingOptions && !!selectingOptions.hideSelected
     }">
-
     <AlgoliaSearchFilters 
       v-if="filtering"
       :constant-filters="constantFilters"
@@ -65,7 +65,9 @@
           v-if="indexName.includes('product')"
           :card-style="cardStyle"
           :classes="classes"
-          :item="hit" />
+          :item="hit"
+          :more="cardProps && cardProps.more ? cardProps.more : []"
+        />
         <CardReview 
           v-else-if="indexName.includes('review')"
           :card-style="cardStyle"
@@ -100,6 +102,13 @@
 import Vue from 'vue';
 import {debounce} from 'lodash'
 import { parseUrlParamFilters, stringifyAlgoliaFilters, stringifyUrlParamFilters } from '~/utils/algolia'
+const defaultSelectingOptions = { 
+    selected: [],
+    identifier: 'id',
+    hideSelected: false,
+    hideSideNav: false,
+    multiple: true
+} 
 export default Vue.extend({
   props: {
     indexName: {
@@ -167,6 +176,12 @@ export default Vue.extend({
             quick: false
           } 
         */
+    },
+    cardProps: {
+      type: Object,
+      default: () => {
+        return { more: [] }
+      }
     }
   },
   data() {
@@ -189,13 +204,7 @@ export default Vue.extend({
       selected: Array.isArray(this.selectedValues) ? this.selectedValues : [],
       searchInputFocused: false,
       selectingOptions: [null, undefined, true].includes(this.selecting) 
-        ? { 
-            selected: [],
-            identifier: 'id',
-            hideSelected: false,
-            hideSideNav: false,
-            multiple: true
-        } 
+        ? defaultSelectingOptions
         : this.selecting,
         hitsHovered: false
     }
@@ -221,6 +230,13 @@ export default Vue.extend({
     fetchNextPage() {
       if(this.fetchNextPage === false || this.nextPage === false) {return};
       this.getNextPage();
+    },
+    selecting(val) {
+      try {
+        this.selectingOptions = {...defaultSelectingOptions, ...val}
+      } catch {
+        this.selectingOptions = val
+      }
     }
   },
   
@@ -323,7 +339,7 @@ export default Vue.extend({
       }
       const slug = this.indexName.includes('product') ? item.handle : item?.objectID || item.id
       if(!this.selectingOptions) {
-        if (this.indexName === 'reviews') {
+        if (['media', 'reviews'].includes(this.indexName)) {
           return;
         }
         return this.$router.push({ path: `${this.$route.path}/${slug}${this.$route.hash}` })
@@ -344,7 +360,7 @@ export default Vue.extend({
 <style lang="scss">
 
 .search-header {
-  @apply sticky z-9999 top-12 flex flex-col content-start items-stretch;
+  @apply sticky z-9999 top-12 flex flex-col content-start items-stretch bg-gray-100 dark:bg-gray-900;
   .search-header-inner {
     @apply flex items-center justify-start;
     .search-bar {

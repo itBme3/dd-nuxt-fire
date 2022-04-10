@@ -1,11 +1,14 @@
 <template>
-  <div
-    v-if="typeof mediaSrc === 'string'"
+  <component 
+    v-if="typeof mediaSrc === 'string' || editable"
+    :is="editable ? 'button' : 'div'"
     :style="{ 
       height: imgHeight,
       backgroundImage: isBackground && typeof mediaSrc === 'string' && mediaSrc.length > 0 ? 'url(' + mediaSrc + ')' : 'none' }"
     class="media overflow-hidden relative flex items-center justify-center"
     style="background-repeat: no-repeat; background-size: cover; background-position: center;"
+    :class="{ 'editable': editable }"
+    @click="editable ? selectImage() : ''"
   >
     <template v-if="typeof mediaSrc === 'string'">
       <img 
@@ -16,14 +19,16 @@
         @load="imageLoaded"
       />
     </template>
+    <Icon v-else name="image" class="m-auto" />
     <slot />
-  </div>
+  </component>
 </template>
 
 <script lang="js">
+import Vue from 'vue'
 import { getThumbImageUrl } from '~/utils/funcs'
 
-export default {
+export default Vue.extend({
   props: {
     media: {
       type: Object,
@@ -36,7 +41,12 @@ export default {
     isBackground: {
       type: Boolean,
       default: false
+    },
+    editable: {
+      type: Boolean,
+      default: false
     }
+
   },
   data () {
     // const mediaSrc = typeof this.mediaSrc !== 'undefined' ? this.mediaSrc : this.getImgSrc(this.media, typeof this.$el !== 'undefined' ? this.$el : { offsetWidth: 300, offsetHeight: 300 })
@@ -60,6 +70,18 @@ export default {
   //   window.removeEventListener('resize', this.setImgSrc)
   // },
   methods: {
+    selectImage() {
+      const onUpdate = (selected) => {
+        this.$commit('update', selected)
+      }
+      this.$store.commit('algoliaSelect/open', { 
+        props: { 
+          indexName: 'media', 
+          selecting: { multiple: false } 
+        }, 
+        onUpdate: onUpdate.bind(this) 
+      })
+    },
     imageLoaded () {
       this.setImgSrc()
     },
@@ -102,9 +124,14 @@ export default {
       this.imgHeight = 'auto'
     }
   }
-}
+})
 </script>
 
+<style lang="scss" scoped>
+.editable {
+  @apply rounded bg-white transition-all ease-quick-in dark:bg-gray-800 hover:shadow-xl transform hover:scale-103 scale-100 hover:dark:bg-opacity-100 dark:bg-opacity-40;
+}
+</style>
 <style lang="scss">
 .overlay {
   @apply bg-opacity-5;

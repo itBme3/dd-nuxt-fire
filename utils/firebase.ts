@@ -54,7 +54,6 @@ export class FireDb {
             const segments = path.split('/').filter(v => v);
             const thisPath = path;
             data.updated_at = Date.now();
-            console.log({ path, data })
             if ( data.created_at && typeof data.created_at !== 'number' )
                   delete data.created_at;
             if ( segments.length % 2 ) {
@@ -68,6 +67,8 @@ export class FireDb {
                         .set(data)
                         .then(() => data);
             } else {
+                  data.docPath = path;
+                  data.docId = path.split('/').pop();
                   return this.firestore.doc(path)
                         .set(data, { merge })
                         .then(() => this.doc(thisPath));

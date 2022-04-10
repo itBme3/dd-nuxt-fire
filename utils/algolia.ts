@@ -84,15 +84,11 @@ export const stringifyAlgoliaFilters = (filterArr: AlgoliaFilterObject[], operat
 
 export const parseUrlParamFilters = (params: string) => {
       const parsed = qs.parse(params, { arrayLimit: 100 });
-      console.log({parsed})
       const obj: any = parsed.filters;
-      // console.log(obj[0].or)
       if (!obj?.reduce) return null;
       const res = {
             filters: obj.reduce((acc: any, filter: any) => {
-                  console.log(filter)
                   const k = Object.keys(filter).filter(key => key !== 'or')[0];
-                  console.log({k})
                   if (!k) return acc;
                   const attr = k.includes('not_') ? k.replace('not_', '') : k;
                   const res = {
@@ -102,7 +98,6 @@ export const parseUrlParamFilters = (params: string) => {
                         or: Array.isArray(filter.or) && filter.or.length > 0
                               ? filter.or.reduce((orAcc: any, orFilter: any) => {
                                     const _k = Object.keys(orFilter).filter(_key => _key !== 'or')[0];
-                                    console.log(_k)
                                     if (!_k) return orAcc;
                                     const _attr = _k.includes('not_') ? _k.replace('not_', '') : _k;
                                     return [...orAcc, {
@@ -116,7 +111,6 @@ export const parseUrlParamFilters = (params: string) => {
                   return [...acc, res]
             }, [])
       }
-      console.log({res})
       return res
 }
 

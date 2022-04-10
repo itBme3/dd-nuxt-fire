@@ -18,6 +18,7 @@
           hit: 'col-span-12',
           card: 'p-2'
         }"
+        :card-props="{ more: ['handle', 'tags'] }"
         card-style="media-left"
       />
     </template>

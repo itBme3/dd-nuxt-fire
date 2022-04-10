@@ -21,197 +21,217 @@
       </div>
       
       <Loading v-if="formState === 'fetching'" />
-
-      <div 
-        v-for="key in ['title', 'handle', 'product_type', 'images', 'tags', 'price', 'weight', 'weight_unit', 'metafields', 'body_html']"
-        :key="key"
-        :class="{
-          'form-field': true,
-          [key]: true
-          }">
-          <label :for="'product-' + key">{{key}}:</label>
-          <RichSelect
-            v-if="key === 'product_type'"
-            :options="productTypes"
-            :selected="product.product_type"
-            :close-on-select="true"
-            :multiple="false"
-            :variant="'light'"
-            :can-create="true"
-            :value-attribute="null"
-            :text-attribute="null"
-            :placeholder="'select product type...'"
-            @update="(e) =>{
-              log({e});
-              updateField('product_type', e)}"
-          />
-
-          <ShopifyProductImages v-else-if="key === 'images'" />
-          
-          <ShopifyProductMetafields v-else-if="key === 'metafields'" />
-          
-          <ShopifyProductTags v-else-if="key === 'tags'" />
-
-          <Editor 
-            v-else-if="fields[key] && fields[key].type === 'richtext'"
-            :content="product[key]"
-            :name="'product-' + key"
-            class="py-1 w-full"
-            @update="(e) => updateField(key, e)"
-          />
-
-          <gInput 
-            v-else-if="!fields[key] || fields[key].type === 'text'"
-            :value="product[key]"
-            :name="'product-' + key"
+      <h4 v-if="formState === 'saving'">Saving To {{ envs.join(' & ').toUpperCase() }} Shop{{ envs.length > 1 ? 's' : '' }}</h4>
+      <div
+        class="form-fields"
+        :class="{ 'hidden': formState === 'saving' }">
+          <div 
+            v-for="key in ['title', 'handle', 'product_type', 'images', 'tags', 'price', 'weight', 'weight_unit', 'metafields', 'body_html']"
+            :key="key"
             :class="{
-              'border-4 border-red-500 border-opacity-100': touched.includes(key) && errors[key] !== undefined
-            }"
-            @input="(e) => updateField(key, e)"
-            @focus="!touched.includes(key) ? touched.push(key) : ''"
-            @blur="checkForErrors()"
-          />
-      </div>
-
-      <div 
-        ref="productOptions"
-        class="form-field-group options relative mb-6">
-        <label v-if="product.options.length" for="product-options">options:</label>
-
-        <ExpansionGroup
-          :expanded-index="expandedIndex">
-            <ExpansionPanel
-              v-for="(option, i) in product.options"
-              ref="productOption"
-              :key="'option' + (i + 1)"
-              :class="{
-                'form-field relative group my-2 rounded-lg bg-gray-300 bg-opacity-50 shadow dark:bg-opacity-30 dark:bg-gray-800': true,
-                ['option' + (i + 1)]: true
-              }"
-              :expand="expandedIndex === i"
-              @expanded="(expanded) => expandedIndex = !expanded ? null : i">
-              
-              <template #title>
-                <h3 class="font-style-italic">{{ product.options[i].name }}</h3>
-              </template>
-
-              <label :for="'product-option' + (i + 1) + '-name'">name:</label>
-              <gInput
-                :id="'product-option' + (i + 1) + '-name'"
-                :value="product.options[i].name"
-                @input="(e) => {
-                  const options = JSON.parse(JSON.stringify(product.options))
-                  options[i].name = e.length === 1 ? capitalize(e) : e
-                  updateField('options', options)
-                }"
-                @keydown="(e) => {
-                  log({ e })
-                  if(['Enter', 'Tab'].includes(e.key)) {
-                    addOptionValue(i)
-                  }
-                  if (e.key === 'Backspace' && !product.options[i].name.length) {
-                    const options = JSON.parse(JSON.stringify(product.options))
-                    options.splice(i, 1)
-                    updateField('options', options)
-                  }
-                }"
+              'form-field': true,
+              [key]: true
+              }">
+              <label :for="'product-' + key">{{key}}:</label>
+              <RichSelect
+                v-if="key === 'product_type'"
+                :options="productTypes"
+                :selected="product.product_type"
+                :close-on-select="true"
+                :multiple="false"
+                :variant="'light'"
+                :can-create="true"
+                :value-attribute="null"
+                :text-attribute="null"
+                :placeholder="'select product type...'"
+                @update="(e) =>{
+                  log({e});
+                  updateField('product_type', e)}"
               />
 
-              <label :for="'product-option' + (i + 1) + '-values'">values:</label>
-              <div 
-                :id="'product-option' + (i + 1) + '-values'"
-                :class="{'option-values': true, ['option-' + (i + 1) + '-values']: true}"
-                >
-                <div 
-                  v-for="(value, valueIndex) in product.options[i].values"
-                  :key="'product-option' + (i + 1) + '-value' + valueIndex"
-                  :class="{'option-value relative flex items-center content-start mb-2': true}"
-                  >
+              <ShopifyProductImages v-else-if="key === 'images'" />
+              
+              <ShopifyProductMetafields v-else-if="key === 'metafields'" />
+              
+              <ShopifyProductTags v-else-if="key === 'tags'" />
+
+              <Editor 
+                v-else-if="fields[key] && fields[key].type === 'richtext'"
+                :content="product[key]"
+                :name="'product-' + key"
+                class="py-1 w-full"
+                @update="(e) => updateField(key, e)"
+              />
+
+              <gInput 
+                v-else-if="!fields[key] || fields[key].type === 'text'"
+                :value="product[key]"
+                :name="'product-' + key"
+                :class="{
+                  'border-4 border-red-500 border-opacity-100': touchedErrors[key] !== undefined
+                }"
+                @input="(e) => updateField(key, e)"
+                @focus="!touched.includes(key) ? touched.push(key) : ''"
+                @blur="checkForErrors()"
+              />
+              
+              
+          </div>
+
+          <div 
+            ref="productOptions"
+            class="form-field-group options relative mb-6">
+            <label v-if="product.options.length" for="product-options">options:</label>
+
+            <ExpansionGroup
+              :expanded-index="expandedIndex">
+                <ExpansionPanel
+                  v-for="(option, i) in product.options"
+                  ref="productOption"
+                  :key="'option' + (i + 1)"
+                  :class="{
+                    'form-field relative group my-2 rounded-lg bg-gray-300 bg-opacity-50 shadow dark:bg-opacity-30 dark:bg-gray-800': true,
+                    ['option' + (i + 1)]: true
+                  }"
+                  :expand="expandedIndex === i"
+                  @expanded="(expanded) => expandedIndex = !expanded ? null : i">
+                  
+                  <template #title>
+                    <h3 class="font-style-italic">{{ product.options[i].name }}</h3>
+                  </template>
+
+                  <label :for="'product-option' + (i + 1) + '-name'">name:</label>
                   <gInput
-                    :value="value"
-                    :name="'product-option' + (i + 1) + '-value' + valueIndex"
+                    :id="'product-option' + (i + 1) + '-name'"
+                    :value="product.options[i].name"
                     @input="(e) => {
                       const options = JSON.parse(JSON.stringify(product.options))
-                      options[i].values[valueIndex] = e.replace(',', '').trim()
+                      options[i].name = e.length === 1 ? capitalize(e) : e
                       updateField('options', options)
-                      if (e.includes(',')) {
-                        addOptionValue(i)
-                      }
                     }"
                     @keydown="(e) => {
+                      log({ e })
                       if(['Enter', 'Tab'].includes(e.key)) {
                         addOptionValue(i)
                       }
-                      if (e.key === 'Backspace' && !product.options[i].values[valueIndex].length) {
+                      if (e.key === 'Backspace' && !product.options[i].name.length) {
                         const options = JSON.parse(JSON.stringify(product.options))
-                        options[i].values.splice(valueIndex, 1)
+                        options.splice(i, 1)
                         updateField('options', options)
                       }
                     }"
                   />
 
-                  <gButton
-                    class="icon-button remove-option-value my-0 py-2 hover:bg-red-500 dark:hover:bg-red-500 hover:text-red-900 order-first mr-2"
-                    @click="() => {
-                      const options = JSON.parse(JSON.stringify(product.options))
-                      options[i].values.splice(valueIndex, 1)
-                      updateField('options', options)
-                    }"
-                  >
-                    <Icon name="close" />
+                  <label :for="'product-option' + (i + 1) + '-values'">values:</label>
+                  <div 
+                    :id="'product-option' + (i + 1) + '-values'"
+                    :class="{'option-values': true, ['option-' + (i + 1) + '-values']: true}"
+                    >
+                    <div 
+                      v-for="(value, valueIndex) in product.options[i].values"
+                      :key="'product-option' + (i + 1) + '-value' + valueIndex"
+                      :class="{'option-value relative flex items-center content-start mb-2': true}"
+                      >
+                      <gInput
+                        :value="value"
+                        :name="'product-option' + (i + 1) + '-value' + valueIndex"
+                        @input="(e) => {
+                          const options = JSON.parse(JSON.stringify(product.options))
+                          options[i].values[valueIndex] = e.replace(',', '').trim()
+                          updateField('options', options)
+                          if (e.includes(',')) {
+                            addOptionValue(i)
+                          }
+                        }"
+                        @keydown="(e) => {
+                          if(['Enter', 'Tab'].includes(e.key)) {
+                            addOptionValue(i)
+                          }
+                          if (e.key === 'Backspace' && !product.options[i].values[valueIndex].length) {
+                            const options = JSON.parse(JSON.stringify(product.options))
+                            options[i].values.splice(valueIndex, 1)
+                            updateField('options', options)
+                          }
+                        }"
+                      />
+
+                      <gButton
+                        class="icon-button remove-option-value my-0 py-2 hover:bg-red-500 dark:hover:bg-red-500 hover:text-red-900 order-first mr-2"
+                        @click="() => {
+                          const options = JSON.parse(JSON.stringify(product.options))
+                          options[i].values.splice(valueIndex, 1)
+                          updateField('options', options)
+                        }"
+                      >
+                        <Icon name="close" />
+                      </gButton>
+                    </div>
+                  </div>
+
+                  <gButton 
+                    class="add-option-value icon-button"
+                    @click="addOptionValue(i)"
+                    >
+                    <Icon name="add" />
                   </gButton>
-                </div>
-              </div>
 
-              <gButton 
-                class="add-option-value icon-button"
-                @click="addOptionValue(i)"
-                >
-                <Icon name="add" />
-              </gButton>
+                <ButtonDelete
+                  confirm-text="Remove"
+                  tooltip-text="Remove This"
+                  class="absolute right-1 top-1 scale-0 opacity-0 group-hover:scale-100 group-hover:opacity-100"
+                  @delete="() => {
+                    const options = JSON.parse(JSON.stringify(product.options))
+                    options.splice(i, 1)
+                    updateField('options', options)
+                  }"
+                />
 
-            <ButtonDelete
-              confirm-text="Remove"
-              tooltip-text="Remove This"
-              class="absolute right-1 top-1 scale-0 opacity-0 group-hover:scale-100 group-hover:opacity-100"
-              @delete="() => {
-                const options = JSON.parse(JSON.stringify(product.options))
-                options.splice(i, 1)
-                updateField('options', options)
-              }"
+                </ExpansionPanel>
+            </ExpansionGroup>
+
+            <gButton 
+              v-if="product.options.length < 3"
+              class="bg-gray-300 dark:bg-gray-800 bg-opacity-50 dark:bg-opacity-50 hover:bg-opacity-100 dark:hover:bg-opacity-100"
+              :class="{ 'mt-4': !product.options.length }"
+              @click="addOption()"
+              >
+              {{ product.options.length ? 'add option' : 'add options'}} <Icon class="mr-0 ml-2" name="add" />
+            </gButton>
+            
+          </div>
+
+          <template v-if="product.variants && product.variants.length">
+            <label for="excluded-variants" class="text-red-400">excluded variants:</label>
+            <LazyRichSelect 
+              id="excluded-variants"
+              class="excluded-variants mb-6"
+              :options="[...variantTitles, ...excludedVariants]"
+              :close-on-select="false"
+              :selected="excludedVariants"
+              :clearable="false"
+              :multiple="true"
+              :text-attribute="null"
+              :value-attribute="null"
+              variant="red"
+              placeholder="exclude..."
+              @update="(e) => excludedVariants = e"
             />
-
-            </ExpansionPanel>
-        </ExpansionGroup>
-
-        <gButton 
-          v-if="product.options.length < 3"
-          class="bg-gray-300 dark:bg-gray-800 bg-opacity-50 dark:bg-opacity-50 hover:bg-opacity-100 dark:hover:bg-opacity-100"
-          :class="{ 'mt-4': !product.options.length }"
-          @click="addOption()"
-          >
-          {{ product.options.length ? 'add option' : 'add options'}} <Icon class="mr-0 ml-2" name="add" />
-        </gButton>
-        
+          </template>
       </div>
 
-      <template v-if="product.variants && product.variants.length">
-        <label for="excluded-variants" class="text-red-400">excluded variants:</label>
-        <LazyRichSelect 
-          id="excluded-variants"
-          class="excluded-variants mb-6"
-          :options="[...variantTitles, ...excludedVariants]"
-          :close-on-select="false"
-          :selected="excludedVariants"
-          :clearable="false"
-          :multiple="true"
-          :text-attribute="null"
-          :value-attribute="null"
-          variant="red"
-          placeholder="exclude..."
-          @update="(e) => excludedVariants = e"
-        />
-      </template>
+      <div class="save-to-envs flex space-x-2">
+          <gCheckbox
+            v-for="env in ['live', 'dev']"
+            :key="env"
+            v-model="saveEnvs[env]"
+            wrapped
+            :label="env.toUpperCase()"
+            :classes="{
+              input: 'checked:bg-green-500'
+            }"
+            @input="() => updateEnvs(env)"
+          />
+      </div>
 
       <gButton
         type="submit"
@@ -221,10 +241,6 @@
         <template v-if="formState !== 'saving'">Create Product</template>
         <Loading v-else classes="bg-green-900" />
       </gButton>
-    
-      <pre>
-        <code>{{ JSON.stringify(excludedVariants, null, 4) }}</code>
-      </pre>
     </div>
   </div>
 </template>
@@ -246,7 +262,7 @@ export default Vue.extend( {
       formState: 'ready' /* ready, fetching, saving, saved */,
       errors: {},
       touched: [],
-      expandedIndex: 0,
+      expandedIndex: null,
       fields: {
         title: {
           type: 'text',
@@ -266,16 +282,22 @@ export default Vue.extend( {
         price: {
           type: 'text'
         }
+      },
+      saveEnvs: {
+        live: true,
+        dev: true
       }
     }
   },
   computed: {
+    envs() {
+      return this.$store.state?.productCreate?.envs
+    },
     product: {
       get() {
         return this.$store?.state?.productCreate?.product || null
       },
       set(value) {
-        console.log({value})
         this.setProduct({value})
       }
     },
@@ -296,7 +318,6 @@ export default Vue.extend( {
         return this.$store?.excludedVariants || []
       },
       set(val) {
-        console.log({ val })
         this.$store.dispatch('productCreate/setExcludedVariants', val)
       }
     },
@@ -316,35 +337,38 @@ export default Vue.extend( {
   },
   mounted() {
     this.$store.dispatch('productCreate/getUniqueSkus').catch(console.error)
-    console.log('productIndex: ', this.productIndex)
   },
   unmounted() {
     this.resetState()
   },
   methods: {
     capitalize,
+
     ...mapMutations({
       setProduct: 'productCreate/setProduct',
       setOnProduct: 'productCreate/setOnProduct',
       resetState: 'productCreate/resetState',
     }),
+
     ...mapActions({
       setVariants: 'productCreate/setVariants',
       copyFrom: 'productCreate/copyFrom',
     }),
+
     copyReferenceProduct() {
       this.formState = 'fetching'
       this.copyFrom().then(() => {
         this.formState = 'ready'
       });
     },
+
     fetchProductTypeOptions(e) {
       const res = this.index.searchForFacetValues('product_type', e, { maxFacetHits: 100 })
           .then(res => res.facetHits)
           .then(results => { return {results: results.map(item => item.value)} });
-      console.log({res})
       return res
     },
+
     checkForErrors() {
       this.errors = {};
       if(this.product.variants.length > 100) {
@@ -356,17 +380,36 @@ export default Vue.extend( {
           this.errors[key] = `attribute "${key}" cannot be undefined`
         })
     },
+
+    updateEnvs() {
+      const envs = [];
+      if(this.saveEnvs.live) {
+        envs.push('live')
+      }
+      if(this.saveEnvs.dev) {
+        envs.push('dev')
+      }
+      this.$store.commit('productCreate/setEnvs', envs)
+    },
+
     createProduct() {
       this.checkForErrors();
       if(!this.errors?.length) {
-        this.formState = 'saving'
+        this.formState = 'saving';
         this.$store.dispatch('productCreate/create')
-          .then(res => {
-            console.log(res);
+          .then(() => {
             this.formState = 'saved';
+          })
+          .catch(err => {
+            if(['unique','handle'].filter(word => err?.message.toLowerCase().indexOf(word) > -1).length === 2) {
+              this.errors.handle = err.message
+              this.touchedErrors.handle = err.message
+            }
+            this.formState = 'ready'
           })
       }
     },
+
     addOption() {
       if (this.product.options.length >= 3) { return }
       const options = !Array.isArray(this.product.options) ? [] : JSON.parse(JSON.stringify(this.product.options))
@@ -379,7 +422,6 @@ export default Vue.extend( {
       setTimeout(() => {
         const nextInput = this.$refs.productOptions.querySelector(`#product-option${options.length}-name`)
         nextInput.focus()
-        console.log(`productOption${options.length}`, this.$refs)
         this.scrollTo(`productOption`, options.length - 1)
       }, 250)
     },
@@ -412,7 +454,6 @@ export default Vue.extend( {
       if (refName === 'productOption') {
         element = element.offsetParent
       }
-      console.log({ ref, element })
       const top = element.offsetTop + offset;
       window.scrollTo({top, left: 0, behavior: 'smooth'});
     }

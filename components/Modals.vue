@@ -12,8 +12,9 @@
           :filter-values="$store.state.algoliaSelect.props.filterValues"
           :constant-values="$store.state.algoliaSelect.props.constantFilters"
           :selecting="{
-            identifier: typeof $store.state.algoliaSelect.props.identifier === 'string' ? $store.state.algoliaSelect.props.identifier : `objectID`,
+            identifier: typeof $store.state.algoliaSelect.props.selecting.identifier === 'string' ? $store.state.algoliaSelect.props.selecting.identifier : `objectID`,
             hideSideNav: !!$store.state.algoliaSelect.props.selecting && !!$store.state.algoliaSelect.props.selecting.hideSideNav,
+            hideSelected: !!$store.state.algoliaSelect.props.selecting && !!$store.state.algoliaSelect.props.selecting.hideSelected,
             multiple: !!$store.state.algoliaSelect.props.selecting && !!$store.state.algoliaSelect.props.selecting.multiple,
             quick: !!$store.state.algoliaSelect.props.selecting && !!$store.state.algoliaSelect.props.selecting.quick,
           }"

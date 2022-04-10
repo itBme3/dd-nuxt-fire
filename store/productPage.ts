@@ -130,13 +130,13 @@ export const actions:any = {
             }
 
             const product = await this.$shops[env].get({ 
-                        path: '/products', 
+                        path: 'products', 
                         query: { 
                         fields: 'id,title,body_html,product_type,handle,status,tags,images',
                         handle,
                         limit: 1
                   } })
-                        .then((res:any) => res.data?.body?.products[0])
+                        .then((res:any) => res.data[0] || {})
                         .catch((err:any) => {
                               return { ERROR: err.message }
                         })
@@ -178,16 +178,6 @@ export const actions:any = {
                         }
                   });
                   commit('setMetafield', {env, metafield, initial: true})
-                  // const metafields = { ...(state[env]?.metafields || {}), [keyPath]: data }
-                  // commit("setEnvState", {
-                  //       env,
-                  //       product: state[env]?.product?.handle !== handle ? null : state[env].product,
-                  //       metafields,
-                  //       initial: {
-                  //             product: state[env]?.product?.handle !== handle ? null : state[env].initial.product,
-                  //             metafields: metafields[keyPath]?.docPath === (state[env]?.metafields && state[env]?.metafields[keyPath] ? state[env]?.metafields[keyPath]?.docPath : null) ? state[env].metafields : metafields,
-                  //       }
-                  // });
                   return metafield
             }
 
@@ -210,14 +200,12 @@ export const actions:any = {
             const metafields: any = state[env]?.metafields
             const initialMetafields: any = state[env]?.initial?.metafields
             const changes: { product: string[], metafields: string[] } = { product: [], metafields: [] }
-            console.log({
-                  initialProduct, product
-            })
             if (product) {
                   if (
                         !objectsAreTheSame(product?.tags?.split(', '), initialProduct?.tags?.split(', '))
                         || product?.title !== initialProduct?.title
                         || product?.body_html !== initialProduct?.body_html
+                        || product?.status !== initialProduct?.status
                   ) {
                         changes.product.push('info')
                   }
@@ -258,6 +246,8 @@ export const actions:any = {
                               title: products[savingFrom].title,
                               tags: products[savingFrom].tags,
                               body_html: products[savingFrom].body_html,
+                              status: products[savingFrom].status,
+                              published_scope: 'global',
                         }
                         : {};
                   if (shouldSave.includes('images')) {
@@ -266,11 +256,13 @@ export const actions:any = {
                   if (!Object.keys(product)?.length) {
                         return
                   }
-                  return await Promise.all(savingTo.map((env:string) => {
+                  return await Promise.all(savingTo.map((env: string) => {
+                        
                         const data = {
                               ...product,
                               id: products[env].id
                         }
+
                         if (shouldSave.includes('images')) {
                               data.images = product.images.map((image: any) => {
                                     const img: {[key:string]: any } = { alt: image.alt, src: image.src, position: image.position }
@@ -280,7 +272,7 @@ export const actions:any = {
                                     return img
                               })
                         }
-                        console.log({ data })
+
                         return this.$shops[env].put({ path: `products/${products[env].id}`, data  })
                               .then(() => {
                                     ['info', 'images'].filter(k => shouldSave.includes(k)).forEach(k => {
@@ -314,8 +306,9 @@ export const actions:any = {
                         .filter((k:string) => k.indexOf('studio.') === 0);
                   const promises:Promise<any>[] = [];
                   nonFilterMetafields.forEach((k:string) => savingTo === null ? '' : savingTo.forEach((env:string) => {
-                  const pathKey = k.replace('featured_reviews', 'featuredReviews')
-                  const docPath = `products_${env}/${products[env].handle}/metafields/${k.split('.')[1]}`;
+                        const pathKey = k
+                        const docId = k.split('.')[1].replace('featuredReviews', 'featured_reviews')
+                  const docPath = `products_${env}/${products[env].handle}/metafields/${docId}`;
                   if(savingFrom === null || savingTo === null) { return }
                   const data = {...metafields[savingFrom][pathKey], docPath}
                   promises.push(
@@ -337,9 +330,7 @@ export const actions:any = {
                   saveProduct(),
                   saveMetafields()
             ])
-            console.log({nextState})
             commit('setState', nextState)
-            
             return { saved, errors }
       }
 }

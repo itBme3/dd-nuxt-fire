@@ -112,8 +112,8 @@ export const TailwindComponentsSettings = {
   gSelect: {
     component: TSelect,
     props: {
-      fixedClasses: 'block w-full pl-3 pr-10 py-2 transition duration-100 ease-in-out border rounded shadow-sm focus:ring-2 focus:ring-purple-500 focus:outline-none focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed',
-      classes: 'text-black placeholder-gray-400 bg-white border-gray-300 focus:border-blue-500 ',
+      fixedClasses: 'hover:shadow-lg rounded active:shadow-md focus:shadow-md block w-full px-3 py-2 transition border border-gray-700 border-opacity-10 duration-100 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed outline-none focus:border-0 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:outline-none active:border-0 active:outline-none active:ring-0',
+      classes: 'bg-gray-800 hover:bg-gray-700 active:bg-gray-700 focus:bg-gray-700 text-gray-100 placeholder-gray-300',
       variants: {
         danger: 'border-red-300 bg-red-50 placeholder-red-200 text-red-900',
         success: 'border-green-300 bg-green-50 placeholder-gray-400 text-green-900'
@@ -243,7 +243,7 @@ export const TailwindComponentsSettings = {
         uncheckedPlaceholder: 'inline-block'
       },
       classes: {
-        wrapper: 'bg-gray-100 rounded-full border-2 border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none focus:ring-opacity-50',
+        wrapper: 'bg-gray-800 rounded-full border-2 border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none focus:ring-opacity-50',
         wrapperChecked: 'bg-blue-500 rounded-full',
         wrapperDisabled: 'bg-gray-100 rounded-full border-2 border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none focus:ring-opacity-50',
         wrapperCheckedDisabled: 'bg-blue-500',

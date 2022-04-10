@@ -77,14 +77,7 @@
       <template v-if="state === 'saving'">
 
         <div class="bg-white bg-opacity-20 dark:bg-gray-800 absolute inset-0 z-99999 flex items-center content-center py-8">
-          <radial-progress-bar
-            :diameter="200"
-            :completed-steps="saved.length"
-            :total-steps="shouldSave.length"
-            inner-stroke-color="#111827"
-            class="mx-auto my-8">
-            <p>saving</p>
-          </radial-progress-bar>
+          <Loading />
         </div>
 
       </template>
@@ -176,15 +169,12 @@
 </template>
 
 <script>
-import RadialProgressBar from 'vue-radial-progress'
+import Vue from 'vue'
 import { ShopEnv } from '~/models/shopify.models'
 import { asyncDelay } from '~/utils/funcs'
 import {shopAdminDomains, shopDomains} from '~/utils/shopify'
 
-export default {
-  components: {
-    RadialProgressBar
-  },
+export default Vue.extend({
   data() {
     return {
       state: 'confirming', /* confirming, selecting, saving, saved */
@@ -214,10 +204,10 @@ export default {
     },
     shouldSaveOptions() { 
       return [
-        { text: 'Content (title, text, tags)', value: 'info' },
+        { text: 'Content (title, text, tags, status)', value: 'info' },
         { text: 'Images', value: 'images' },
         { text: 'Product Details', value: 'studio.product_details' },
-        { text: 'Featured Reviews', value: 'studio.featured_reviews' },
+        { text: 'Featured Reviews', value: 'studio.featuredReviews' },
         { text: 'The Look', value: 'studio.the_look' }
       ]
     },
@@ -254,32 +244,6 @@ export default {
       this.$store.dispatch('productPage/getChanges', 'live');
       this.$store.dispatch('productPage/getChanges', 'dev');
     },
-    // async saveProduct() {
-    //   const product = this.shouldSave.includes('info') 
-    //     ? {
-    //       title: this.products[this.envs.from].title,
-    //       tags: this.products[this.envs.from].tags,
-    //       body_html: this.products[this.envs.from].body_html,
-    //     }
-    //     : {};
-    //   if (this.shouldSave.includes('images')) {
-    //     product.images = this.products[this.envs.from].images
-    //   }
-    //   if (!Object.keys(product)?.length) {
-    //     return
-    //   }
-
-    //   return await Promise.all(this.envs.to.map(env => {
-    //     const data = {...product, id: this.products[env].id}
-    //     console.log(data)
-    //     return this.$shops[env].put({ path: `products/${this.products[env].id}`, data  })
-    //       .then(() => ['info','images'].filter(k => this.shouldSave.includes(k)).forEach(k => this.saved.push(k)))
-    //       .catch(err => {
-    //         console.error(err)
-    //         this.errors.push(err)
-    //       })
-    //   }))
-    // },
     onClose() {
       this.$store.commit('productPage/saving', { to: null, from: null })
     },
@@ -296,7 +260,7 @@ export default {
         (async() => {
           try {
             if ([null, undefined, {}].includes(this.products[env]) && env !== this.envs.from) {
-              this.products[env] = await this.$shops[env].get({ path: `/products/${this.products[env].id}`, query: { fields: 'title,id,images,body_html,tags' } })
+              this.products[env] = await this.$shops[env].get({ path: `products/${this.products[env].id}`, query: { fields: 'title,id,images,body_html,tags' } })
             }
           } catch (err) {
             console.error(err);
@@ -324,7 +288,7 @@ export default {
       ])
     }
   }
-}
+})
 </script>
 
 <style lang="scss">

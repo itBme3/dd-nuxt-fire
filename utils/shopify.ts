@@ -1,4 +1,4 @@
-import { DeleteRequestParams, GetRequestParams, PostRequestParams, PutRequestParams, RequestParams, ShopEnv } from "~/models/shopify.models";
+import { DeleteRequestParams, GetRequestParams, PostRequestParams, PutRequestParams, ShopEnv } from "~/models/shopify.models";
 
 export const shopDomains = {
       live: 'https://dearborndenim.us',
@@ -32,17 +32,19 @@ export class Shopify implements ShopApi {
             }
       }
 
-      get(params: GetRequestParams):Promise<any> {
+      get(params: GetRequestParams): Promise<any> {
             return this.$fire.functions.httpsCallable('shopifyApi')({ env: this.env, method: 'get', params })
                   .catch((err:any) => alert(err))
       }
 
-      post(params: PostRequestParams):Promise<any> {
+      async post(callParams: PostRequestParams):Promise<any> {
+            const params = await this.imageSources(callParams)
             return this.$fire.functions.httpsCallable('shopifyApi')({ env: this.env, method: 'post', params })
                   .catch((err:any) => alert(err))
       }
 
-      put(params: PutRequestParams):Promise<any> {
+      async put(callParams: PutRequestParams): Promise<any> {
+            const params = await this.imageSources(callParams)
             return this.$fire.functions.httpsCallable('shopifyApi')({ env: this.env, method: 'put', params })
                   .catch((err:any) => alert(err))
       }
@@ -50,6 +52,25 @@ export class Shopify implements ShopApi {
       delete(params: DeleteRequestParams):Promise<any> {
             return this.$fire.functions.httpsCallable('shopifyApi')({ env: this.env, method: 'delete', params })
                   .catch((err:any) => alert(err))
+      }
+
+      async imageSources(params: PutRequestParams | PostRequestParams):Promise<any> {
+            if (params?.data?.images?.filter((image: any) => image.src?.includes('media%2F')).length > 0) {
+                  params.data.images = await Promise.all(params.data.images.map((image: any) => {
+                        if (!image?.src?.includes('media%2F')) { return image }
+                        let name = image.src.split('media%2F')[1].split('?');
+                        name.pop();
+                        name = name.join('?')
+                        return this.$fire.functions.httpsCallable('tempImage')(name)
+                              .then((res: any) => {
+                                    return {
+                                          ...image,
+                                          src: res.data
+                                    }
+                              })
+                  }))
+            }
+            return params
       }
       
 }

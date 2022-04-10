@@ -42,9 +42,9 @@ export default {
   methods: {
     getCurrent(env) {
       return Promise.all([
-        this.$shops[env].get({ path: `/products/${this.products[env].id}`, query: { fields: 'title,id,handle,images,body_html,tags' } })
+        this.$shops[env].get({ path: `products/${this.products[env].id}`, query: { fields: 'title,id,handle,images,body_html,tags,status' } })
           .then(res => {
-            this.products[env] = res.data.body?.product;
+            this.products[env] = res.data;
             return res
           }).catch(err => {
             console.error(err);

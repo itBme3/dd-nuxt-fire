@@ -1,7 +1,9 @@
 /* eslint-disable camelcase */
-import { ShopEnv } from "~/models/shopify.models";
+import Vue from 'vue'
+import { DataType, ShopEnv } from "~/models/shopify.models";
 import { flattenArray, getRandomNumber } from "~/utils/funcs";
-import { defaultsByProductType } from "~/utils/product-create";
+import { productHandleExists, defaultsByProductType } from "~/utils/products";
+import { shopAdminDomains } from "~/utils/shopify";
 
 interface StateProductOption {
       name: string;
@@ -50,7 +52,7 @@ interface State {
       uniqueSkus: StateUniqueSkus;
       envs: ShopEnv[];
       excludedVariants: string[];
-      metafields?: {[key:string]: any};
+      metafields: {[key:string]: any};
 }
 
 const initialState:State = {
@@ -76,11 +78,22 @@ export const state = (): State => ({
 });
 
 export const mutations = {
-      
+
       resetState(state: State) {
             state.product = Object.assign({}, state.product, initialState)
       },
 
+      setEnvs(state: State, val:ShopEnv[]) {
+            const envs = [];
+            if (!Array.isArray(val) || val.includes(ShopEnv.LIVE)) {
+                  envs.push(ShopEnv.LIVE)
+            }
+            if (val?.includes(ShopEnv.DEV)) {
+                  envs.push(ShopEnv.DEV)
+            }
+            Vue.set(state, 'envs', envs)
+      },
+      
       setProduct(state: State, { value, merge }: { value: StateProduct; merge?: boolean }) {
             const merging = [undefined, true].includes(merge);
             const data = { ...(merging ? state.product : initialState.product), ...value };
@@ -125,7 +138,6 @@ export const mutations = {
 export const actions:any = {
 
       copyFrom({ state }: any, { env }: { env?: ShopEnv } = { env: ShopEnv.LIVE }) {
-            console.log({ state })
             return new Promise((resolve) => {
                   const shopEnv = env === ShopEnv.DEV ? ShopEnv.DEV : ShopEnv.LIVE
                   const onSubmit = (product: any) => {
@@ -141,7 +153,6 @@ export const actions:any = {
                               selected: null,
                               selecting: {
                                     multiple: false,
-                                    // quick: true
                               }
                         })), 
                         onSubmit(e:any) {
@@ -157,13 +168,13 @@ export const actions:any = {
       async setProductFromCopy({ state }: any, { product, env }: { product: any; env: ShopEnv }) {
             if(!product?.handle) { return null }
             const shopProduct = await this.$shops[env].get({ 
-                        path: '/products', 
+                        path: 'products', 
                         query: { 
                         fields: 'id,title,body_html,product_type,handle,status,tags,images,options,variants',
                         handle: product.handle,
                         limit: 1
                   } })
-                        .then((res:any) => res.data?.body?.products[0])
+                        .then((res:any) => res.data[0])
                         .catch((err:any) => {
                               return { ERROR: err.message }
                         })
@@ -171,11 +182,7 @@ export const actions:any = {
                   title = state?.product?.title,
                   handle = state?.product?.handle,
                   body_html = state?.product?.body_html,
-                  tags = state?.product?.tags,
-                  // images = state?.product?.images?.map((item: any) => {
-                  //       const { position, src, alt } = item;
-                  //       return { position, src, alt }
-                  // }) || [],
+                  tags:newTags = state?.product?.tags,
                   price = shopProduct?.variants[0]?.price || state.product.price,
                   weight = shopProduct?.variants[0]?.weight || state.product.weight,
                   weight_unit = shopProduct?.variants[0]?.weight_unit || state.product.weight_unit,
@@ -183,10 +190,20 @@ export const actions:any = {
                   options = state?.product?.options,
                   variants = state?.product?.variants,
             } = shopProduct;
-            const images:any[] = Array.isArray(state?.product?.images) ? state.product.images : []
+            const tags = (() => {
+                  const stateTags = state?.product?.tags || [];
+                  return [...new Set([
+                        ...(typeof newTags === 'string' ? newTags.split(', ') : Array.isArray(newTags) ? newTags : []),
+                        ...(typeof stateTags === 'string' ? stateTags.split(', ') : Array.isArray(stateTags) ? stateTags : []),
+                  ])].join(', ')
+            })();
+            const images:any[] = Array.isArray(state?.product?.images) ? state.product.images : [];
             const newProduct = {
-                  title, handle, body_html,
-                  tags, images,
+                  title: state?.product?.title?.length ? state.product.title : title,
+                  handle: state?.product?.handle?.length ? state.product.handle : handle,
+                  body_html,
+                  tags,
+                  images,
                   product_type,
                   price, weight, weight_unit,
                   options: options?.map((item: any) => {
@@ -388,16 +405,20 @@ export const actions:any = {
             }
       },
 
-      async create({ state, $shops }:any) {
-            const products = {
+      async create({ state }:{state: State}) {
+            const products: { [ShopEnv.LIVE]: { [key: string]: any; }; [ShopEnv.DEV]: { [key: string]: any } } = {
                   [ShopEnv.LIVE]: {
                         ...state.product,
+                        status: 'active',
+                        published_scope: 'global',
                         variants: state.product.variants.map((variant:StateProductVariant, i:number) => {
                               return { ...variant, sku: state.uniqueSkus[ShopEnv.LIVE][i] }
                         })
                   },
                   [ShopEnv.DEV]: {
                         ...state.product,
+                        status: 'active',
+                        published_scope: 'global',
                         variants: state.product.variants.map((variant:StateProductVariant, i:number) => {
                               return { ...variant, sku: state.uniqueSkus[ShopEnv.DEV][i] }
                         })
@@ -407,14 +428,48 @@ export const actions:any = {
                   [ShopEnv.DEV]: null,
                   [ShopEnv.LIVE]: null,
             }
-            return await Promise.all(state.envs.map((env:ShopEnv) => 
-                  $shops[env].post('products', products[env])
-                        .then((res:any) => {
-                              created[env] = res
+            const promises = state.envs.map(async (env: ShopEnv) => {
+                  const handleExists = await productHandleExists(state.product.handle, env, this.$shops)
+                  if (handleExists) {
+                        const errMessage = `Product handles must be unique.\nThe handle "${state.product.handle}" exists on "${env.toUpperCase()}" shop.`
+                        alert(errMessage)
+                        throw new Error(errMessage);
+                  }
+                  return this.$shops[env].post({
+                        path: 'products',
+                        data: products[env === ShopEnv.DEV ? ShopEnv.DEV : ShopEnv.LIVE],
+                        type: DataType.JSON
+                  })
+                        .then(async (res: any) => {
+                              created[env] = res.data
+                              await this.$shops[env].put({ path: `products/${res.data.id}`, data: { status: 'draft' } })
+                                    .catch(console.error)
                               return created
                         })
-                        .catch(console.error)
-            )).then(() => created)
+            });
+            if (state.metafields && Object.keys(state.metafields).length) {
+                  Object.keys(state.metafields).forEach((key: string) => {
+                        state.envs.forEach((env: ShopEnv) => {
+                              const docId = state.metafields[key].docPath.split('/').pop()
+                              const docPath = `products_${env}/${state.product.handle}/metafields/${docId}`
+                              promises.push(this.$db.updateAt(docPath, {
+                                    ...state.metafields[key],
+                                    docPath,
+                                    docId
+                              }))
+                        })
+                  })
+            }
+            return await Promise.all(promises).then(() => {
+                  this.$router.push(`/products/${state.product.handle}${!created[ShopEnv.LIVE]?.id ? '#dev' : '' }`)
+                  if (created[ShopEnv.LIVE]?.id) {
+                        window.open(`${shopAdminDomains[ShopEnv.LIVE]}/products/${created[ShopEnv.LIVE]?.id}`, '_blank')
+                  }
+                  if (created[ShopEnv.DEV]?.id) {
+                        window.open(`${shopAdminDomains[ShopEnv.DEV]}/products/${created[ShopEnv.DEV]?.id}`, '_blank')
+                  }
+                  return created
+            })
       },
 
       setExcludedVariants({dispatch, commit}: any, value: string[]) {

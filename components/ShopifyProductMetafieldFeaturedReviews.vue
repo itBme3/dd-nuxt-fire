@@ -40,24 +40,25 @@
         /> -->
 
         <gInput 
-          :value="review.title"
+          :value="stripHtml(review.title)"
           class="text-xl sm:text-3xl mb-2"
-          @input="lodash.debounce((e) => {
+          @input="(e) => {
             const val = JSON.parse(JSON.stringify(metafieldValue))
-            val[reviewIndex].title = e;
+            val[reviewIndex].title = stripHtml(e);
             metafieldValue = val
-          }, 500)" />
+          }"
+        />
 
         <Editor 
           :content="review.body"
           :slim="true"
           class="review-body py-1 w-full"
           min-height="auto"
-          @update="lodash.debounce((e) => {
+          @update="(e) => {
             const val = JSON.parse(JSON.stringify(metafieldValue))
             val[reviewIndex].body = e;
             metafieldValue = val
-          }, 500)"
+          }"
         />
         <i class="text-gray-500 block mt-3">{{ review.reviewer }}</i>
       </Card>
@@ -75,7 +76,7 @@
 </template>
 
 <script>
-import _ from 'lodash';
+import {debounce} from 'lodash';
 import draggable from 'vuedraggable'
 import { stripHtml } from '~/utils/funcs';
 
@@ -93,7 +94,6 @@ export default {
     const namespace = 'studio';
     const key = 'featuredReviews';
     return {
-      lodash: _,
       namespace, key,
       keyPath: `${namespace}.${key}`
     }
@@ -130,56 +130,73 @@ export default {
     },
     metafieldValue: {
       get() {
-        try {
-          return this.metafieldDoc?.value
-        } catch {
-          return null
-        }
+       return this.metafieldDoc?.value || []
       },
-      set(value) {
+      set: debounce(function(val) {
+        const value = val?.map(review => {
+            return {
+              ...review, title: stripHtml(review.title)
+            }
+          }) || [];
         const metafield = {
           key: this.key, 
           namespace: this.namespace,
           ...(![undefined, null].includes(this.metafieldDoc) ? this.metafieldDoc : {}), 
-          value: value?.map(review => {
-            return {
-              ...review, title: stripHtml(review.title)
-            }
-          })
+          value
         }
-        this.$store.commit('productCreate/setMetafield', { metafield })
-      }
+        this.isProductPage 
+            ? this.$store.dispatch('productPage/setMetafield', { metafield, env: this.env })
+            : this.$store.commit('productCreate/setMetafield', { metafield })
+      }, 500)
     }
   },
   mounted()  {
     const { env, namespace, key } = this
-    console.log({keyPath: this.keyPath} )
     if (this.isProductPage) {
       this.$store.dispatch('productPage/getMetafield', { env, namespace, key, handle: this.product.handle })
     }
   },
   methods: {
+    debounce,
+    stripHtml,
     addItems(append = false) {
-      this.$store.commit('algoliaSelect/open', { 
-        props: { indexName: 'reviews' },
-        onSubmit: (selection) => {
-          if (Array.isArray(selection)) {
-            console.log( { selection } )
-            // const value = Object.assign({}, value, this.metafieldValue)
-            const newItems = selection.map(review => {
-              const { title, content: body, score, id, name: reviewer, created_at: date } = review;
-              return { title: stripHtml(title), body, score, id, reviewer, date }
-            })
-            const value = !Array.isArray(this.metafieldValue) ? [] : JSON.parse(JSON.stringify(this.metafieldValue))
-            this.metafieldValue = append 
-              ? [...value, ...newItems]
-              : [...newItems, ...value]
-            console.log({ $el: this.$el })
-            setTimeout(() => {
-              window.scrollTo({top: this.$el.offsetTop + (append ? this.$el.offsetHeight : 0), left: 0, behavior: 'smooth'});
-            }, 250)
-          }
+      let onSubmit = (selection) => {
+        if (Array.isArray(selection)) {
+          // const value = Object.assign({}, value, this.metafieldValue)
+          const newItems = selection.map(review => {
+            const { title, content: body, score, id, name: reviewer, created_at: date } = review;
+            return { title: stripHtml(title), body, score, id, reviewer, date }
+          })
+          const value = !Array.isArray(this.metafieldValue) ? [] : JSON.parse(JSON.stringify(this.metafieldValue))
+          console.log( { value } )
+          this.metafieldValue = append 
+            ? [...value, ...newItems]
+            : [...newItems, ...value]
+          setTimeout(() => {
+            window.scrollTo({top: this.$el.offsetTop + (append ? this.$el.offsetHeight : 0), left: 0, behavior: 'smooth'});
+          }, 250)
         }
+      }
+      onSubmit = onSubmit.bind(this)
+      this.$store.commit('algoliaSelect/open', { 
+        props: { 
+          indexName: 'reviews', 
+          filterValues: {
+            filters: [
+              {
+                attribute: 'product.handle',
+                value: this.product.handle,
+                type: 'refinement_list',
+              },
+              {
+                attribute: 'score',
+                value: [4, 5],
+                type: 'range',
+              }
+            ] 
+          }
+        },
+        onSubmit
       })
     }
   }

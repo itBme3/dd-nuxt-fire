@@ -10,7 +10,7 @@ export declare enum ShopMethod {
   Delete = "DELETE",
 }
 
-export declare enum DataType {
+export enum DataType {
     JSON = "application/json",
     GraphQL = "application/graphql",
     URLEncoded = "application/x-www-form-urlencoded"
@@ -24,7 +24,7 @@ export interface GetRequestParams {
 }
 export declare type PostRequestParams = GetRequestParams & {
     type: DataType;
-    data: Record<string, unknown> | string;
+    data: {[key:string]:any};
 };
 export declare type PutRequestParams = PostRequestParams;
 export declare type DeleteRequestParams = GetRequestParams;

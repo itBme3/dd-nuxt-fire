@@ -61,6 +61,7 @@ export const mutations = {
                   onSubmit = initialState.onSubmit,
                   onCancel = initialState.onCancel
             } = params;
+            console.log({props})
             state.props =  Object.assign({ }, state.props, { ...defaultProps, ...(!props ? {} : props) })
             Vue.set(state, 'onCancel',  onCancel)
             Vue.set(state, 'onUpdate',  onUpdate)

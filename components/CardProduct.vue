@@ -63,7 +63,7 @@ export default Vue.extend({
     },
     more: {
       type: Array,
-      default: () => [ 'tags', 'handle', 'product_type' ]
+      default: () => [ /* 'tags', 'handle', 'product_type' */ ]
     }
   },
   computed: {

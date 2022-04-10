@@ -86,21 +86,24 @@
   </div>
 </template>
 
-<script lang="js">
+<script>
+
+import Vue from 'vue'
+// import {productHandleExists} from '~/utils/products'
 
 
+export default Vue.extend({
 
-
-export default {
-
-  async asyncData({ $store }) {
-    try {
-      await $store.dispatch('productPage/getProduct', { handle: 'tailored-fit-dark-wash', env: 'dev' });
-      return {}
-    } catch(err) {
-      return {}
-    }
-  },
+  // async asyncData({$shops}) {
+  //   try {
+  //     await productHandleExists('tailored-fit-dark-wash', 'live', $shops)
+  //       .then(handleExists => console.log({handleExists}))
+  //     // await $store.dispatch('productPage/getProduct', { handle: 'tailored-fit-dark-wash', env: 'dev' });
+  //     return {}
+  //   } catch(err) {
+  //     return {}
+  //   }
+  // },
 
   data() {
       const handles = ['tailored-fit-dark-wash', 'tailored-fit=light-wash', 'tailored-fit-dark-wash-v2', 'tailored-fit-dark-wash-v3', 'tailored-fit-grey-wash']
@@ -196,7 +199,7 @@ export default {
   //   //   this.$store.local
   //   // }
   }
-}
+})
 </script>
 
 <style>

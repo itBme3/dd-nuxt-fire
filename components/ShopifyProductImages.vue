@@ -1,7 +1,7 @@
 <template>
   <div class="product-images">
     <gButton 
-      v-tooltip="'add item'"
+      v-tooltip="'add images'"
       class="add-item-button w-full py-3 mb-2"
       @click="selectImages()"
       >
@@ -113,14 +113,21 @@ export default {
   },
   methods: {
     selectImages(append = false) {
+      console.log({selectedValues: this.productImages
+          .map(p => { return {downloadUrl: p.src}})});
+      const onSubmit = this.addImages.bind(this)
       this.appendImages = append
       this.$store.commit('algoliaSelect/open', { props: {
         indexName: `media`,
         selecting: {
-          multiple: true
-        }
+          multiple: true,
+          hideSelected: true,
+          identifier: 'downloadUrl'
+        },
+        selectedValues: this.productImages
+          .map(p => { return {downloadUrl: p.src}})
       }, 
-        onSubmit: this.addImages.bind(this)
+        onSubmit
       })
     },
     addImages(selectedImages) {
@@ -135,7 +142,8 @@ export default {
         }, '')
         const { downloadUrl: src } = img;
         return { src, alt }
-      })
+      }).filter(img => !img.src?.includes('cdn.shopify'))
+      console.log({newImages})
       this.productImages = (this.appendImages ? [...this.productImages, ...newImages] : [...newImages, ...this.productImages])
         .map((img, i) => {
           return { ...img, position: i + 1 }
