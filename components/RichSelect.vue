@@ -1,5 +1,6 @@
 <template>
-<div>
+<div class="rich-select">
+  <label v-if="label && selectedOptions.length">{{ label }}:</label>
   <gRichSelect
     ref="richSelect"
     v-model="selectedOptions"
@@ -12,6 +13,7 @@
     :placeholder="placeholder"
     :max-height="maxHeight"
     :variant="variant"
+    :classes="classes"
     :delay="0"
     :fetch-options="typeof fetchOptions === 'function' ? fetchOptions : undefined"
     @click="scrollTo('richSelect', -100)"
@@ -38,7 +40,7 @@
         </div>
       </template>
       <template #arrow>
-          <i class="gicon gicon-add rounded-full transform transition-transform scale-100 hover:scale-105 p-2 dark:bg-gray-800 bg-opacity-80 dark:bg-opacity-80 hover:bg-opacity-100 dark:hover:bg-opacity-100 bg-gray-100 hover:bg-white hover:shadow-2xl shadow" />
+          <i class="gicon gicon-add rounded-full transform transition-transform scale-100 hover:scale-105 p-2 hover:shadow-2xl shadow" />
       </template>
   </gRichSelect>
   </div>
@@ -84,6 +86,10 @@ export default {
       type: String,
       default: 'select...'
     },
+    label: {
+      type: String,
+      default: null
+    },
     maxHeight: {
       type: Number,
       default: 300
@@ -103,6 +109,10 @@ export default {
     selected: {
       type: [String, Array],
       default: () => []
+    },
+    classes: {
+      type: Object,
+      default: () => { return undefined }
     }
   },
   data() {

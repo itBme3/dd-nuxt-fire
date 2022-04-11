@@ -125,8 +125,8 @@ export const TailwindComponentsSettings = {
     props: {
       fixedClasses: {
         wrapper: 'relative',
-        buttonWrapper: 'inline-block relative w-full',
-        selectButton: 'w-full flex text-left justify-between bg-transparent cursor-pointer border-gray-200 dark:border-gray-800 hover:bg-gray-200 dark:hover:bg-gray-800 border items-center p-2 text-black transition duration-100 ease-in-out border rounded shadow-sm focus:ring-2 focus:outline-none focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed',
+        buttonWrapper: 'rich-select-button-wrapper inline-block relative w-full',
+        selectButton: 'rich-select-select-button w-full flex text-left justify-between bg-transparent cursor-pointer border-gray-200 dark:border-gray-800 hover:bg-gray-200 dark:hover:bg-gray-800 border items-center p-2 text-black transition duration-100 ease-in-out border rounded shadow-sm focus:ring-2 focus:outline-none focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed',
         selectButtonLabel: 'block truncate',
         selectButtonTagWrapper: 'flex flex-wrap items-start content-start',
         selectButtonTag: 'flex px-2 disabled:cursor-not-allowed disabled:opacity-50 duration-100 ease-in-out focus:border-transparent focus:outline-none focus:ring-2 focus:ring-opacity-50 rounded shadow-sm text-sm transition white-space-no m-0.5 max-w-full overflow-hidden h-8 flex items-center',
@@ -160,14 +160,14 @@ export const TailwindComponentsSettings = {
       classes: {
         wrapper: '',
         buttonWrapper: '',
-        selectButton: 'focus:border-yellow-400 focus:ring-yellow-400',
+        selectButton: 'focus:border-yellow-400 focus:ring-yellow-400 dark:focus:border-yellow-400 dark:focus:ring-yellow-400',
         selectButtonLabel: 'text-yellow-600 dark:text-yellow-400',
         selectButtonTag: 'bg-yellow-400 text-yellow-900 focus:ring-yellow-400',
         selectButtonTagDeleteButtonIcon: '',
         selectButtonPlaceholder: 'text-gray-400 dark:text-gray-600',
         selectButtonIcon: 'text-gray-600',
-        selectButtonClearButton: 'bg-yellow-400 text-yellow-900',
-        selectButtonClearIcon: 'w-4 h-4 fill-red-400',
+        selectButtonClearButton: 'bg-gray-400 bg-opacity-10 hover:bg-red-400 hover:bg-opacity-100 hover:text-red-900 text-red-500 rounded-full',
+        selectButtonClearIcon: 'w-4 h-4',
         selectedOption: 'hidden',
         dropdown: 'bg-white dark:bg-gray-800 shadow-lg',
         dropdownFeedback: 'pb-2 px-3 text-gray-400 text-sm',
@@ -196,13 +196,14 @@ export const TailwindComponentsSettings = {
           return {
             ...acc,
             [color]: {
-              selectButton: `focus:border-${ color === 'light' ? 'gray' : color }-400 focus:ring-${ color === 'light' ? 'gray' : color }-400${ color === 'light' ? 'gray' : color }#${color === 'light' ? ' bg-opacity-10 hover:bg-opacity-10 dark:text-gray-400' : '' }`,
-              selectButtonClearButton: `bg-${ color === 'light' ? 'gray' : color }-400#${color === 'light' ? ' bg-opacity-10 hover:bg-opacity-10 dark:text-gray-400' : '' }`,
-              selectButtonClearIcon: `text-${ color === 'light' ? 'gray' : color }-900#${color === 'light' ? ' bg-opacity-10 hover:bg-opacity-10 dark:text-gray-400' : '' }`,
-              selectButtonLabel: `text-${ color === 'light' ? 'gray' : color }-500 dark:text-${ color === 'light' ? 'gray' : color }-400#${color === 'light' ? ' bg-opacity-10 hover:bg-opacity-10 dark:text-gray-400' : '' }`,
-              selectButtonTag: `bg-${ color === 'light' ? 'gray' : color }-400 text-${ color === 'light' ? 'gray' : color }-900 focus:ring-${ color === 'light' ? 'gray' : color }-400#${color === 'light' ? ' bg-opacity-10 hover:bg-opacity-10 dark:text-gray-400' : '' }`,
-              selectedOption: `bg-${ color === 'light' ? 'gray' : color }-400 text-${ color === 'light' ? 'gray' : color }-900#${color === 'light' ? ' bg-opacity-10 hover:bg-opacity-10 dark:text-gray-400' : '' }`,
-              selectedHighlightedOption: `bg-${ color === 'light' ? 'gray' : color }-500 text-${ color === 'light' ? 'gray' : color }-900#${color === 'light' ? ' bg-opacity-10 hover:bg-opacity-10 dark:text-gray-400' : '' }`
+              selectButton: `focus:border-${color === 'light' ? 'gray' : color}-400 focus:ring-${color === 'light' ? 'gray' : color}-400${color === 'light' ? 'gray' : color} ${color === 'light' ? ' bg-opacity-10 hover:bg-opacity-10 dark:text-gray-400' : ''}`,
+              selectButtonIcon: `text-${ color === 'light' ? 'gray' : color }-900 ${color === 'light' ? ' bg-opacity-10 hover:bg-opacity-10 dark:text-gray-400' : '' }`,
+              // selectButtonClearButton: `bg-${ color === 'light' ? 'gray' : color }-400 ${color === 'light' ? ' bg-opacity-10 hover:bg-opacity-10 dark:text-gray-400' : '' }`,
+              // selectButtonClearIcon: `text-${ color === 'light' ? 'gray' : color }-900 ${color === 'light' ? ' bg-opacity-10 hover:bg-opacity-10 dark:text-gray-400' : '' }`,
+              selectButtonLabel: `text-${ color === 'light' ? 'gray' : color }-500 dark:text-${ color === 'light' ? 'gray' : color }-400 ${color === 'light' ? ' bg-opacity-10 hover:bg-opacity-10 dark:text-gray-400' : '' }`,
+              selectButtonTag: `bg-${ color === 'light' ? 'gray' : color }-400 text-${ color === 'light' ? 'gray' : color }-900 focus:ring-${ color === 'light' ? 'gray' : color }-400 ${color === 'light' ? ' bg-opacity-10 hover:bg-opacity-10 dark:text-gray-400' : '' }`,
+              selectedOption: `bg-${ color === 'light' ? 'gray' : color }-400 text-${ color === 'light' ? 'gray' : color }-900 ${color === 'light' ? ' bg-opacity-10 hover:bg-opacity-10 dark:text-gray-400' : '' }`,
+              selectedHighlightedOption: `bg-${ color === 'light' ? 'gray' : color }-500 text-${ color === 'light' ? 'gray' : color }-900 ${color === 'light' ? ' bg-opacity-10 hover:bg-opacity-10 dark:text-gray-400' : '' }`
             }
           }
        }, {})
@@ -338,7 +339,7 @@ export const TailwindComponentsSettings = {
         closeIcon: 'modal-closeIcon fill-current h-6 w-6 transform scale-125'
       },
       classes: {
-        overlay: 'bg-gray-100 dark:bg-gray-900 bg-opacity-90',
+        overlay: 'bg-gray-100 dark:bg-gray-900 bg-opacity-90 dark:bg-opacity-90',
         wrapper: 'max-w-lg bg-white dark:bg-gray-800 shadow-xl mt-24',
         modal: 'bg-transparent',
         header: '',

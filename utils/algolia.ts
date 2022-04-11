@@ -21,6 +21,11 @@ export const filterOptionsByIndex:{[key:string]: string[]} =  {
       reviews: ['product.tags', 'product.handle', 'score'],
 }
 
+export const bulkEditOptionsByIndex:{[key:string]: string[]} =  {
+      products: ['tags'],
+      media: ['fits', 'tags', 'materials', 'colors', 'wash', 'products'],
+}
+
 const filterOptionKeys = [
       ...Object.values(filterOptionsByIndex).reduce((acc, arr) => {
             return [...new Set([...acc, ...arr])]
