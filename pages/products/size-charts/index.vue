@@ -38,10 +38,10 @@
 </template>
 
 <script>
+import Vue from 'vue'
+import {debounce} from 'lodash'
 
-import _ from 'lodash'
-
-export default {
+export default Vue.extend({
   
   data() {
     const startAfterDefaults = {
@@ -64,7 +64,7 @@ export default {
     }).catch(err => alert(err))
   },
   methods: {
-    nextPage: _.debounce(function () {
+    nextPage: debounce(function () {
       if (this.canLoadMore && !!this.docs?.length) {
         const startAfter = this.docs[this.docs.length - 1][this.orderBy[0]];
         return this.getDocs({append:true, startAfter})
@@ -91,5 +91,5 @@ export default {
       return this.docs
     }
   }
-}
+})
 </script>

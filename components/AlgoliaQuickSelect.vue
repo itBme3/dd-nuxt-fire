@@ -69,7 +69,8 @@
 </template>
 
 <script>
-  export default {
+import Vue from 'vue'
+  export default Vue.extend({
     props: {
       indexName: {
         type: String,
@@ -139,7 +140,7 @@
         theClasses: { ...theClasses, card: 'bg-gray-200 text-gray-700' }
       }
     }
-  }
+  })
 </script>
 
 <style lang="scss">

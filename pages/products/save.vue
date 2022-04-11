@@ -18,7 +18,8 @@
 
 <script>
 
-export default {
+import Vue from 'vue'
+export default Vue.extend({
   data(){
     return {
       show: false,
@@ -68,5 +69,5 @@ export default {
       ])
     }
   }
-}
+})
 </script>

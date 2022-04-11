@@ -13,10 +13,11 @@
 /* eslint-disable no-template-curly-in-string */
 /* eslint-disable no-undef */
 
+import Vue from 'vue'
 import Prism from 'prismjs'
 import 'prismjs/themes/prism-tomorrow.css'
 
-export default {
+export default Vue.extend({
   props: {
     lang: {
       type: String,
@@ -26,7 +27,7 @@ export default {
   mounted() {
     Prism.highlightAll()
   },
-}
+})
 </script>
 
 <style scoped></style>

@@ -263,6 +263,7 @@
 </template>
 
 <script>
+import Vue from 'vue'
 import { Editor, EditorContent } from '@tiptap/vue-2'
 import StarterKit from '@tiptap/starter-kit'
 import Link from '@tiptap/extension-link'
@@ -274,7 +275,7 @@ import Color from '@tiptap/extension-color'
 import Highlight from '@tiptap/extension-highlight'
 
 
-export default {
+export default Vue.extend({
   components: {
     EditorContent
   },
@@ -385,7 +386,7 @@ export default {
       }
     }
   },
-}
+})
 </script>
 <style lang="scss">
 

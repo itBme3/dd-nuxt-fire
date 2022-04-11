@@ -61,7 +61,8 @@
 import { blankAttributes, attributeKeys } from '~/models/media.model'
 import { getColor } from '~/utils/colors'
 
-export default {
+import Vue from 'vue'
+export default Vue.extend({
   props: {
     current: {
       type: Object,
@@ -100,7 +101,7 @@ export default {
     },
     getColor
   }
-}
+})
 </script>
 
 <style lang="scss">

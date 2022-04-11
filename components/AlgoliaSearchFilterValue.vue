@@ -104,7 +104,8 @@
 </template>
 
 <script>
-export default {
+import Vue from 'vue'
+export default Vue.extend({
   props: {
     value: {
       type: Object,
@@ -150,7 +151,7 @@ export default {
         this.$emit('change', this.filter)
     }
   }
-}
+})
 </script>
 
 <style lang="scss" scoped>

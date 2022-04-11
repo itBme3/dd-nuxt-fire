@@ -14,7 +14,8 @@
 </template>
 
 <script>
-export default {
+import Vue from 'vue'
+export default Vue.extend({
   props: {
     env: {
       type: String,
@@ -32,5 +33,5 @@ export default {
       this.shopEnv = this.env
     }
   }
-}
+})
 </script>

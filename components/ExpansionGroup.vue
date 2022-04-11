@@ -5,7 +5,8 @@
 </template>
 
 <script>
-export default {
+import Vue from 'vue'
+export default Vue.extend({
   props: {
     expandedIndex: {
       type: Number,
@@ -25,5 +26,5 @@ export default {
   mounted() {
     console.log({ this: this })
   },
-}
+})
 </script>

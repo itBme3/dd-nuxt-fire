@@ -63,7 +63,8 @@
 import { objectsAreTheSame } from '~/utils/funcs';
 import { duplicateChart, deleteChart } from '~/utils/product-charts';
 const defaultDoc = { chart: null, image: null, rows: [], columns: [] }
-export default {
+import Vue from 'vue'
+export default Vue.extend({
   data() {
     return {
       updates: defaultDoc,
@@ -117,5 +118,5 @@ export default {
       }
     }
   }
-}
+})
 </script>

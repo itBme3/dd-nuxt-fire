@@ -3,16 +3,16 @@
     <SubTitle title="SignUp / LogIn" />
     <template v-if="!isLoggedIn">
       <Btn @click="googleSignIn">Sign In With Google</Btn>
-      <Btn class="border border-gray-300 bg-opacity-0 text-blue-500 text-xs hover:text-white hover:border-blue-500 hover:bg-blue-500 float-right" @click="creatingUser = !creatingUser">{{ creatingUser ? 'Sign In' : 'New Here?'}}</Btn>
+      <Btn class="bg-gray-800 bg-opacity-50 text-blue-500 text-xs hover:text-white hover:border-blue-500 hover:bg-blue-500 float-right" @click="creatingUser = !creatingUser">{{ creatingUser ? 'Sign In' : 'New Here?'}}</Btn>
       <h4 class="mt-4 mb-2">Sign In With Email:</h4>
       <form onsubmit="return false;"
-        class="rounded border border-gray-200 p-3">
+        class="rounded border border-gray-700 p-6">
         <div v-if="creatingUser"
           class="mb-4">
           <label class="inline-block text-gray-700 text-sm font-bold mb-2" for="displayName">
             Display Name
           </label>
-          <input
+          <gInput
             v-model="formData.displayName"
             class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             placeholder="Do Jane"
@@ -25,9 +25,11 @@
             <label class="inline-block text-gray-700 text-sm font-bold mb-2" for="email">
               Email
             </label>
-            <Btn @click="resettingPassword = !resettingPassword"
-              class="border border-gray-300 bg-opacity-0 text-blue-500 text-xs hover:text-white hover:border-blue-500 hover:bg-blue-500 float-right mb-2">{{  resettingPassword ? 'Sign In' : 'Reset Password' }}</Btn>
-            <input
+            <Btn 
+              class="bg-gray-800 bg-opacity-50 text-blue-500 text-xs hover:text-white hover:border-blue-500 hover:bg-blue-500 float-right mb-2"
+              @click="resettingPassword = !resettingPassword"
+              >{{  resettingPassword ? 'Sign In' : 'Reset Password' }}</Btn>
+            <gInput
               v-model="formData.email"
               class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               placeholder="Email"
@@ -42,7 +44,7 @@
             Password
           </label>
           
-          <input
+          <gInput
             v-model="formData.password"
             class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             placeholder="Password"

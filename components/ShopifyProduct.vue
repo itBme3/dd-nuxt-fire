@@ -75,7 +75,8 @@
 
 <script>
 
-export default {
+import Vue from 'vue'
+export default Vue.extend({
   props: {
     handle: {
       type: String,
@@ -160,7 +161,7 @@ export default {
       window.scrollTo({top, left: 0, behavior: 'smooth'});
     }
   }
-}
+})
 </script>
 
 

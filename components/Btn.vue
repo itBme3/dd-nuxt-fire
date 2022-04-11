@@ -14,7 +14,8 @@
 </template>
 
 <script>
-export default {
+import Vue from 'vue'
+export default Vue.extend({
   props: {
     disabled: {
       type: Boolean,
@@ -25,7 +26,7 @@ export default {
       default: false,
     },
   },
-}
+})
 </script>
 
 <style lang="scss" scoped></style>

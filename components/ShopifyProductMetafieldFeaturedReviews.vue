@@ -76,11 +76,12 @@
 </template>
 
 <script>
+import Vue from 'vue'
 import {debounce} from 'lodash';
 import draggable from 'vuedraggable'
 import { stripHtml } from '~/utils/funcs';
 
-export default {
+export default Vue.extend({
   components: {
     draggable
   },
@@ -200,7 +201,7 @@ export default {
       })
     }
   }
-}
+})
 </script>
 
 <style lang="scss">

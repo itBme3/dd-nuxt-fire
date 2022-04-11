@@ -66,8 +66,9 @@
 
 <script>
 import qs from 'qs'
-
-export default {
+import Vue from 'vue'
+import { debounce } from 'lodash'
+export default Vue.extend({
   beforeRouteLeave (to, from, next) {
     
     if (Object.values(this.changesDetected).filter(v => v).length === 0) {
@@ -109,7 +110,7 @@ export default {
     }
   },
   watch: {
-    'shopEnv': _.debounce(function(val) {
+    'shopEnv': debounce(function(val) {
       if(this.$route.hash.replace('#', '') === this.shopEnv) return;
       this.toggleEnv(val)
     }, 250)
@@ -128,5 +129,5 @@ export default {
       window.history.pushState({path}, '', path);
     }
   }
-}
+})
 </script>

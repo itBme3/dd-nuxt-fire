@@ -14,7 +14,8 @@
 </template>
 
 <script>
-export default {
+import Vue from 'vue'
+export default Vue.extend({
   // computed: {
   //   colorMode() {
   //     if (window === 'undefined') return 'dark';
@@ -80,7 +81,7 @@ export default {
       window.localStorage.setItem(storageKey, preference)
     }
   }
-}
+})
 </script>
 
 <style lang="scss">

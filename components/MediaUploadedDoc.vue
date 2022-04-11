@@ -12,10 +12,11 @@
 </template>
 
 <script>
+import Vue from 'vue'
 import { objectsAreTheSame } from '~/utils/funcs'
 import { blankAttributes, attributeKeys } from '~/models/media.model'
 
-export default {
+export default Vue.extend({
   props: {
     bulkAttributes: {
       type: Object,
@@ -59,5 +60,5 @@ export default {
       return objectsAreTheSame(docAttributes, this.attributes) === false;
     }
   }
-}
+})
 </script>

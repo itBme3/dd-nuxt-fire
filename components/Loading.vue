@@ -10,14 +10,15 @@
 </template>
 
 <script>
-export default {
+import Vue from 'vue'
+export default Vue.extend({
   props: {
     classes: {
       type: String,
       default: 'bg-gray-300 dark:bg-gray-700'
     }
   }
-}
+})
 </script>
 
 <style lang="scss" scoped>

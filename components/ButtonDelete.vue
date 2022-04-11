@@ -24,7 +24,8 @@
 </template>
 
 <script>
-export default {
+import Vue from 'vue'
+export default Vue.extend({
   props: {
     tabindex: {
       type: String,
@@ -54,7 +55,7 @@ export default {
       confirming: false
     }
   }
-}
+})
 </script>
 
 <style lang="scss">

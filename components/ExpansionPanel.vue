@@ -29,7 +29,8 @@
 </template>
 
 <script>
-export default {
+import Vue from 'vue'
+export default Vue.extend({
   props: {
     classes: {
       type: Object,
@@ -77,7 +78,7 @@ export default {
       }, 250)
     },
   }
-}
+})
 </script>
 
 <style lang="scss">

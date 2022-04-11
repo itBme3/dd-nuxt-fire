@@ -18,8 +18,9 @@
 </template>
 
 <script>
+import Vue from 'vue'
 import { decodeHtml } from '~/utils/funcs'
-export default {
+export default Vue.extend({
   props: {
     item: {
       type: Object,
@@ -52,7 +53,7 @@ export default {
       
     }
   }
-}
+})
 </script>
 
 <style lang="scss">

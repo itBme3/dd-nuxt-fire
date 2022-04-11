@@ -52,9 +52,10 @@
 </template>
 
 <script>
+import Vue from 'vue'
 import draggable from 'vuedraggable'
 
-export default {
+export default Vue.extend({
   components: {
     draggable
   },
@@ -203,5 +204,5 @@ export default {
       }
     }
   }
-}
+})
 </script>

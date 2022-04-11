@@ -82,9 +82,10 @@
 </template>
 
 <script>
+import Vue from 'vue'
 import { handleize } from '~/utils/funcs'
 
-export default {
+export default Vue.extend({
   props: {
     env: {
       type: String,
@@ -151,7 +152,7 @@ export default {
       window.scrollTo({top, left: 0, behavior: 'smooth'});
     }
   }
-}
+})
 </script>
 
 <style lang="scss">

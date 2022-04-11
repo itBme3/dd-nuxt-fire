@@ -35,7 +35,8 @@
 </template>
 
 <script>
-export default {
+import Vue from 'vue'
+export default Vue.extend({
   computed: {
     isProductPage() {
       return this.$route.path.split('/')[1] === 'products'
@@ -56,5 +57,5 @@ export default {
       onCancel(e)
     }
   }
-}
+})
 </script>

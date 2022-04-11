@@ -34,13 +34,14 @@
 </template>
 
 <script>
+import Vue from 'vue'
 import { HotTable } from '@handsontable/vue';
 import { registerAllModules } from 'handsontable/registry';
 import 'handsontable/dist/handsontable.full.css';
 import { handleize } from '~/utils/funcs';
   registerAllModules();
 
-  export default {
+export default Vue.extend({
     components: {
       HotTable
     },
@@ -230,6 +231,6 @@ import { handleize } from '~/utils/funcs';
         this.$emit('change', { rows, columns })
       }
     },
-  }
+  })
 </script>
 

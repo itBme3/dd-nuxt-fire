@@ -42,12 +42,13 @@
 
 <script>
 /* eslint-disable camelcase */
+import Vue from 'vue'
 import vue2Dropzone from 'vue2-dropzone';
 import 'vue2-dropzone/dist/vue2Dropzone.min.css';
 import { getImageFileType, imageFileTypes } from '~/utils/funcs';
 import { blankAttributes } from '~/models/media.model';
 
-export default {
+export default Vue.extend({
   components: {
     vueDropzone: vue2Dropzone
   },
@@ -142,5 +143,5 @@ export default {
       this.mediaDocs = [];
     }
   }
-}
+})
 </script>

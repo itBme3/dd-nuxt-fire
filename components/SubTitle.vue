@@ -5,12 +5,13 @@
 </template>
 
 <script>
-export default {
+import Vue from 'vue'
+export default Vue.extend({
   props: {
     title: {
       type: String,
       required: true,
     },
   },
-}
+})
 </script>

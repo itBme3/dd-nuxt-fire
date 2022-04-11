@@ -25,8 +25,9 @@
   </div>
 </template>
 <script>
-const {debounce} = require('lodash')
-export default {
+import Vue from 'vue'
+import {debounce} from 'lodash'
+export default Vue.extend({
   props: {
     env: {
       type: String,
@@ -53,5 +54,5 @@ export default {
       }, 250)
     }
   }
-}
+})
 </script>

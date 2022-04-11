@@ -25,7 +25,8 @@
 </template>
 
 <script>
-export default {
+import Vue from 'vue'
+export default Vue.extend({
   props: {
     cardStyle: {
       type: String,
@@ -56,7 +57,7 @@ export default {
       this.contentClasses = typeof val?.content === 'string' ? val.content : '';
     }
   }
-}
+})
 </script>
 
 <style lang="scss">

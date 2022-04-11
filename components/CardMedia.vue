@@ -20,7 +20,8 @@
 </template>
 
 <script>
-export default {
+import Vue from 'vue'
+export default Vue.extend({
   props: {
     item: {
       type: Object,
@@ -54,5 +55,5 @@ export default {
       return await docRef.set({ rating: this.mediaItem.rating }, {merge: true}).then(console.log)
     }
   }
-}
+})
 </script>

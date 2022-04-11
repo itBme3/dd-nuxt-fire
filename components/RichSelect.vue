@@ -47,8 +47,9 @@
 </template>
 
 <script>
+import Vue from 'vue'
 import { objectsAreTheSame } from '~/utils/funcs'
-export default {
+export default Vue.extend({
   props: {
     options: {
       type: [Array, Object],
@@ -168,5 +169,5 @@ export default {
       window.scrollTo({top, left: 0, behavior: 'smooth'});
     }
   }
-}
+})
 </script>

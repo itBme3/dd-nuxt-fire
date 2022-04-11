@@ -52,10 +52,11 @@
 </template>
 
 <script>
+import Vue from 'vue'
 import draggable from 'vuedraggable'
 import { capitalize } from '~/utils/funcs';
 
-export default {
+export default Vue.extend({
   components: {
     draggable
   },
@@ -153,5 +154,5 @@ export default {
       console.log('images moved')
     }
   }
-}
+})
 </script>
