@@ -1,7 +1,7 @@
 import { NuxtConfig } from '@nuxt/types'
 
 const isDev = process.env.NODE_ENV === 'development'
-const fireDev = process.env.FIRE_ENV !== 'live'
+const fireDev = isDev && process.env.FIRE_ENV !== 'live'
 const useEmulators = false // manually change if emulators needed
 // console.log({ isDev, port: isDev && useEmulators ? 5000 : undefined })
 
@@ -52,7 +52,7 @@ const config: NuxtConfig = {
       appId: fireDev ? '1:773304666438:web:ebbd2d9158bf22ee713d47' : '1:14338671750:web:0b0777f1f131edba',
       measurementId: '206385704',
     },
-    onFirebaseHosting: false,
+    onFirebaseHosting: true,
     terminateDatabasesAfterGenerate: true,
     services: {
       auth: {
@@ -69,7 +69,7 @@ const config: NuxtConfig = {
         emulatorPort: isDev && useEmulators ? 8080 : undefined,
       },
       functions: {
-        emulatorPort: 5000
+        emulatorPort: isDev ? 5000 : undefined
       },
       storage: {
         emulatorPort: isDev && useEmulators ? 9199 : undefined,

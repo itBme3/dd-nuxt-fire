@@ -6,7 +6,7 @@
     "dearborn-denim": {
       "hosting": {
         "dd-nuxt-fire": [
-          "dearborn-denim"
+          "dearborn-denim-test"
         ]
       }
     }

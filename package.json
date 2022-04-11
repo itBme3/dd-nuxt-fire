@@ -3,9 +3,10 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "nuxt",
+    "dev": "NODE_ENV=production nuxt",
     "dev:fire-live": "FIRE_ENV=live nuxt",
     "build": "nuxt build",
+    "build:prod": "NODE_ENV=production nuxt build",
     "start": "nuxt start",
     "generate": "nuxt generate",
     "lint:js": "eslint --ext \".js,.vue\" --ignore-path .gitignore .",
