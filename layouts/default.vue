@@ -30,7 +30,7 @@ export default Vue.extend({
       if (this.forced) {
         return
       }
-      if (preference === 'system') {
+      if (preference === 'dark') {
         this.value = colorMode.getColorScheme()
         this._watchMedia()
       } else {
@@ -45,7 +45,7 @@ export default Vue.extend({
     }
   },
   created () {
-    if (this.preference === 'system') {
+    if (this.preference === 'dark') {
       this._watchMedia()
     }
   },

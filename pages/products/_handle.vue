@@ -1,6 +1,6 @@
 <template>
   <div class="product-page max-w-7xl mx-auto">
-    <div class="product-toolbar flex items-center sticky top-[60px] w-full bg-gray-100 dark:bg-gray-900 z-9999">
+    <div class="product-toolbar flex items-center sticky top-[45px] sm:top-[60px] w-full bg-gray-100 dark:bg-gray-900 z-9999">
       <ShopifyToggleEnv 
         :env="shopEnv"
         class="ml-auto mr-3"

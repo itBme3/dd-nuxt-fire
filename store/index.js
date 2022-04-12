@@ -45,7 +45,7 @@ export const actions = {
 export const getters = {
   isLoggedIn: (state) => {
     try {
-      return state.auth.user.uid !== null
+      return ![undefined, null].includes(state?.auth?.user?.uid)
     } catch {
       return false
     }

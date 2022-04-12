@@ -9,37 +9,55 @@
     <nuxt-link to="/" class="logo w-12 h-12 p-2">
       <Icon :name="'logoIcon'" class="h-full w-full" />
     </nuxt-link>
-    <div v-if="isMobile && !mobileNavCollapsed" :class="{
-        'cursor-pointer fixed inset-0 z-99999 bg-opacity-30 dark:bg-opacity-80 bg-gray-900': true,
-      }"
-      @click="mobileNavCollapsed = true"></div>
-    <div :class="{
-      'menu flex flex-col ml-auto mr-0': true,
-      'absolute left-auto right-0': isMobile
-    }">
-      <Btn v-if="isMobile"
-        class="icon-button mt-2 mr-2 px-3 py-2 ml-auto dark:bg-gray-800 bg-white relative z-999999"
-        @click="mobileNavCollapsed = !mobileNavCollapsed">
-        <Icon :name="mobileNavCollapsed ? 'menu' : 'close'" />
-      </Btn>
-      <nav :class="{
-        'site-navigation p-1 flex ml-auto mr-0 relative z-999999': true,
-        'flex-col space-y-1 max-w-[200px] shadow-xl rounded bg-white dark:bg-gray-900': isMobile,
-        'flex-row flex-nowrap space-x-1': !isMobile,
-        'hidden': isMobile && mobileNavCollapsed
-        }">
-        <SiteNavLink
-          v-for="page in pages"
-          :key="page.path"
-          :link="page" 
-        />
-      </nav>
-    </div>
+
+    <UserActive 
+      v-if="$route.path !== '/'"
+      :in-nav="true"
+      :show="userExpanded ? ['image','email','logout'] : ['image']"
+      card-style="media-above"
+      class="shadow-none bg-transparent p-0 my-auto ml-3"
+      @click="userExpanded = !userExpanded"
+    />
+    
+    <template v-if="pages.length">
+      <div v-if="isMobile && !mobileNavCollapsed" 
+        :class="{
+          'cursor-pointer fixed inset-0 z-99999 bg-opacity-30 dark:bg-opacity-80 bg-gray-900': true,
+        }"
+        @click="mobileNavCollapsed = true">
+      </div>
+
+
+      <div :class="{
+        'menu flex flex-col my-auto ml-auto mr-0': true,
+        'absolute left-auto right-0': isMobile
+      }">
+        <Btn v-if="isMobile"
+          class="icon-button mt-2 mr-2 px-3 py-2 ml-auto dark:bg-gray-800 bg-white relative z-999999"
+          @click="mobileNavCollapsed = !mobileNavCollapsed">
+          <Icon :name="mobileNavCollapsed ? 'menu' : 'close'" />
+        </Btn>
+
+        <nav :class="{
+          'site-navigation p-1 flex ml-auto mr-0 relative z-999999': true,
+          'flex-col space-y-1 max-w-[200px] shadow-xl rounded bg-white dark:bg-gray-900': isMobile,
+          'flex-row flex-nowrap space-x-1': !isMobile,
+          'hidden': isMobile && mobileNavCollapsed
+          }">
+          <SiteNavLink
+            v-for="page in pages"
+            :key="page.path"
+            :link="page" 
+          />
+        </nav>
+      </div>
+    </template>
+
   </div>
 </template>
 <script>
 import Vue from 'vue'
-import navPages from '~/utils/pages'
+import {mapGetters} from 'vuex'
 export default Vue.extend({
 
   data() {
@@ -47,21 +65,24 @@ export default Vue.extend({
       mobileNavCollapsed: true,
       isMobile: false,
       width: 0,
-      height: 0
+      height: 0,
+      userExpanded: false,
     }
   },
   computed: {
-    pages() {
-      const accessPages = Array.isArray(this.$store.state?.auth?.user?.doc?.access?.can_access_pages) ? this.$store.state.auth.user.doc.access.can_access_pages : [];
-      const isAdmin = !!this.$store.state?.auth?.user?.doc?.access?.is_admin;
-      return isAdmin ? navPages 
-        : !accessPages?.length ? [] 
-        : navPages.filter(p => accessPages.includes(p.path) || accessPages.includes(`${p.path}/**`))
-    }
+    ...mapGetters({
+      pages: 'auth/userAccessPages'
+    })
   },
   watch: {
     '$route.fullPath' () {
       this.mobileNavCollapsed = true
+      this.userExpanded = false
+    },
+    mobileNavCollapsed(val) {
+      if(!val) {
+        this.userExpanded = true
+      }
     }
   },
   mounted () {

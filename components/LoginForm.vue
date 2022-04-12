@@ -4,7 +4,7 @@
     <template v-if="!isLoggedIn">
       <Btn @click="googleSignIn">Sign In With Google</Btn>
       <Btn class="bg-gray-800 bg-opacity-50 text-blue-500 text-xs hover:text-white hover:border-blue-500 hover:bg-blue-500 float-right" @click="creatingUser = !creatingUser">{{ creatingUser ? 'Sign In' : 'New Here?'}}</Btn>
-      <h4 class="mt-4 mb-2">Sign In With Email:</h4>
+      <!-- <h4 class="mt-4 mb-2">Sign In With Email:</h4> -->
       <form onsubmit="return false;"
         class="rounded border border-gray-700 p-6">
         <div v-if="creatingUser"
@@ -97,6 +97,7 @@ export default Vue.extend({
       try {
         const provider = new this.$fireModule.auth.GoogleAuthProvider();
         await this.$fire.auth.signInWithPopup(provider)
+          .then(() => {window.location.href = '/'})
       } catch(e) {
         alert(e)
       }
@@ -106,7 +107,7 @@ export default Vue.extend({
         await this.$fire.auth.createUserWithEmailAndPassword(
           this.formData.email,
           this.formData.password
-        )
+        ).then(() => {window.location.href = '/'})
       } catch (e) {
         alert(e)
       }
@@ -116,7 +117,7 @@ export default Vue.extend({
         await this.$fire.auth.signInWithEmailAndPassword(
           this.formData.email,
           this.formData.password
-        )
+        ).then(() => {window.location.href = '/'})
       } catch (e) {
         alert(e)
       }

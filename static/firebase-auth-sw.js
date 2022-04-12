@@ -1,12 +1,9 @@
 const ignorePaths = ["\u002F__webpack_hmr","\u002F_loading","\u002F_nuxt\u002F"]
 
-importScripts(
-  'https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js'
-)
-importScripts(
-  'https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js'
-)
-firebase.initializeApp({"apiKey":"AIzaSyDiuv3nUpj6Z05k8ph3AbzQyHyusxknoMk","authDomain":"dearborn-denim.firebaseapp.com","databaseURL":"https:\u002F\u002Fdearborn-denim.firebaseio.com","projectId":"dearborn-denim","storageBucket":"dearborn-fire","messagingSenderId":"14338671750","appId":"1:14338671750:web:0b0777f1f131edba","measurementId":"206385704"})
+// Only works on Firebase hosting!
+importScripts('/__/firebase/9.6.0/firebase-app-compat.js')
+importScripts('/__/firebase/9.6.0/firebase-auth-compat.js')
+importScripts('/__/firebase/init.js')
 
 // Initialize authService
 const authService = firebase.auth()

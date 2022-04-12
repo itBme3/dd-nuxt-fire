@@ -53,6 +53,12 @@ export const TailwindComponentsSettings = {
         input: 'transition duration-100 ease-in-out rounded shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-purple-500 focus:outline-none focus:ring-opacity-50 focus:ring-offset-0  disabled:opacity-50 disabled:cursor-not-allowed text-blue-500 border-gray-300'
       },
       variants: {
+         wrap: {
+          groupWrapper: 'flex flex-row flex-wrap',
+          labelTag: 'mb-2 mr-2 block',
+          label: 'ml-2 text-gray-700 dark:text-gray-400 uppercase text-sm',
+          input: 'transition duration-100 ease-in-out rounded shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-purple-500 focus:outline-none focus:ring-opacity-50 focus:ring-offset-0  disabled:opacity-50 disabled:cursor-not-allowed text-blue-500 border-gray-300'
+        },
         danger: {
           groupWrapper: 'flex flex-col',
           label: 'ml-2 text-red-500 uppercase text-sm',
@@ -91,6 +97,11 @@ export const TailwindComponentsSettings = {
         input: 'text-blue-500 transition duration-100 ease-in-out border-gray-300 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-purple-500 focus:outline-none focus:ring-opacity-50 focus:ring-offset-0 disabled:opacity-50 disabled:cursor-not-allowed'
       },
       variants: {
+        wrap: {
+          groupWrapper: 'flex flex-row flex-wrap',
+          label: 'mx-2 mb-2 text-gray-700 uppercase text-sm',
+          input: 'text-blue-500 transition duration-100 ease-in-out border-gray-300 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-purple-500 focus:outline-none focus:ring-opacity-50 focus:ring-offset-0 disabled:opacity-50 disabled:cursor-not-allowed'
+        },
         danger: {
           groupWrapper: 'flex flex-col',
           label: 'ml-2 text-red-500 uppercase text-sm',
