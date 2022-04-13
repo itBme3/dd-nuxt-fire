@@ -46,6 +46,7 @@
   import Vue from 'vue'
 import {debounce} from 'lodash'
   import {userRoles, userAccessTypes} from '~/models/users.model'
+import { defaultAvatar } from '~/utils/users'
   export default Vue.extend({
     props: {
       docs: {
@@ -63,6 +64,10 @@ import {debounce} from 'lodash'
         return this.docs?.user?.uid || null
       },
       userDoc() {
+        const doc = this.docs?.user || {}
+        if(!doc?.avatar?.length) {
+          doc.avatar = defaultAvatar(doc.uid)
+        }
         return this.docs?.user || {}
       },
       userAccessTypes() {

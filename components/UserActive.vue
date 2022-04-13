@@ -22,7 +22,7 @@
 
       <!-- <h4 v-if="!inNav">{{ userName }}</h4> -->
       <gInput 
-        v-if="!inNav && show.includes('name') && userNamez"
+        v-if="!inNav && show.includes('name') && userName"
         v-model="userName"
         :style="{
           'max-width': 'calc(' + userName.length + 'ch * 2)'

@@ -1,12 +1,18 @@
 <template>
   <div class="w-[calc(100%-2em)] mx-auto my-5 max-w-md">
-    <SubTitle title="SignUp / LogIn" />
+    <!-- <Title>Login:</Title> -->
     <template v-if="!isLoggedIn">
-      <Btn @click="googleSignIn">Sign In With Google</Btn>
+      <Btn class="inline-flex mb-4" @click="googleSignIn">
+        <img src="/media/google-logo.png" 
+          class="w-8 h-auto mr-2"/> Login With Google
+      </Btn>
       <Btn class="bg-gray-800 bg-opacity-50 text-blue-500 text-xs hover:text-white hover:border-blue-500 hover:bg-blue-500 float-right" @click="creatingUser = !creatingUser">{{ creatingUser ? 'Sign In' : 'New Here?'}}</Btn>
       <!-- <h4 class="mt-4 mb-2">Sign In With Email:</h4> -->
-      <form onsubmit="return false;"
-        class="rounded border border-gray-700 p-6">
+      <form 
+        onsubmit="return false;"
+        class="rounded border border-gray-700 p-6"
+        @keydown.enter="keydownEnter"
+        >
         <div v-if="creatingUser"
           class="mb-4">
           <label class="inline-block text-gray-700 text-sm font-bold mb-2" for="displayName">
@@ -26,6 +32,7 @@
               Email
             </label>
             <Btn 
+              tabindex="-1"
               class="bg-gray-800 bg-opacity-50 text-blue-500 text-xs hover:text-white hover:border-blue-500 hover:bg-blue-500 float-right mb-2"
               @click="resettingPassword = !resettingPassword"
               >{{  resettingPassword ? 'Sign In' : 'Reset Password' }}</Btn>
@@ -93,6 +100,16 @@ export default Vue.extend({
   //   // INFO -> this.$store.state.authUser is accessible even on server-side
   // },
   methods: {
+    keydownEnter(e:any) {
+      e.preventDefault();
+      if(this.creatingUser) {
+        return this.createUser()
+      }
+      if (this.resettingPassword) {
+        return this.resetPassword()
+      }
+      return this.signInUser()
+    },
     async googleSignIn() {
       try {
         const provider = new this.$fireModule.auth.GoogleAuthProvider();

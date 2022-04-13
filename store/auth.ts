@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import pages, { NavLink } from '~/utils/pages'
+import { defaultAvatar } from '~/utils/users';
 
 interface State {
       user: {[key:string]: any}
@@ -14,6 +15,9 @@ export const mutations = {
             state.user = Object.assign({}, state.user, {});
       },
       setUser(state: State, { authUser, userDoc }: { authUser: any, userDoc: any }) {
+            if (!userDoc?.avatar?.length) {
+                  userDoc.avatar = defaultAvatar(userDoc.uid)
+            }
             state.user = {
                   uid: authUser.uid,
                   email: authUser.email,
@@ -36,6 +40,15 @@ export const actions:any = {
             this.$db.updateAt(`users/${state.user.uid}`, { name })
                   .then(() => commit('setUserName', name))
                   .catch((err:any) => {throw new Error(err)})
+      },
+
+      async logout() {
+            try {
+                  await this.$fire.auth.signOut()
+                  window.location.href = '/login'
+            } catch (e) {
+                  alert(e)
+            }
       }
 
 }

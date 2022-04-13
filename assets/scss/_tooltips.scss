@@ -1,5 +1,12 @@
 .tooltip {
-  @apply block shadow-lg z-999999;
+  @apply block shadow-lg z-[99999999];
+
+  &.popover {
+    @apply z-[99999999];
+    .popover-inner {
+      @apply bg-gray-800 p-3;
+    }
+  }
   .tooltip-inner {
     @apply bg-gray-700 shadow-lg text-gray-300 rounded px-2 py-1 text-xs;
   }
@@ -44,5 +51,14 @@
     @apply w-0 h-0 border-gray-700 z-1 absolute;
     border-style: solid;
     margin: 5px;
+  }
+}
+
+
+.site-nav-user {
+  .v-popover {
+    .trigger {
+      @apply flex flex-wrap items-center #{!important};
+    }
   }
 }

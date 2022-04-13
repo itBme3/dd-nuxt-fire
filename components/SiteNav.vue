@@ -9,16 +9,10 @@
     <nuxt-link to="/" class="logo w-12 h-12 p-2">
       <Icon :name="'logoIcon'" class="h-full w-full" />
     </nuxt-link>
-
-    <UserActive 
-      v-if="$route.path !== '/'"
-      :in-nav="true"
-      :show="userExpanded ? ['image','email','logout'] : ['image']"
-      card-style="media-above"
-      class="shadow-none bg-transparent p-0 my-auto ml-3"
-      @click="userExpanded = !userExpanded"
-    />
     
+
+    
+
     <template v-if="pages.length">
       <div v-if="isMobile && !mobileNavCollapsed" 
         :class="{
@@ -49,10 +43,13 @@
             :key="page.path"
             :link="page" 
           />
+          
+          <SiteNavUser v-if="$route.path !== '/'" />
+
         </nav>
+
       </div>
     </template>
-
   </div>
 </template>
 <script>
@@ -77,7 +74,9 @@ export default Vue.extend({
   watch: {
     '$route.fullPath' () {
       this.mobileNavCollapsed = true
-      this.userExpanded = false
+      try {
+        this.$refs.userPopover.hide()
+      } catch {}
     },
     mobileNavCollapsed(val) {
       if(!val) {
@@ -89,6 +88,7 @@ export default Vue.extend({
     this.getDocumentDimensions()
     window.addEventListener('resize', this.getDocumentDimensions)
     window.addEventListener('scroll', this.collapseNav)
+    console.log(this.$refs.userPopover)
   },
   unmounted () {
     window.removeEventListener('resize', this.getDocumentDimensions)

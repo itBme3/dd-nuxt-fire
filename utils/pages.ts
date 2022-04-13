@@ -47,7 +47,7 @@ const pages: NavLink[] = [
       {
             label: 'Users',
             path: '/users',
-            icon: 'user',
+            icon: 'users',
             color: 'red'
       }
 ]

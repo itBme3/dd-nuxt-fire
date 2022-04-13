@@ -18,7 +18,7 @@ const config: NuxtConfig = {
     link: [
       { rel: 'icon', type: 'image/png', href: 'media/fire.png' },
       { rel: 'stylesheet', href: 'https://use.typekit.net/ptm4ahe.css' },
-      { rel: 'stylesheet', href: 'https://d1azc1qln24ryf.cloudfront.net/99224/GiGIcons/style-cf.css?8ct99z' }
+      { rel: 'stylesheet', href: 'https://d1azc1qln24ryf.cloudfront.net/99224/GiGIcons/style-cf.css?g84nx0' }
     ],
     script: []
   },
