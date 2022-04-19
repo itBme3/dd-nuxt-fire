@@ -1,31 +1,16 @@
 <template>
   <div class="w-[calc(100%-2em)] mx-auto my-5 max-w-md">
-    <!-- <Title>Login:</Title> -->
     <template v-if="!isLoggedIn">
       <Btn class="inline-flex mb-4" @click="googleSignIn">
         <img src="/media/google-logo.png" 
           class="w-8 h-auto mr-2"/> Login With Google
       </Btn>
       <Btn class="bg-gray-800 bg-opacity-50 text-blue-500 text-xs hover:text-white hover:border-blue-500 hover:bg-blue-500 float-right" @click="creatingUser = !creatingUser">{{ creatingUser ? 'Sign In' : 'New Here?'}}</Btn>
-      <!-- <h4 class="mt-4 mb-2">Sign In With Email:</h4> -->
       <form 
         onsubmit="return false;"
         class="rounded border border-gray-700 p-6"
         @keydown.enter="keydownEnter"
         >
-        <div v-if="creatingUser"
-          class="mb-4">
-          <label class="inline-block text-gray-700 text-sm font-bold mb-2" for="displayName">
-            Display Name
-          </label>
-          <gInput
-            v-model="formData.displayName"
-            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            placeholder="Do Jane"
-            type="text"
-            autocomplete="off"
-          />
-        </div>
         <div class="mb-4">
           <template v-if="(resettingPassword && !resetPasswordEmailSent) || !resettingPassword">
             <label class="inline-block text-gray-700 text-sm font-bold mb-2" for="email">
@@ -121,10 +106,10 @@ export default Vue.extend({
     },
     async createUser() {
       try {
-        await this.$fire.auth.createUserWithEmailAndPassword(
+        return await this.$fire.auth.createUserWithEmailAndPassword(
           this.formData.email,
           this.formData.password
-        ).then(() => {window.location.href = '/'})
+        )
       } catch (e) {
         alert(e)
       }
@@ -134,7 +119,9 @@ export default Vue.extend({
         await this.$fire.auth.signInWithEmailAndPassword(
           this.formData.email,
           this.formData.password
-        ).then(() => {window.location.href = '/'})
+        ).then(() => {
+          window.location.href = '/'
+        })
       } catch (e) {
         alert(e)
       }

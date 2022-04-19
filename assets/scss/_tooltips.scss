@@ -4,7 +4,7 @@
   &.popover {
     @apply z-[99999999];
     .popover-inner {
-      @apply bg-gray-800 p-3;
+      @apply bg-gray-100 dark:bg-gray-800 p-3;
     }
   }
   .tooltip-inner {

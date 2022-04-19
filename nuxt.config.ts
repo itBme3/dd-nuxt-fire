@@ -18,7 +18,7 @@ const config: NuxtConfig = {
     link: [
       { rel: 'icon', type: 'image/png', href: 'media/fire.png' },
       { rel: 'stylesheet', href: 'https://use.typekit.net/ptm4ahe.css' },
-      { rel: 'stylesheet', href: 'https://d1azc1qln24ryf.cloudfront.net/99224/GiGIcons/style-cf.css?g84nx0' }
+      { rel: 'stylesheet', href: 'https://d1azc1qln24ryf.cloudfront.net/99224/GiGIcons/style-cf.css?v12i4z' }
     ],
     script: []
   },
@@ -113,7 +113,7 @@ const config: NuxtConfig = {
     },
   },
   colorMode: {
-    preference: 'system', // default value of $colorMode.preference
+    preference: 'dark', // default value of $colorMode.preference
     fallback: 'dark', // fallback value if not system preference found
     hid: 'nuxt-color-mode-script',
     globalName: '__NUXT_COLOR_MODE__',

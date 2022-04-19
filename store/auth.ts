@@ -55,7 +55,7 @@ export const actions:any = {
 export const getters = {
       userAccess(state: State):string[] {
             const accessTypes = ['products','images','reviews']
-            const accessPages = state?.user?.doc?.access?.can_access_pages || []
+            const access = state?.user?.doc?.access?.access || []
             const userRole = state?.user?.doc?.access?.role || 'user'
             const isAdmin = !!state?.user?.doc?.access?.is_admin || userRole === 'admin'
             if (isAdmin) {
@@ -64,11 +64,11 @@ export const getters = {
             if (userRole !== 'editor') {
                   return []
             }
-            return accessTypes.filter(accessType => accessPages.map((path: string) => path.split('/')[1]).includes(accessType))
+            return access
       },
       userAccessPages(state: State):NavLink[] {
             const accessTypes = ['products','images','reviews']
-            const accessPages = state?.user?.doc?.access?.can_access_pages || []
+            const access = state?.user?.doc?.access?.access || []
             const userRole = state?.user?.doc?.access?.role || 'user'
             const isAdmin = !!state?.user?.doc?.access?.is_admin || userRole === 'admin'
             if (isAdmin) {
@@ -77,7 +77,8 @@ export const getters = {
             if (userRole !== 'editor') {
                   return []
             }
-            const userAccess = accessTypes.filter(accessType => accessPages.map((path: string) => path.split('/')[1]).includes(accessType))
+            // const userAccess = accessTypes.filter(accessType => accessPages.map((path: string) => path.split('/')[1]).includes(accessType))
+            const userAccess = accessTypes.filter(accessType => access.includes(accessType))
             return pages.filter(page => userAccess.includes(page.path.split('/')[1]))
       }
  }

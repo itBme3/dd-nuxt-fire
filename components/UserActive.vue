@@ -20,7 +20,6 @@
         />
       </template>
 
-      <!-- <h4 v-if="!inNav">{{ userName }}</h4> -->
       <gInput 
         v-if="!inNav && show.includes('name') && userName"
         v-model="userName"
@@ -36,6 +35,8 @@
             <span class="text-gray-600 block">email:</span> {{ userEmail }}
           </small>
         </Transition>
+      
+        <UserColorMode class="mb-4" />
 
         <Transition name="down-fade">
             <template v-if="show.includes('logout')">
@@ -89,7 +90,7 @@
       },
       userName: {
         get() {
-          return this.$store?.state?.auth?.user?.doc?.name || null
+          return this.$store?.state?.auth?.user?.doc?.name || this.$store?.state?.auth?.user?.email || ''
         },
         set(val) {
           this.$store.dispatch('auth/updateUserName', val)

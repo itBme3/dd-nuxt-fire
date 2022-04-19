@@ -23,12 +23,14 @@
 
       <template v-if="isMobile">
         <small class="ml-2">{{ $store.state.auth.user.email }}</small>
-        <Btn class="mt-3" @click="$store.dispatch('auth/logout')">logout</Btn>
+        <UserColorMode />
+        <Btn class="mt-3 bg-white dark:bg-gray-800 bg-opacity-70 dark:bg-opacity-70" @click="$store.dispatch('auth/logout')">logout</Btn>
       </template>
 
       <template slot="popover">
         <small>{{ $store.state.auth.user.email }}</small>
-        <Btn class="mt-2" @click="$store.dispatch('auth/logout')">logout</Btn>
+        <UserColorMode />
+        <Btn class="mt-2 bg-white dark:bg-gray-800 bg-opacity-70 dark:bg-opacity-70" @click="$store.dispatch('auth/logout')">logout</Btn>
       </template>
     </v-popover>
   </div>
