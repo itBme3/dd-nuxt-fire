@@ -8,7 +8,9 @@
     >
     <template v-if="!!mediaItem.downloadUrl || !!mediaItem.image || !!mediaItem.image"
       #media>
-      <Media :media="!!mediaItem.downloadUrl ? mediaItem : !!mediaItem.image ? mediaItem.image : mediaItem.media" />
+      <Media :media="!!mediaItem.downloadUrl ? mediaItem : !!mediaItem.image ? mediaItem.image : mediaItem.media" >
+        <img v-if="mediaItem.downloadUrl && hovering" :src="mediaItem.downloadUrl" class="absolute inset-0 z-10" />
+      </Media>
     </template>
     <template #after>
       <SelectStarRating 
