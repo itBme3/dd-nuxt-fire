@@ -114,8 +114,6 @@ export default Vue.extend({
   },
   methods: {
     selectImages(append = false) {
-      console.log({selectedValues: this.productImages
-          .map(p => { return {downloadUrl: p.src}})});
       const onSubmit = this.addImages.bind(this)
       this.appendImages = append
       this.$store.commit('algoliaSelect/open', { props: {
@@ -144,7 +142,6 @@ export default Vue.extend({
         const { downloadUrl: src } = img;
         return { src, alt }
       }).filter(img => !img.src?.includes('cdn.shopify'))
-      console.log({newImages})
       this.productImages = (this.appendImages ? [...this.productImages, ...newImages] : [...newImages, ...this.productImages])
         .map((img, i) => {
           return { ...img, position: i + 1 }

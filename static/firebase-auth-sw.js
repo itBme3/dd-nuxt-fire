@@ -6,7 +6,7 @@ importScripts(
 importScripts(
   'https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js'
 )
-firebase.initializeApp({"apiKey":"AIzaSyBvdRs7O57J8c1baYHE3olZskgBxLHJtWw","authDomain":"dearborn-fire-dev.firebaseapp.com","databaseURL":"https:\u002F\u002Fdearborn-fire-dev.firebaseio.com","projectId":"dearborn-fire-dev","storageBucket":"dearborn-fire-dev.appspot.com","messagingSenderId":"773304666438","appId":"1:773304666438:web:ebbd2d9158bf22ee713d47","measurementId":"206385704"})
+firebase.initializeApp({"apiKey":"AIzaSyDiuv3nUpj6Z05k8ph3AbzQyHyusxknoMk","authDomain":"dearborn-denim.firebaseapp.com","databaseURL":"https:\u002F\u002Fdearborn-denim.firebaseio.com","projectId":"dearborn-denim","storageBucket":"dearborn-fire","messagingSenderId":"14338671750","appId":"1:14338671750:web:0b0777f1f131edba","measurementId":"206385704"})
 
 // Initialize authService
 const authService = firebase.auth()

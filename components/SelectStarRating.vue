@@ -48,7 +48,6 @@ export default Vue.extend({
   },
   methods: {
     selectValue(e) {
-      console.log({ e })
       this.selectedValue = e; 
       this.$emit('change', e)
     }

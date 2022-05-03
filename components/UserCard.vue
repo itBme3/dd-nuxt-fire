@@ -97,7 +97,6 @@ import { defaultAvatar } from '~/utils/users'
           } else if (role === 'editor') {
             access = this.userAccess.filter(accessType => accessType !== 'users')
           }
-          console.log({ role, access })
           this.accessDoc = {...this.accessDoc, role, access}
         }
       },

@@ -88,7 +88,6 @@ export default Vue.extend({
     this.getDocumentDimensions()
     window.addEventListener('resize', this.getDocumentDimensions)
     window.addEventListener('scroll', this.collapseNav)
-    console.log(this.$refs.userPopover)
   },
   unmounted () {
     window.removeEventListener('resize', this.getDocumentDimensions)

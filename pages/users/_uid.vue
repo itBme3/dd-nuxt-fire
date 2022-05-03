@@ -33,7 +33,6 @@
     },
     methods: {
       async getUser() {
-        console.log({uid: this.uid})
         if(!this.uid) {
           this.userDoc = {}
           this.accessDoc = {}
@@ -41,7 +40,6 @@
         }
         this.userDoc = await this.$db.doc(`users/${this.uid}`)
         this.accessDoc = await this.$db.doc(`user_access/${this.uid}`)
-        console.log({userDoc: this.userDoc, accessDoc: this.accessDoc})
         if (!this.userDoc?.uid || !this.accessDoc?.uid) {
           return this.$router.push('/users')
         }

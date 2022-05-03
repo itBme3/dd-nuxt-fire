@@ -91,7 +91,6 @@ export default Vue.extend({
                 key: 'rename_col',
                 name: "Rename",
                 callback(key, selection, clickEvent) { // Callback for specific option
-                  console.log({key, selection, clickEvent})
                   renameColumn(clickEvent, selection)
                 }
               },
@@ -99,7 +98,6 @@ export default Vue.extend({
                 key: 'add_col_left',
                 name: "Add Column (left)",
                 callback(key, selection, clickEvent) { // Callback for specific option
-                  console.log({key, selection, clickEvent})
                   addColumn(selection[0].end.col)
                 }
               },
@@ -107,7 +105,6 @@ export default Vue.extend({
                 key: 'add_col_right',
                 name: "Add Column (right)",
                 callback(key, selection, clickEvent) { // Callback for specific option
-                  console.log({key, selection, clickEvent})
                   addColumn(selection[0].end.col + 1)
                 }
               },
@@ -115,7 +112,6 @@ export default Vue.extend({
                 key: 'delete_col',
                 name: "Delete",
                 callback(key, selection, clickEvent) { // Callback for specific option
-                  console.log({key, selection, clickEvent})
                 }
               },
             ]
@@ -166,7 +162,6 @@ export default Vue.extend({
         }
         this.$refs.tableComponent?.hotInstance.updateSettings(this.tableSettings);
         setTimeout(()=> {
-          console.log(this.$refs.tableComponent?.hotInstance)
         }, 500)
       },
 
@@ -181,7 +176,6 @@ export default Vue.extend({
           y: e.y,
           index
         }
-        console.log(this.$refs.tableComponent?.hotInstance);
         setTimeout(() => {
           this.$refs.tableComponent?.hotInstance.deselectCell()
         }, 100)
@@ -227,7 +221,6 @@ export default Vue.extend({
           .map(row => row.reduce((acc, col, i) => {
             return {...acc, [`${columns[i].field}`]: col}
           }, {}));
-        console.log({ rows, columns })
         this.$emit('change', { rows, columns })
       }
     },

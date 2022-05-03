@@ -115,7 +115,6 @@ export default Vue.extend({
       },
       set(value) {
         const metafieldDoc = {key: this.key, namespace: this.namespace, ...(![undefined, null].includes(this.metafieldDoc) ? this.metafieldDoc : {}), value}
-        console.log({ metafieldDoc })
         this.metafieldDoc = metafieldDoc
       }
     },
@@ -161,10 +160,6 @@ export default Vue.extend({
             const selectionHandles = selection
               .map(p => p.handle)
               .filter(h => !this.lookProductHandles.includes(h))
-            console.log({
-              selectionHandles,
-              lookProductHandles: this.lookProductHandles
-            })
             this.metafieldValue = (append 
               ? [...this.lookProductHandles, ...selectionHandles] 
               : [...selectionHandles, ...this.lookProductHandles]
@@ -193,11 +188,9 @@ export default Vue.extend({
       if (Array.isArray(this.lookProductHandles) && this.lookProductHandles.length) {
         const fetchHandles = this.lookProductHandles.filter(handle => Object.keys(this.lookProducts).includes(handle))
         if (fetchHandles.length) {
-          console.log(fetchHandles);
           Promise.all(fetchHandles.map(handle =>
             this.$store.dispatch('productsCache/getProduct', {handle, env: this.env})
           )).then(products => {
-            console.log({products})
             products.forEach(p => { this.lookProducts[p.handle] = p })
           }).catch(err => console.error(err))
         }

@@ -45,7 +45,6 @@ export default Vue.extend({
     // eslint-disable-next-line nuxt/no-globals-in-created
     window.addEventListener('keydown', (e) => {
       if (!this.hovering || !('0,1,2,3,4,5'.split(',')).includes(e.key)) return null;
-      console.log({ rating: parseInt(e.key) })
       this.updateRating(parseInt(e.key)).catch(err => alert(err.message))
     });
   },
@@ -53,8 +52,7 @@ export default Vue.extend({
     async updateRating(val) {
       this.mediaItem.rating = val;
       const docRef = this.$fire.firestore.collection('media').doc(this.mediaItem.objectID);
-      console.log({ docRef })
-      return await docRef.set({ rating: this.mediaItem.rating }, {merge: true}).then(console.log)
+      return await docRef.set({ rating: this.mediaItem.rating }, {merge: true})
     }
   }
 })

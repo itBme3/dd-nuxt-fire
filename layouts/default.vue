@@ -16,15 +16,6 @@
 <script>
 import Vue from 'vue'
 export default Vue.extend({
-  // computed: {
-  //   colorMode() {
-  //     if (window === 'undefined') return 'dark';
-  //     if( this.$colorMode.preference === 'system' ) {
-  //       return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
-  //     }
-  //     return this.$colorMode.preference === 'light' ? 'light' : 'dark'
-  //   }
-  // },
   watch: {
     preference (preference) {
       if (this.forced) {
@@ -71,14 +62,14 @@ export default Vue.extend({
     },
     _watchStorageChange () {
       window.addEventListener('storage', (e) => {
-        if (e.key === storageKey) {
+        if (e.key === 'nuxt-color-mode') {
           this.preference = e.newValue
         }
       })
     },
     _storePreference (preference) {
       // Local storage to sync with other tabs
-      window.localStorage.setItem(storageKey, preference)
+      window.localStorage.setItem('nuxt-color-mode', preference)
     }
   }
 })

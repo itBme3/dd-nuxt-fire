@@ -154,14 +154,12 @@ export default Vue.extend({
   methods: {
     addFilter(filterVal:AlgoliaFilterObject) {
       this.filterValues.push(filterVal)
-      console.log({ filterValues: this.filterValues })
       this.updatingValues = true;
       setTimeout(() => {
         this.updatingValues = false;
       }, 100)
     },
     updateFilter(indx:number, filter:AlgoliaFilterObject) {
-      console.log('updateFilter: ', filter)
       this.updatingValues = true;
       if (!filter) {
         this.filterValues.splice(indx, 1)
@@ -176,7 +174,6 @@ export default Vue.extend({
       }, 100)
     },
     updateOrFilter(indx:number, orIndx:number, filter:AlgoliaFilterObject) {
-      console.log('updateFilter: ', filter)
       this.updatingValues = true;
       if (!filter) {
         this.filterValues[indx].or?.splice(orIndx, 1)

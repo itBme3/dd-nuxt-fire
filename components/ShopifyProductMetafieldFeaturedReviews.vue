@@ -169,7 +169,6 @@ export default Vue.extend({
             return { title: stripHtml(title), body, score, id, reviewer, date }
           })
           const value = !Array.isArray(this.metafieldValue) ? [] : JSON.parse(JSON.stringify(this.metafieldValue))
-          console.log( { value } )
           this.metafieldValue = append 
             ? [...value, ...newItems]
             : [...newItems, ...value]

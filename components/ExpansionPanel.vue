@@ -72,7 +72,6 @@ export default Vue.extend({
       this.expanded = expanded
     },
     expanded(expanded) {
-      console.log(this.$el)
       setTimeout(() => {
         window.scrollTo({top: this.$el.offsetParent.offsetTop + (expanded ? -300 : 200), left: 0, behavior: 'smooth'})
       }, 250)

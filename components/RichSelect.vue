@@ -128,7 +128,6 @@ export default Vue.extend({
       this.selectOptions = val
     },
     selected(val) {
-      console.log({val, selectedOptions: this.selectedOptions})
       if(objectsAreTheSame(val, this.selectedOptions)) { return }
       this.selectedOptions = typeof val === 'string' ? val : JSON.parse(JSON.stringify(val))
     },

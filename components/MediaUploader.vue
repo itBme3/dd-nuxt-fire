@@ -73,7 +73,7 @@ export default Vue.extend({
         addRemoveLinks: true,
         acceptedFiles: imageFileTypes.join(', ')
       },
-      bulkAttributes: JSON.parse(JSON.stringify({...blankAttributes, tags: ['modeled']}))
+      bulkAttributes: JSON.parse(JSON.stringify({...blankAttributes, tags: []}))
     }
   },
   // created() {

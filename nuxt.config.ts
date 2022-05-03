@@ -3,7 +3,6 @@ import { NuxtConfig } from '@nuxt/types'
 const isDev = process.env.NODE_ENV === 'development'
 const fireDev = isDev && process.env.FIRE_ENV !== 'live'
 const useEmulators = false // manually change if emulators needed
-// console.log({ isDev, port: isDev && useEmulators ? 5000 : undefined })
 
 
 const config: NuxtConfig = {

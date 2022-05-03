@@ -45,7 +45,6 @@ export default Vue.extend({
   methods: {
     onSubmit(e) {
       const onSubmit = this.$store?.state?.algoliaSelect?.onSubmit ? this.$store.state.algoliaSelect.onSubmit : (val) => val
-      console.log({e})
       onSubmit(e)
     },
     onUpdate(e) {

@@ -72,7 +72,6 @@ export default Vue.extend({
     stringifyAlgoliaFilters,
     async getHits() {
       this.hits = await this.index.searchForFacetValues(this.attribute, this.search).then((res) => res.facetHits);
-      console.log('hit: ', this.hits);
       return this.hits
     }
   }

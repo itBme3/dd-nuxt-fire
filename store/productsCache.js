@@ -27,11 +27,11 @@ export const mutations = {
 }
 
 export const actions = {
-      async getProduct ({state, commit, $db}, { handle, env }) {
+      async getProduct ({state, commit}, { handle, env }) {
             if (state[env][handle]?.handle) {
                   return state[env][handle]
             }
-            const product = await $db.doc(`products_${env}/${handle}`)
+            const product = await this.$db.doc(`products_${env}/${handle}`)
                   .then((doc) => {
                         if (doc?.handle) {
                               return {

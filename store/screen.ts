@@ -16,7 +16,6 @@ export const state = ():State  => ({
 
 export const mutations = {
       setDimensions(state: State, screen: { height: number; width: number }) {
-            console.log({state})
             Vue.set(state, 'screen', screen)
       }
 }

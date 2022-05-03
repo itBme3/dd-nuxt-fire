@@ -62,7 +62,6 @@ export class FireDb {
                   const docRef = this.firestore.collection(path).doc();
                   data.docId = docRef.id;
                   data.docPath = `${path}/${docRef.id}`;
-                  console.log({data, firestore: this.firestore, docRef})
                   return this.firestore.doc(data.docPath)
                         .set(data)
                         .then(() => data);

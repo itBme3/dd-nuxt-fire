@@ -3,10 +3,8 @@ export const duplicateChart = (chartDoc: { [key: string]: any }, $db: any) => {
             chartDoc.chart = `${chartDoc.chart} (copy)`
             delete chartDoc.docId
             delete chartDoc.docPath
-            console.log({ chartDoc })
             return $db.updateAt('size_charts', chartDoc)
                   .then((res:any) => {
-                        console.log(res);
                         window.open(`/products/size-charts/${res.docId}`, '_blank')
                   })
                   .catch((err:any) => { throw err })

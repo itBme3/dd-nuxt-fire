@@ -59,7 +59,6 @@ export default Vue.extend({
               featured_reviews: docs.filter(d => d.docId === 'featured_reviews')[0],
               the_look: docs.filter(d => d.docId === 'the_look')[0],
             }
-            console.log({ metafields: this.metafields })
           })
           .catch(err => {
             console.error(err);

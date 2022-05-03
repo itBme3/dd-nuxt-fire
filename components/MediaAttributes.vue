@@ -44,8 +44,8 @@
           :multiple="true"
           :variant="getColor(i)"
           :fetch-options="fetchOptions(key)"
-          :can-create="true"
-          :selected="attributes[key]"
+          :can-create="key !== 'products'"
+          :selected="JSON.parse(JSON.stringify(attributes[key].map(w => w.toLowerCase())))"
           :value-attribute="null"
           :text-attribute="null"
           :placeholder="'select ' + key + '...'"
@@ -58,10 +58,10 @@
 </template>
 
 <script>
+import Vue from 'vue'
 import { blankAttributes, attributeKeys } from '~/models/media.model'
 import { getColor } from '~/utils/colors'
 
-import Vue from 'vue'
 export default Vue.extend({
   props: {
     current: {
@@ -73,6 +73,7 @@ export default Vue.extend({
     return {
       attributes: JSON.parse(JSON.stringify(blankAttributes)),
       index: this.$algolia.initIndex('media'),
+      productsIndex: this.$algolia.initIndex('products_live'),
       attributeKeys,
       adding: attributeKeys.filter(key => Array.isArray(this.current[key]) && this.current[key].length > 0)
     }
@@ -87,10 +88,42 @@ export default Vue.extend({
     }, 250)
   },
   methods: {
-    updateAttributes(key, val) {
-      console.log({ key, val });
-      this.attributes[key] = val;
-      this.$emit('update', this.attributes)
+    async updateAttributes(key, val) {
+      try {
+        if(
+          key === 'products'
+        ) {
+          const newProducts = await Promise.all(val
+            .map(handle => {
+              return this.$db.doc(`products_live/${handle}`)
+            })).then(res => res.filter(p => !!p.handle));
+          const attributesFromProduct = ['material', 'style', 'color', 'fit', 'wash'];
+          for(const product of newProducts) {
+            attributesFromProduct.forEach(key => {
+              const k = key === 'wash' ? 'color' : key;
+              const mediaKey = `${k}s`
+              if (!Array.isArray(this.attributes[mediaKey])) {
+                this.attributes[mediaKey] = []
+              }
+              const current = Array.isArray(this.attributes[mediaKey]) ? this.attributes[mediaKey] : [];
+              const onProduct = Array.isArray(product[k]) ? product[k] : [];
+              const values = [...current, ...onProduct.filter(w => !current.includes(w))]
+              if(values?.length && !this.adding.includes(mediaKey)) {
+                this.adding.push(mediaKey);
+              }
+              setTimeout(() => {
+                this.attributes[mediaKey] = values
+              }, 500)
+            })
+          }
+        }
+        this.attributes[key] = val;
+        this.$emit('update', this.attributes);
+      } catch(err) {
+        this.attributes[key] = val;
+        this.$emit('update', this.attributes);
+        console.error(err)
+      }
     },
     fetchOptions(key) {
       return (e) => {
