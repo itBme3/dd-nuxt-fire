@@ -1,4 +1,6 @@
-# dd-nuxt-fire
+# Dearborn Denim Marketing Automation
+
+<img src="static/icon.png" style="width: 100px; height: auto;" />
 
 ## Build Setup
 

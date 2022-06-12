@@ -55,11 +55,11 @@ export default Vue.extend({
   props: {
     storagePath: {
       type: String,
-      default: 'test-uploads'
+      default: 'media'
     },
     collectionPath: {
       type: String,
-      default: 'test-uploads'
+      default: 'media'
     },
   },
   data() {
